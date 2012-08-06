@@ -93,21 +93,21 @@ PY_SCRIPTS_L   =
 #
 # Jarfiles and their directories
 # ---------------------------------
-JARFILES        =
+JARFILES        = oiexplorer
 
 #
-# <brief description of jjjfff jar files>
-jjjfff_DIRS     =
-jjjfff_EXTRAS   = 
+#  iexplorer jar files
+oiexplorer_DIRS     = fr
+oiexplorer_EXTRAS   = 
 
 #
 # Java programs
 # ---------------------------------
-JAVA_EXECUTABLES=
+JAVA_EXECUTABLES= OIFitsExplorer
 
 #
 # <brief description of jjjjjj java program>
-jjjjjj_CLASS    =
+OIFitsExplorer_CLASS    = fr.jmmc.oiexplorer.OIFitsExplorerGui
 
 #
 # Command Definition Files (CDF)
@@ -145,6 +145,7 @@ CSOURCENAMES = \
 MAKEDIR = $(MCSROOT)/include
 include $(MAKEDIR)/mkfMakefile
 
+JNLP=OIFitsExplorer
 #
 # TARGETS
 # -------
@@ -158,6 +159,8 @@ man   : do_man
 	@echo " . . . man page(s) done"
 
 install : install_all
+	@echo "Deploy $(JNLP).jnlp"
+	jmcsDeployJnlp $(JNLP).jnlp
 	@echo " . . . installation done"
 
 #___oOo___
