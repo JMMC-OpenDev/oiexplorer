@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class OifitsExplorerGui extends App{
+public class OIFitsExplorerGui extends App{
 
     /** Class logger */
-    private static final Logger logger = LoggerFactory.getLogger(OifitsExplorerGui.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OIFitsExplorerGui.class.getName());
 
     /* members */
 
@@ -47,7 +47,7 @@ public class OifitsExplorerGui extends App{
         final long start = System.nanoTime();
         try {
             // Start application with the command line arguments
-            new OifitsExplorerGui(args);
+            new OIFitsExplorerGui(args);
         } finally {
             if (logger.isInfoEnabled()) {
                 logger.info("startup : duration = {} ms.", 1e-6d * (System.nanoTime() - start));
@@ -59,15 +59,15 @@ public class OifitsExplorerGui extends App{
      * Return the Aspro Gui singleton
      * @return Aspro Gui singleton
      */
-    public static OifitsExplorerGui getInstance() {
-        return (OifitsExplorerGui) App.getSharedInstance();
+    public static OIFitsExplorerGui getInstance() {
+        return (OIFitsExplorerGui) App.getSharedInstance();
     }
 
     /**
      * Public constructor with command line arguments
      * @param args command line arguments
      */
-    public OifitsExplorerGui(final String[] args) {
+    public OIFitsExplorerGui(final String[] args) {
         super(args);
     }
 
