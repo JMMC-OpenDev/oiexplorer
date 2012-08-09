@@ -64,28 +64,28 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jSplitPane2 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jSplitPane = new javax.swing.JSplitPane();
+        jScrollPaneList = new javax.swing.JScrollPane();
         jListOIFitsFiles = new javax.swing.JList();
 
         setLayout(new java.awt.GridBagLayout());
 
         jListOIFitsFiles.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane1.setViewportView(jListOIFitsFiles);
+        jScrollPaneList.setViewportView(jListOIFitsFiles);
 
-        jSplitPane2.setLeftComponent(jScrollPane1);
+        jSplitPane.setLeftComponent(jScrollPaneList);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        add(jSplitPane2, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(jSplitPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList jListOIFitsFiles;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JScrollPane jScrollPaneList;
+    private javax.swing.JSplitPane jSplitPane;
     // End of variables declaration//GEN-END:variables
 }
