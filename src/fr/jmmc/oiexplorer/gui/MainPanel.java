@@ -24,6 +24,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
 
     private void postInitComponents() {
         OIFitsManager.getInstance().register(this);
+        mainSplitPane.setRightComponent(new DataTreePanel());
     }
 
 
@@ -64,7 +65,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jSplitPane = new javax.swing.JSplitPane();
+        mainSplitPane = new javax.swing.JSplitPane();
         jScrollPaneList = new javax.swing.JScrollPane();
         jListOIFitsFiles = new javax.swing.JList();
 
@@ -73,19 +74,19 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
         jListOIFitsFiles.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPaneList.setViewportView(jListOIFitsFiles);
 
-        jSplitPane.setLeftComponent(jScrollPaneList);
+        mainSplitPane.setLeftComponent(jScrollPaneList);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(jSplitPane, gridBagConstraints);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        add(mainSplitPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList jListOIFitsFiles;
     private javax.swing.JScrollPane jScrollPaneList;
-    private javax.swing.JSplitPane jSplitPane;
+    private javax.swing.JSplitPane mainSplitPane;
     // End of variables declaration//GEN-END:variables
 }
