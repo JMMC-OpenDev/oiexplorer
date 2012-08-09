@@ -12,6 +12,7 @@ import fr.jmmc.jmcs.gui.util.SwingSettings;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.resource.image.ResourceImage;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
+import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,7 +21,6 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +29,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class OIFitsExplorerGui extends App{
+public class OIFitsExplorerGui extends App {
 
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OIFitsExplorerGui.class.getName());
 
     /* members */
-
     /**
      * Main entry point : use swing setup and then start the application
      * @param args command line arguments
@@ -86,13 +85,12 @@ public class OIFitsExplorerGui extends App{
         // Using invokeAndWait to be in sync with this thread :
         // note: invokeAndWaitEDT throws an IllegalStateException if any exception occurs
         SwingUtils.invokeAndWaitEDT(new Runnable() {
-
             /**
              * Initializes the swing components with their actions in EDT
              */
             @Override
             public void run() {
-                prepareFrame(getFrame());                
+                prepareFrame(getFrame());
             }
         });
 
@@ -107,12 +105,12 @@ public class OIFitsExplorerGui extends App{
      */
     private void initServices() throws IllegalStateException, IllegalArgumentException {
 
-      
+
         // Initialize tasks and the task executor :
         TaskSwingWorkerExecutor.start();
 
         // Initialize the parallel job executor:
-        ParallelJobExecutor.getInstance();        
+        ParallelJobExecutor.getInstance();
     }
 
     /**
@@ -123,7 +121,6 @@ public class OIFitsExplorerGui extends App{
         logger.debug("OifitsExplorerGui.execute() handler called.");
 
         SwingUtils.invokeLaterEDT(new Runnable() {
-
             /**
              * Show the application frame using EDT
              */
@@ -146,18 +143,20 @@ public class OIFitsExplorerGui extends App{
     protected boolean finish() {
         logger.debug("OifitsExplorerGui.finish() handler called.");
 
-        // Ask the user if he wants to save modifications
-        final MessagePane.ConfirmSaveChanges result = MessagePane.showConfirmSaveChangesBeforeClosing();
+        // Ask the user if he wants to save modifications       
+        //@TODO replace by code when save will be available.
+        MessagePane.ConfirmSaveChanges result = MessagePane.ConfirmSaveChanges.Ignore;
+        //MessagePane.ConfirmSaveChanges result = MessagePane.showConfirmSaveChangesBeforeClosing();
 
         // Handle user choice
         switch (result) {
             // If the user clicked the "Save" button, save and exit
             case Save:
                 /*
-                if (this.saveAction != null) {
-                    return this.saveAction.save();
-                }
-                */
+                 if (this.saveAction != null) {
+                 return this.saveAction.save();
+                 }
+                 */
                 break;
 
             // If the user clicked the "Don't Save" button, exit
@@ -179,7 +178,7 @@ public class OIFitsExplorerGui extends App{
      */
     @Override
     public void cleanup() {
-        
+
         // stop the task executor :
         TaskSwingWorkerExecutor.stop();
 
@@ -243,9 +242,9 @@ public class OIFitsExplorerGui extends App{
      * Create the main content i.e. the setting panel
      */
     private void createContent() {
-       
-        // adds the panel in scrollPane
-        getFramePanel().add(new JScrollPane(new JLabel("coucou")), BorderLayout.CENTER);
+        // adds the main panel in scrollPane
+        MainPanel mainPanel = new MainPanel();
+        getFramePanel().add(new JScrollPane(mainPanel), BorderLayout.CENTER);
     }
 
     /**
@@ -254,11 +253,11 @@ public class OIFitsExplorerGui extends App{
     private void registerActions() {
         // File menu :
         new LoadOIFitsAction();
-        
+
         // Edit menu :
-        
+
         // Interop menu :
-        
+
     }
 
     /**
@@ -269,7 +268,6 @@ public class OIFitsExplorerGui extends App{
         // TODO Add handler to load oifits
     }
 
-    
     /**
      * Window adapter to handle windowClosing event.
      */
@@ -280,5 +278,5 @@ public class OIFitsExplorerGui extends App{
             // callback on exit :
             App.quitAction().actionPerformed(null);
         }
-    }    
+    }
 }

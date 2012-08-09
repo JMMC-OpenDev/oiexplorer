@@ -10,9 +10,8 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.MimeType;
+import fr.jmmc.oiexplorer.core.model.OIFitsManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
-import fr.jmmc.oitools.model.OIFitsFile;
-import fr.jmmc.oitools.model.OIFitsLoader;
 import fr.nom.tam.fits.FitsException;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -34,7 +33,7 @@ public class LoadOIFitsAction extends RegisteredAction {
     public final static String actionName = "loadOIFits";
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(className);
-    /** AsproX MimeType */
+    /** OIFits MimeType */
     private final static MimeType mimeType = MimeType.OIFITS;
 
     /**
@@ -53,45 +52,58 @@ public class LoadOIFitsAction extends RegisteredAction {
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
 
-        File file = null;
+        File files[] = null;
 
         // If the action was automatically triggered from App launch
         if (evt.getSource() == ActionRegistrar.getInstance()) {
-            file = new File(evt.getActionCommand());
+            File file = new File(evt.getActionCommand());
 
             if (!file.exists() || !file.isFile()) {
                 MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath());
-                file = null;
+                files = null;
             }
 
             if (file != null) {
                 // update current directory for Observation settings:
                 FileChooserPreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
+
+                files = new File[]{file};
             }
 
         } else {
-
-            file = FileChooser.showOpenFileChooser("Load observation settings", null, mimeType, null);
-
+            files = FileChooser.showOpenFilesChooser("Load observation settings", null, mimeType);
         }
 
         // If a file was defined (No cancel in the dialog)
-        if (file != null) {
-            StatusBar.show("file loaded : " + file.getName());
+        if (files != null) {
+            final OIFitsChecker checker = new OIFitsChecker();
 
-            // The file must be one oidata file (next line automatically unzip gz files)
-            OIFitsChecker checker = new OIFitsChecker();
+            String fileLocation = null;
+            Exception e = null;
             try {
-                OIFitsFile oifitsFile  = OIFitsLoader.loadOIFits(checker, file.getAbsolutePath());
+                for (File file : files) {
+                    fileLocation = file.getAbsolutePath();
+
+                    StatusBar.show("loading file: " + fileLocation);
+
+                    OIFitsManager.getInstance().loadOIFitsFile(fileLocation, checker);
+                }
+            } catch (MalformedURLException mue) {
+                e = mue;
+            } catch (IOException ioe) {
+                e = ioe;
+            } catch (FitsException fe) {
+                e = fe;
+            } finally {
+                if (e != null) {
+                    MessagePane.showErrorMessage("Could not load the file : " + fileLocation, e);
+                    StatusBar.show("Could not load the file : " + fileLocation);
+                }
+
+                // display validation messages anyway:
                 MessagePane.showMessage(checker.getCheckReport());
-            } catch (MalformedURLException ex) {
-                MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath(), ex);
-            } catch (IOException ex) {
-                MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath(), ex);
-                java.util.logging.Logger.getLogger(LoadOIFitsAction.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (FitsException ex) {
-                MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath(), ex);
-            }            
+            }
         }
+
     }
 }
