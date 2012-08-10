@@ -4,17 +4,27 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel;
+import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
-import fr.jmmc.oiexplorer.core.model.OIFitsManager;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionListener;
 import fr.jmmc.oitools.model.OIFitsFile;
+import java.awt.Component;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JList;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 
 /**
  * Main container of OIFits Explorer App
  * @author mella
  */
 public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionListener {
+
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
 
     /** Creates new form MainPanel */
     public MainPanel() {
@@ -23,28 +33,29 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
     }
 
     private void postInitComponents() {
-        OIFitsManager.getInstance().register(this);
-        mainSplitPane.setRightComponent(new DataTreePanel());
+
+        this.jListOIFitsFiles.setCellRenderer(new OIFitsListRenderer());
+
+        OIFitsCollectionManager.getInstance().register(this);
     }
 
+    /**
+     * Refresh the list of OIfits files
+     */
+    private void updateOIFitsList(final OIFitsCollection oiFitsCollection) {
 
-  /**
-   * Refresh the list of OIfits files
-   */
-  private void updateOIFitsList(final OIFitsCollection oiFitsCollection) {
+        final Object oldValue = this.jListOIFitsFiles.getSelectedValue();
 
-    final Object oldValue = this.jListOIFitsFiles.getSelectedValue();
+        this.jListOIFitsFiles.setModel(new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles()));
 
-    this.jListOIFitsFiles.setModel(new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles()));
+        // restore previous selected item :
+        this.jListOIFitsFiles.setSelectedValue(oldValue, true);
+    }
 
-      // restore previous selected item :
-    this.jListOIFitsFiles.setSelectedValue(oldValue, true);
-  }    
-    
-  /**
-   * Handle the given OIFits collection event
-   * @param event OIFits collection event
-   */    
+    /**
+     * Handle the given OIFits collection event
+     * @param event OIFits collection event
+     */
     @Override
     public void onProcess(final OIFitsCollectionEvent event) {
         switch (event.getType()) {
@@ -68,25 +79,120 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
         mainSplitPane = new javax.swing.JSplitPane();
         jScrollPaneList = new javax.swing.JScrollPane();
         jListOIFitsFiles = new javax.swing.JList();
+        rightSplitPane = new javax.swing.JSplitPane();
+        dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
+        jTabbedPaneViews = new javax.swing.JTabbedPane();
+        oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
+        vis2Panel = new fr.jmmc.oiexplorer.core.gui.Vis2Panel();
 
         setLayout(new java.awt.GridBagLayout());
+
+        mainSplitPane.setResizeWeight(0.2);
 
         jListOIFitsFiles.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPaneList.setViewportView(jListOIFitsFiles);
 
         mainSplitPane.setLeftComponent(jScrollPaneList);
 
+        rightSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        rightSplitPane.setResizeWeight(0.2);
+        rightSplitPane.setTopComponent(dataTreePanel);
+
+        jTabbedPaneViews.addTab("data", oIFitsHtmlPanel);
+        jTabbedPaneViews.addTab("plot", vis2Panel);
+
+        rightSplitPane.setRightComponent(jTabbedPaneViews);
+
+        mainSplitPane.setRightComponent(rightSplitPane);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         add(mainSplitPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
     private javax.swing.JList jListOIFitsFiles;
     private javax.swing.JScrollPane jScrollPaneList;
+    private javax.swing.JTabbedPane jTabbedPaneViews;
     private javax.swing.JSplitPane mainSplitPane;
+    private fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel oIFitsHtmlPanel;
+    private javax.swing.JSplitPane rightSplitPane;
+    private fr.jmmc.oiexplorer.core.gui.Vis2Panel vis2Panel;
     // End of variables declaration//GEN-END:variables
+
+    public DataTreePanel getDataTreePanel() {
+        return dataTreePanel;
+    }
+
+    public OIFitsHtmlPanel getOIFitsHtmlPanel() {
+        return oIFitsHtmlPanel;
+    }
+
+    public Vis2Panel getVis2PlotPanel() {
+        return vis2Panel;
+    }
+
+    /**
+     * This custom renderer defines the target icon (calibrator or science) and use the target Name
+     * @author bourgesl
+     */
+    private static final class OIFitsListRenderer extends DefaultListCellRenderer {
+
+        /** default serial UID for Serializable interface */
+        private static final long serialVersionUID = 1;
+
+        /**
+         * Public constructor
+         */
+        private OIFitsListRenderer() {
+            super();
+        }
+
+        /**
+         * Return a component that has been configured to display the specified
+         * value. That component's <code>paint</code> method is then called to
+         * "render" the cell.  If it is necessary to compute the dimensions
+         * of a list because the list cells do not have a fixed size, this method
+         * is called to generate a component on which <code>getPreferredSize</code>
+         * can be invoked.
+         *
+         * @param list The JList we're painting.
+         * @param value The value returned by list.getModel().getElementAt(index).
+         * @param index The cells index.
+         * @param isSelected True if the specified cell was selected.
+         * @param cellHasFocus True if the specified cell has the focus.
+         * @return A component whose paint() method will render the specified value.
+         *
+         * @see JList
+         * @see ListSelectionModel
+         * @see ListModel
+         */
+        @Override
+        public Component getListCellRendererComponent(
+                final JList list,
+                final Object value,
+                final int index,
+                final boolean isSelected,
+                final boolean cellHasFocus) {
+
+            final String val;
+            if (value == null) {
+                val = null;
+            } else if (value instanceof OIFitsFile) {
+                val = ((OIFitsFile) value).getAbsoluteFilePath();
+            } else {
+                val = value.toString();
+            }
+
+            super.getListCellRendererComponent(
+                    list, val, index,
+                    isSelected, cellHasFocus);
+
+            return this;
+        }
+    }
 }

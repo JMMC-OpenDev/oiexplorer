@@ -12,6 +12,7 @@ import fr.jmmc.jmcs.gui.util.SwingSettings;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.resource.image.ResourceImage;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import java.awt.BorderLayout;
@@ -26,15 +27,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class represents the OIFitsExplorer application
  * @author mella
  */
-public class OIFitsExplorerGui extends App {
+public final class OIFitsExplorerGui extends App {
 
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(OIFitsExplorerGui.class.getName());
 
     /* members */
+    /** main Panel */
+    private MainPanel mainPanel;
+
     /**
      * Main entry point : use swing setup and then start the application
      * @param args command line arguments
@@ -55,8 +59,8 @@ public class OIFitsExplorerGui extends App {
     }
 
     /**
-     * Return the Aspro Gui singleton
-     * @return Aspro Gui singleton
+     * Return the OIFitsExplorerGui singleton
+     * @return OIFitsExplorerGui singleton
      */
     public static OIFitsExplorerGui getInstance() {
         return (OIFitsExplorerGui) App.getSharedInstance();
@@ -105,6 +109,8 @@ public class OIFitsExplorerGui extends App {
      */
     private void initServices() throws IllegalStateException, IllegalArgumentException {
 
+        // Initialize OIFitsManager:
+        OIFitsCollectionManager.getInstance();
 
         // Initialize tasks and the task executor :
         TaskSwingWorkerExecutor.start();
@@ -127,6 +133,9 @@ public class OIFitsExplorerGui extends App {
             @Override
             public void run() {
                 logger.debug("OifitsExplorerGui.ready : handler called.");
+
+                // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
+                OIFitsCollectionManager.getInstance().reset();
 
                 getFrame().setVisible(true);
             }
@@ -243,8 +252,9 @@ public class OIFitsExplorerGui extends App {
      */
     private void createContent() {
         // adds the main panel in scrollPane
-        MainPanel mainPanel = new MainPanel();
-        getFramePanel().add(new JScrollPane(mainPanel), BorderLayout.CENTER);
+        this.mainPanel = new MainPanel();
+
+        getFramePanel().add(new JScrollPane(this.mainPanel), BorderLayout.CENTER);
     }
 
     /**
@@ -266,6 +276,14 @@ public class OIFitsExplorerGui extends App {
     @Override
     protected void declareInteroperability() {
         // TODO Add handler to load oifits
+    }
+
+    /**
+     * Return the main panel
+     * @return main panel
+     */
+    public MainPanel getMainPanel() {
+        return this.mainPanel;
     }
 
     /**
