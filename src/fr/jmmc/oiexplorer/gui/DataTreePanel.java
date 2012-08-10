@@ -75,9 +75,13 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     public void onProcess(final OIFitsCollectionEvent event) {
         logger.info("Received event to process {}", event);
         generateTree(event.getOIFitsCollection());
-        
-        // select first target :
-        dataTree.selectFirstChildNode(dataTree.getRootNode());
+
+        if (event.getOIFitsCollection().isEmpty()) {
+            processTargetSelection(null);
+        } else {
+            // select first target :
+            dataTree.selectFirstChildNode(dataTree.getRootNode());
+        }
     }
 
     /**
@@ -140,7 +144,13 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
                     } else if (userObject instanceof OITable) {
                         final OITable oiTable = (OITable) userObject;
 
-                        processTableSelection(oiTable);
+                        final DefaultMutableTreeNode parentNode = dataTree.getParentNode(currentNode);
+
+                        if (parentNode != null && parentNode.getUserObject() instanceof TargetUID) {
+                            final TargetUID parentTarget = (TargetUID) parentNode.getUserObject();
+
+                            processTableSelection(parentTarget, oiTable);
+                        }
                     }
                 }
             });
@@ -164,18 +174,19 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         // update Html representation:
         oiFitsHtmlPanel.setVerbose(false);
         oiFitsHtmlPanel.updateOIFits(dataForTarget);
-        
+
         // Update plots:
         final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
-        
-        vis2Panel.plot(dataForTarget);
+
+        vis2Panel.plot(target, dataForTarget);
     }
 
     /**
      * Update the UI when a OITable is selected in the data tree
+     * @param target selected target
      * @param oiTable selected table
      */
-    private void processTableSelection(final OITable oiTable) {
+    private void processTableSelection(final TargetUID target, final OITable oiTable) {
         logger.warn("processTableSelection: {}", oiTable);
 
         // Update Html output:
@@ -185,14 +196,14 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         // update Html representation:
         oiFitsHtmlPanel.setVerbose(true);
         oiFitsHtmlPanel.updateOIFits(oiTable);
-        
+
         // Update plots:
         final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
-        
+
         final OIFitsFile oiFitsFile = new OIFitsFile();
         oiFitsFile.addOiTable(oiTable);
-        
-        vis2Panel.plot(oiFitsFile);
+
+        vis2Panel.plot(target, oiFitsFile);
     }
 
     /** This method is called from within the constructor to

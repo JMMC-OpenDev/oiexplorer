@@ -15,6 +15,8 @@ import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
+import fr.jmmc.oiexplorer.gui.action.NewAction;
+import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -262,7 +264,10 @@ public final class OIFitsExplorerGui extends App {
      */
     private void registerActions() {
         // File menu :
+        new NewAction();
         new LoadOIFitsAction();
+        // export PDF :
+        new OIFitsExplorerExportPDFAction();
 
         // Edit menu :
 

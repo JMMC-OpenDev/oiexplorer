@@ -111,21 +111,20 @@
 
   <menubar>
     <menu label="File">
-      <menu label="Open OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="O"
-            icon="/fr/jmmc/oiexplorer/gui/icons/fileopen.png" description="load an observation file"/>      
+      <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewAction" action="newCollection" accelerator="N" />
+      <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="O"
+            description="Add an OIFits file"/>      
       <!--
       <menu label="Save observation" classpath="fr.jmmc.oiexplorer.gui.action.SaveObservationAction" action="saveObservation" accelerator="S"
             icon="/fr/jmmc/oiexplorer/gui/icons/filesaveas.png" description="save the current observation as an observation file"/>
       -->
-      <menu/> <!-- menu separator -->
       <!--
       <menu label="Export to OIFits" classpath="fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction" action="exportOIFits" accelerator="F"
             description="Export your target observables to an OIFits file"/>
       -->      
       <menu/> <!-- menu separator -->
-      <!--<menu label="Export plot to PDF" classpath="fr.jmmc.oiexplorer.gui.action.ExportPDFAction" action="exportPDF" accelerator="P"
-            icon="/fr/jmmc/oiexplorer/gui/icons/icon_pdf.gif" description="Export the current plot to a PDF document"/>
-             -->
+      <menu label="Export plot to PDF" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportPDFAction" action="exportPDF" accelerator="P"
+            icon="/fr/jmmc/oiexplorer/core/resource/image/icon_pdf.gif" description="Export the current plot to a PDF document"/>
     </menu>
 
     <menu label="Edit">      
