@@ -10,7 +10,7 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.MimeType;
-import fr.jmmc.oiexplorer.core.model.OIFitsManager;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.nom.tam.fits.FitsException;
 import java.awt.event.ActionEvent;
@@ -86,7 +86,7 @@ public class LoadOIFitsAction extends RegisteredAction {
 
                     StatusBar.show("loading file: " + fileLocation);
 
-                    OIFitsManager.getInstance().loadOIFitsFile(fileLocation, checker);
+                    OIFitsCollectionManager.getInstance().loadOIFitsFile(fileLocation, checker);
                 }
             } catch (MalformedURLException mue) {
                 e = mue;
