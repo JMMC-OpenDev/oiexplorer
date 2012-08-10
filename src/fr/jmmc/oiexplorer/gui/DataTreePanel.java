@@ -4,28 +4,40 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericJTree;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.oiexplorer.OIFitsExplorerGui;
+import fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel;
+import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
-import fr.jmmc.oiexplorer.core.model.OIFitsManager;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.TargetUID;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionListener;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
 import java.util.Map;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This panel contains the data tree
  * @author mella
  */
-public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectionListener {
+public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectionListener, TreeSelectionListener {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(DataTreePanel.class);
 
     /* members */
-    GenericJTree<String> dataTree;
+    /** oiFits collection in use */
+    private OIFitsCollection oiFitsCollection;
+    /** data tree */
+    private GenericJTree<Object> dataTree;
 
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
@@ -34,41 +46,153 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     }
 
     private void postInit() {
-        dataTree = new GenericJTree<String>(String.class) {
+
+        // dataTree contains TargetUID or OITable objects:
+        dataTree = new GenericJTree<Object>(Object.class) {
+            /** default serial UID for Serializable interface */
+            private static final long serialVersionUID = 1;
+
             @Override
-            protected String convertUserObjectToString(String userObject) {
-                return userObject;
+            protected String convertUserObjectToString(final Object userObject) {
+                if (userObject instanceof TargetUID) {
+                    return ((TargetUID) userObject).getTarget();
+                }
+                if (userObject instanceof OITable) {
+                    return ((OITable) userObject).toString();
+                }
+                return toString(userObject);
             }
         };
-        OIFitsManager.getInstance().register(this);
+
+        // tree selection listener :
+        dataTree.addTreeSelectionListener(this);
+
         genericTreePanel.add(dataTree);
+
+        OIFitsCollectionManager.getInstance().register(this);
     }
 
-    public void onProcess(OIFitsCollectionEvent event) {
+    public void onProcess(final OIFitsCollectionEvent event) {
         logger.info("Received event to process {}", event);
         generateTree(event.getOIFitsCollection());
- 
+        
+        // select first target :
+        dataTree.selectFirstChildNode(dataTree.getRootNode());
     }
 
     /**
      * Generate the tree from the current edited list of targets
+     * @param oifitsCollection OIFitsCollection to process
      */
-    private void generateTree(OIFitsCollection oifitsCollection) {
+    private void generateTree(final OIFitsCollection oifitsCollection) {
+
+        this.oiFitsCollection = oifitsCollection;
+
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.setUserObject("Targets");
         rootNode.removeAllChildren();
-        Map<String, OIFitsFile> oiFitsPerTarget = oifitsCollection.getOiFitsPerTarget();
-        for (Map.Entry<String, OIFitsFile> entry : oiFitsPerTarget.entrySet()) {
-            String target = entry.getKey();
-            DefaultMutableTreeNode targetTreeNode = dataTree.addNode(rootNode, target);
-            
-            OIFitsFile dataForTarget = entry.getValue();            
+
+        final Map<TargetUID, OIFitsFile> oiFitsPerTarget = oifitsCollection.getOiFitsPerTarget();
+
+        for (Map.Entry<TargetUID, OIFitsFile> entry : oiFitsPerTarget.entrySet()) {
+            final TargetUID target = entry.getKey();
+            final DefaultMutableTreeNode targetTreeNode = dataTree.addNode(rootNode, target);
+
+            final OIFitsFile dataForTarget = entry.getValue();
             for (OITable table : dataForTarget.getOiTables()) {
-                dataTree.addNode(targetTreeNode, table.getExtName());
+                dataTree.addNode(targetTreeNode, table);
             }
         }
         // fire node structure changed :
         dataTree.fireNodeChanged(rootNode);
+    }
+
+    /**
+     * Process the tree selection events
+     * @param e tree selection event
+     */
+    @Override
+    public void valueChanged(final TreeSelectionEvent e) {
+        final DefaultMutableTreeNode currentNode = dataTree.getLastSelectedNode();
+
+        if (currentNode != null) {
+            // Use invokeLater to selection change issues with editors :
+            SwingUtils.invokeLaterEDT(new Runnable() {
+                /**
+                 * Update tree selection
+                 */
+                @Override
+                public void run() {
+                    // Check if it is the root node :
+                    final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
+                    if (currentNode == rootNode) {
+                        dataTree.selectFirstChildNode(rootNode);
+                        return;
+                    }
+
+                    /* retrieve the node that was selected */
+                    final Object userObject = currentNode.getUserObject();
+
+                    if (userObject instanceof TargetUID) {
+                        final TargetUID target = (TargetUID) userObject;
+
+                        processTargetSelection(target);
+                    } else if (userObject instanceof OITable) {
+                        final OITable oiTable = (OITable) userObject;
+
+                        processTableSelection(oiTable);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Update the UI when a target is selected in the data tree
+     * @param target selected target
+     */
+    private void processTargetSelection(final TargetUID target) {
+        logger.warn("processTargetSelection: {}", target);
+
+        // Get OIFitsFile structure for this target:
+        final OIFitsFile dataForTarget = this.oiFitsCollection.getOiDataList(target);
+
+        // Update Html output:
+        final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
+        final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
+
+        // update Html representation:
+        oiFitsHtmlPanel.setVerbose(false);
+        oiFitsHtmlPanel.updateOIFits(dataForTarget);
+        
+        // Update plots:
+        final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
+        
+        vis2Panel.plot(dataForTarget);
+    }
+
+    /**
+     * Update the UI when a OITable is selected in the data tree
+     * @param oiTable selected table
+     */
+    private void processTableSelection(final OITable oiTable) {
+        logger.warn("processTableSelection: {}", oiTable);
+
+        // Update Html output:
+        final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
+        final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
+
+        // update Html representation:
+        oiFitsHtmlPanel.setVerbose(true);
+        oiFitsHtmlPanel.updateOIFits(oiTable);
+        
+        // Update plots:
+        final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
+        
+        final OIFitsFile oiFitsFile = new OIFitsFile();
+        oiFitsFile.addOiTable(oiTable);
+        
+        vis2Panel.plot(oiFitsFile);
     }
 
     /** This method is called from within the constructor to
@@ -81,13 +205,13 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jScrollPane2 = new javax.swing.JScrollPane();
+        jScrollPane = new javax.swing.JScrollPane();
         genericTreePanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
         genericTreePanel.setLayout(new java.awt.BorderLayout());
-        jScrollPane2.setViewportView(genericTreePanel);
+        jScrollPane.setViewportView(genericTreePanel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -95,10 +219,10 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(jScrollPane2, gridBagConstraints);
+        add(jScrollPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel genericTreePanel;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
 }
