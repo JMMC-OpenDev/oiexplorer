@@ -24,13 +24,12 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This class represents the OIFitsExplorer application
- * @author mella
+ * @author mella, bourgesl
  */
 public final class OIFitsExplorerGui extends App {
 
@@ -256,7 +255,7 @@ public final class OIFitsExplorerGui extends App {
         // adds the main panel in scrollPane
         this.mainPanel = new MainPanel();
 
-        getFramePanel().add(new JScrollPane(this.mainPanel), BorderLayout.CENTER);
+        getFramePanel().add(this.mainPanel, BorderLayout.CENTER);
     }
 
     /**
