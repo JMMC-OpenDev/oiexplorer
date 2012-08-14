@@ -167,8 +167,10 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         // Get OIFitsFile structure for this target:
         final OIFitsFile dataForTarget = this.oiFitsCollection.getOiDataList(target);
 
-        // Update Html output:
+        // Get main container
         final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
+                
+        // Update Html output:        
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
 
         // update Html representation:
@@ -178,7 +180,12 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         // Update plots:
         final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
 
-        vis2Panel.plot(target, dataForTarget);
+        vis2Panel.plot(target, dataForTarget);     
+        
+        // Update plot selector:
+        final PlotSelectorPanel plotSelectorPanel = mainPanel.getPlotSelectorPanel();
+        plotSelectorPanel.updateOIFits(target, dataForTarget);
+        
     }
 
     /**
@@ -189,8 +196,10 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     private void processTableSelection(final TargetUID target, final OITable oiTable) {
         logger.warn("processTableSelection: {}", oiTable);
 
-        // Update Html output:
+        // Get main container
         final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
+                
+        // Update Html output:
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
 
         // update Html representation:
@@ -204,6 +213,10 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         oiFitsFile.addOiTable(oiTable);
 
         vis2Panel.plot(target, oiFitsFile);
+        
+        // Update plot selector:
+        final PlotSelectorPanel plotSelectorPanel = mainPanel.getPlotSelectorPanel();
+        plotSelectorPanel.updateOIFits(target, oiFitsFile);
     }
 
     /** This method is called from within the constructor to

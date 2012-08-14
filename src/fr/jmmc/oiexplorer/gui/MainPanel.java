@@ -82,8 +82,9 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
         rightSplitPane = new javax.swing.JSplitPane();
         dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
         jTabbedPaneViews = new javax.swing.JTabbedPane();
-        oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
+        plotSelectorPanel = new fr.jmmc.oiexplorer.gui.PlotSelectorPanel();
         vis2Panel = new fr.jmmc.oiexplorer.core.gui.Vis2Panel();
+        oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -98,8 +99,9 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
         rightSplitPane.setResizeWeight(0.2);
         rightSplitPane.setTopComponent(dataTreePanel);
 
+        jTabbedPaneViews.addTab("custom plots", plotSelectorPanel);
+        jTabbedPaneViews.addTab("generic plots", vis2Panel);
         jTabbedPaneViews.addTab("data", oIFitsHtmlPanel);
-        jTabbedPaneViews.addTab("plot", vis2Panel);
 
         rightSplitPane.setRightComponent(jTabbedPaneViews);
 
@@ -120,6 +122,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
     private javax.swing.JTabbedPane jTabbedPaneViews;
     private javax.swing.JSplitPane mainSplitPane;
     private fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel oIFitsHtmlPanel;
+    private fr.jmmc.oiexplorer.gui.PlotSelectorPanel plotSelectorPanel;
     private javax.swing.JSplitPane rightSplitPane;
     private fr.jmmc.oiexplorer.core.gui.Vis2Panel vis2Panel;
     // End of variables declaration//GEN-END:variables
@@ -134,6 +137,10 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
 
     public Vis2Panel getVis2PlotPanel() {
         return vis2Panel;
+    }
+    
+    public PlotSelectorPanel getPlotSelectorPanel(){
+        return plotSelectorPanel;
     }
 
     /**
