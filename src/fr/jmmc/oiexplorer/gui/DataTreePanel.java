@@ -73,7 +73,8 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     }
 
     public void onProcess(final OIFitsCollectionEvent event) {
-        logger.info("Received event to process {}", event);
+        logger.debug("Received event to process {}", event);
+        
         generateTree(event.getOIFitsCollection());
 
         if (event.getOIFitsCollection().isEmpty()) {
@@ -162,7 +163,7 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
      * @param target selected target
      */
     private void processTargetSelection(final TargetUID target) {
-        logger.warn("processTargetSelection: {}", target);
+        logger.debug("processTargetSelection: {}", target);
 
         // Get OIFitsFile structure for this target:
         final OIFitsFile dataForTarget = this.oiFitsCollection.getOiDataList(target);
@@ -174,7 +175,6 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
 
         // update Html representation:
-        oiFitsHtmlPanel.setVerbose(false);
         oiFitsHtmlPanel.updateOIFits(dataForTarget);
 
         // Update plots:
@@ -194,7 +194,7 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
      * @param oiTable selected table
      */
     private void processTableSelection(final TargetUID target, final OITable oiTable) {
-        logger.warn("processTableSelection: {}", oiTable);
+        logger.debug("processTableSelection: {}", oiTable);
 
         // Get main container
         final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
@@ -203,7 +203,6 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
 
         // update Html representation:
-        oiFitsHtmlPanel.setVerbose(true);
         oiFitsHtmlPanel.updateOIFits(oiTable);
 
         // Update plots:

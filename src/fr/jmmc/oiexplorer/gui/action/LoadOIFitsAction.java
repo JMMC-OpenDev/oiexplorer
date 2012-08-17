@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
  */
 public class LoadOIFitsAction extends RegisteredAction {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
     /** Class name. This name is used to register to the ActionRegistrar */
     public final static String className = LoadOIFitsAction.class.getName();
     /** Action name. This name is used to register to the ActionRegistrar */
@@ -78,6 +80,10 @@ public class LoadOIFitsAction extends RegisteredAction {
         if (files != null) {
             final OIFitsChecker checker = new OIFitsChecker();
 
+            OIFitsCollectionManager.getInstance().setNotify(false);
+
+            final long startTime = System.nanoTime();
+
             String fileLocation = null;
             Exception e = null;
             try {
@@ -95,13 +101,20 @@ public class LoadOIFitsAction extends RegisteredAction {
             } catch (FitsException fe) {
                 e = fe;
             } finally {
+                logger.info("LoadOIFitsAction: duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
+
+                OIFitsCollectionManager.getInstance().setNotify(true);
+
                 if (e != null) {
                     MessagePane.showErrorMessage("Could not load the file : " + fileLocation, e);
                     StatusBar.show("Could not load the file : " + fileLocation);
                 }
 
                 // display validation messages anyway:
-                MessagePane.showMessage(checker.getCheckReport());
+                final String checkReport = checker.getCheckReport();
+                logger.info("validation results:\n{}", checkReport);
+                
+                MessagePane.showMessage(checkReport);
             }
         }
 

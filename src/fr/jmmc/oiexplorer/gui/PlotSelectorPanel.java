@@ -50,8 +50,9 @@ public class PlotSelectorPanel extends javax.swing.JPanel {
             this.target = target;
             this.oiFitsFile = oiFitsFile;
 
-            logger.warn("updateOIFits() fill combo for '{}' target ", target);
-            Set<String> columns = getDistinctColumns(oiFitsFile);
+            logger.debug("updateOIFits() fill combo for '{}' target ", target);
+            
+            final Set<String> columns = getDistinctColumns(oiFitsFile);
 
             // Clear all content
             xAxisChoices.clear();
@@ -133,22 +134,27 @@ public class PlotSelectorPanel extends javax.swing.JPanel {
     private void xAxisComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xAxisComboBoxActionPerformed
         if (target != null && oiFitsFile != null) {
 
-            String selectedColumn = (String) xAxisComboBox.getSelectedItem();
-            logger.warn("Dump of column {}:", selectedColumn);
+            final boolean doDump = false;
+            
+            if (doDump) {
+                final String selectedColumn = (String) xAxisComboBox.getSelectedItem();
+                logger.warn("xAxisComboBoxActionPerformed: Dump of column {}:", selectedColumn);
 
-            ColumnMeta meta;
-            // Add every column of every tables for given target into combomodel sets
-            for (OITable oiTable : oiFitsFile.getOiTables()) {
-                meta = oiTable.getColumnMeta(selectedColumn);
-                logger.warn("Meta:{}", meta);
+                ColumnMeta meta;
+                // Add every column of every tables for given target into combomodel sets
+                for (OITable oiTable : oiFitsFile.getOiTables()) {
+                    meta = oiTable.getColumnMeta(selectedColumn);
 
-                if (meta != null) {
-                    if (meta.isArray()) {
-                        double[][] values = oiTable.getColumnAsDoubles(selectedColumn);
-                        logger.warn("Dump of table {}:{}", oiTable, Arrays.deepToString(values));
-                    } else {
-                        double[] value = oiTable.getColumnAsDouble(selectedColumn);
-                        logger.warn("Dump of table {}:{}", oiTable, Arrays.toString(value));
+                    logger.warn("Meta : {}", meta);
+
+                    if (meta != null) {
+                        if (meta.isArray()) {
+                            double[][] values = oiTable.getColumnAsDoubles(selectedColumn);
+                            logger.warn("Dump of table {} : {}", oiTable, Arrays.deepToString(values));
+                        } else {
+                            double[] value = oiTable.getColumnAsDouble(selectedColumn);
+                            logger.warn("Dump of table {} : {}", oiTable, Arrays.toString(value));
+                        }
                     }
                 }
             }
