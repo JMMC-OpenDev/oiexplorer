@@ -38,7 +38,7 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     private OIFitsCollection oiFitsCollection;
     /** data tree */
     private GenericJTree<Object> dataTree;
-
+    
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
         initComponents();
@@ -74,7 +74,7 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
 
     public void onProcess(final OIFitsCollectionEvent event) {
         logger.debug("Received event to process {}", event);
-        
+
         generateTree(event.getOIFitsCollection());
 
         if (event.getOIFitsCollection().isEmpty()) {
@@ -170,22 +170,16 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
 
         // Get main container
         final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
-                
+
         // Update Html output:        
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
 
         // update Html representation:
-        oiFitsHtmlPanel.updateOIFits(dataForTarget);
+        oiFitsHtmlPanel.updateOIFits(dataForTarget);        
 
-        // Update plots:
-        final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
+        // Update plot panel:
+        mainPanel.getPlotPanel().updateOIFits(target, dataForTarget);
 
-        vis2Panel.plot(target, dataForTarget);     
-        
-        // Update plot selector:
-        final PlotSelectorPanel plotSelectorPanel = mainPanel.getPlotSelectorPanel();
-        plotSelectorPanel.updateOIFits(target, dataForTarget);
-        
     }
 
     /**
@@ -198,24 +192,19 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
 
         // Get main container
         final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
-                
+
         // Update Html output:
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
 
         // update Html representation:
         oiFitsHtmlPanel.updateOIFits(oiTable);
 
-        // Update plots:
-        final Vis2Panel vis2Panel = mainPanel.getVis2PlotPanel();
-
+        // Prepare a container for the selected table
         final OIFitsFile oiFitsFile = new OIFitsFile();
         oiFitsFile.addOiTable(oiTable);
-
-        vis2Panel.plot(target, oiFitsFile);
         
-        // Update plot selector:
-        final PlotSelectorPanel plotSelectorPanel = mainPanel.getPlotSelectorPanel();
-        plotSelectorPanel.updateOIFits(target, oiFitsFile);
+        // Update plot panel:
+        mainPanel.getPlotPanel().updateOIFits(target, oiFitsFile);
     }
 
     /** This method is called from within the constructor to

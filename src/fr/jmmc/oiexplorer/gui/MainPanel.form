@@ -68,28 +68,23 @@
               </Constraints>
             </Component>
             <Container class="javax.swing.JTabbedPane" name="jTabbedPaneViews">
+              <AccessibilityProperties>
+                <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="plots"/>
+                <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value=""/>
+              </AccessibilityProperties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
-                  <JSplitPaneConstraints position="right"/>
+                  <JSplitPaneConstraints position="bottom"/>
                 </Constraint>
               </Constraints>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
-                <Component class="fr.jmmc.oiexplorer.gui.PlotSelectorPanel" name="plotSelectorPanel">
+                <Component class="fr.jmmc.oiexplorer.core.gui.PlotPanelEditor" name="plotPanel">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="custom plots">
-                        <Property name="tabTitle" type="java.lang.String" value="custom plots"/>
-                      </JTabbedPaneConstraints>
-                    </Constraint>
-                  </Constraints>
-                </Component>
-                <Component class="fr.jmmc.oiexplorer.core.gui.Vis2Panel" name="vis2Panel">
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="generic plots">
-                        <Property name="tabTitle" type="java.lang.String" value="generic plots"/>
+                      <JTabbedPaneConstraints tabName="plots">
+                        <Property name="tabTitle" type="java.lang.String" value="plots"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
