@@ -107,7 +107,7 @@ JAVA_EXECUTABLES= OIFitsExplorer
 
 #
 # <brief description of jjjjjj java program>
-OIFitsExplorer_CLASS    = fr.jmmc.oiexplorer.OIFitsExplorerGui
+OIFitsExplorer_CLASS    = fr.jmmc.oiexplorer.OIFitsExplorer
 
 #
 # Command Definition Files (CDF)

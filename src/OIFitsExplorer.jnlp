@@ -3,7 +3,7 @@
   <information>
     <title>OIFits Explorer</title>
     <vendor>JMMC</vendor>
-    <homepage href="http://www.jmmc.fr/aspro2"/>
+    <homepage href="http://www.jmmc.fr/oifitsexplorer"/>
     <description>Explore your interferometric observations data files (OIFits)</description>
     <icon href="OIFitsExplorer.png"/>
     <offline-allowed/>    
@@ -32,5 +32,5 @@
     <extension href="../OIExplorerCoreLibs/OIExplorerCoreLibs.jnlp"/>
 
   </resources>
-  <application-desc main-class="fr.jmmc.oiexplorer.OIFitsExplorerGui"/>
+  <application-desc main-class="fr.jmmc.oiexplorer.OIFitsExplorer"/>
 </jnlp>

@@ -3,7 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui.action;
 
-import fr.jmmc.oiexplorer.OIFitsExplorerGui;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.core.gui.action.ExportPDFAction;
 import java.awt.Component;
 
@@ -29,6 +29,6 @@ public final class OIFitsExplorerExportPDFAction extends ExportPDFAction {
      * @return selected GUI panel
      */
     protected Component getSelectedComponent() {
-        return OIFitsExplorerGui.getInstance().getMainPanel().getVis2PlotPanel();
+        return OIFitsExplorer.getInstance().getMainPanel().getVis2PlotPanel();
     }
 }

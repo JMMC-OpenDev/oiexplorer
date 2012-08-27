@@ -5,7 +5,7 @@ package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
-import fr.jmmc.oiexplorer.OIFitsExplorerGui;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel;
 import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
@@ -169,7 +169,7 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         final OIFitsFile dataForTarget = this.oiFitsCollection.getOiDataList(target);
 
         // Get main container
-        final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
+        final MainPanel mainPanel = OIFitsExplorer.getInstance().getMainPanel();
 
         // Update Html output:        
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
@@ -191,7 +191,7 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
         logger.debug("processTableSelection: {}", oiTable);
 
         // Get main container
-        final MainPanel mainPanel = OIFitsExplorerGui.getInstance().getMainPanel();
+        final MainPanel mainPanel = OIFitsExplorer.getInstance().getMainPanel();
 
         // Update Html output:
         final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();

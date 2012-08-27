@@ -31,10 +31,10 @@ import org.slf4j.LoggerFactory;
  * This class represents the OIFitsExplorer application
  * @author mella, bourgesl
  */
-public final class OIFitsExplorerGui extends App {
+public final class OIFitsExplorer extends App {
 
     /** Class logger */
-    private static final Logger logger = LoggerFactory.getLogger(OIFitsExplorerGui.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OIFitsExplorer.class.getName());
 
     /* members */
     /** main Panel */
@@ -51,7 +51,7 @@ public final class OIFitsExplorerGui extends App {
         final long start = System.nanoTime();
         try {
             // Start application with the command line arguments
-            new OIFitsExplorerGui(args);
+            new OIFitsExplorer(args);
         } finally {
             if (logger.isInfoEnabled()) {
                 logger.info("startup : duration = {} ms.", 1e-6d * (System.nanoTime() - start));
@@ -60,18 +60,18 @@ public final class OIFitsExplorerGui extends App {
     }
 
     /**
-     * Return the OIFitsExplorerGui singleton
-     * @return OIFitsExplorerGui singleton
+     * Return the OIFitsExplorer singleton
+     * @return OIFitsExplorer singleton
      */
-    public static OIFitsExplorerGui getInstance() {
-        return (OIFitsExplorerGui) App.getSharedInstance();
+    public static OIFitsExplorer getInstance() {
+        return (OIFitsExplorer) App.getSharedInstance();
     }
 
     /**
      * Public constructor with command line arguments
      * @param args command line arguments
      */
-    public OIFitsExplorerGui(final String[] args) {
+    public OIFitsExplorer(final String[] args) {
         super(args);
     }
 
