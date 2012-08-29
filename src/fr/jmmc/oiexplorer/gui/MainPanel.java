@@ -88,7 +88,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
 
         setLayout(new java.awt.GridBagLayout());
 
-        mainSplitPane.setResizeWeight(0.2);
+        mainSplitPane.setResizeWeight(0.1);
 
         jListOIFitsFiles.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPaneList.setViewportView(jListOIFitsFiles);
@@ -190,7 +190,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
             if (value == null) {
                 val = null;
             } else if (value instanceof OIFitsFile) {
-                val = ((OIFitsFile) value).getAbsoluteFilePath();
+                val = ((OIFitsFile) value).getName(); // or getAbsoluteFilePath()
             } else {
                 val = value.toString();
             }
