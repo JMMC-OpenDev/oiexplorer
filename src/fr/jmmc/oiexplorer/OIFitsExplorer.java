@@ -14,9 +14,11 @@ import fr.jmmc.jmcs.resource.image.ResourceImage;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
+import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
+import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -265,6 +267,8 @@ public final class OIFitsExplorer extends App {
         // File menu :
         new NewAction();
         new LoadOIFitsAction();
+        new LoadOIDataCollectionAction();
+        new SaveOIDataCollectionAction();
         // export PDF :
         new OIFitsExplorerExportPDFAction();
 

@@ -115,6 +115,8 @@
       <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewAction" action="newCollection" accelerator="N" />
       <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="O"
             description="Add an OIFits file"/>      
+      <menu label="Open OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction" action="loadOIDataCollection"/>
+      <menu label="Save OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction" action="saveOIDataCollection"/>
       <!--
       <menu label="Save observation" classpath="fr.jmmc.oiexplorer.gui.action.SaveObservationAction" action="saveObservation" accelerator="S"
             icon="/fr/jmmc/oiexplorer/gui/icons/filesaveas.png" description="save the current observation as an observation file"/>
