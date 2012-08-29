@@ -3,6 +3,8 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui.action;
 
+import fr.jmmc.jmcs.data.preference.FileChooserPreferences;
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
@@ -11,7 +13,6 @@ import fr.jmmc.jmcs.jaxb.JAXBFactory;
 import fr.jmmc.jmcs.jaxb.JAXBUtils;
 import fr.jmmc.jmcs.util.MimeType;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.OiDataCollection;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import fr.nom.tam.fits.FitsException;
@@ -44,6 +45,7 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
      */
     public LoadOIDataCollectionAction() {
         super(className, actionName);
+        flagAsOpenAction();
     }
 
     /**
@@ -54,10 +56,25 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
 
-        File file = null;
+        File file;
 
+        // If the action was automatically triggered from App launch
+        if (evt.getSource() == ActionRegistrar.getInstance()) {
+            file = new File(evt.getActionCommand());
 
-        file = FileChooser.showOpenFileChooser("Load oiexplorer data collection file", null, mimeType, null);
+            if (!file.exists() || !file.isFile()) {
+                MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath());
+                file = null;
+            }
+
+            if (file != null) {
+                // update current directory for oidata:
+                FileChooserPreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
+            }
+
+        } else {
+            file = FileChooser.showOpenFileChooser("Load oiexplorer data collection file", null, mimeType, null);
+        }
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {

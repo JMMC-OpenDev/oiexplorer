@@ -43,7 +43,6 @@ public class LoadOIFitsAction extends RegisteredAction {
      */
     public LoadOIFitsAction() {
         super(className, actionName);
-        flagAsOpenAction();
     }
 
     /**
