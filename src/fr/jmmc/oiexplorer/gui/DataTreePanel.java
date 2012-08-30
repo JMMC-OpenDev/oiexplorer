@@ -7,12 +7,12 @@ import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel;
-import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.TargetUID;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionListener;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
 import java.util.Map;
@@ -34,9 +34,12 @@ public class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectio
     private static final Logger logger = LoggerFactory.getLogger(DataTreePanel.class);
 
     /* members */
-    /** oiFits collection in use */
+    /** oiFits collection in use TODO: kill */
     private OIFitsCollection oiFitsCollection;
-    /** data tree */
+    /** subset */
+    private SubsetDefinition subsetDefinition = null;
+    
+    /** Swing data tree */
     private GenericJTree<Object> dataTree;
     
     /** Creates new form DataTreePanel */

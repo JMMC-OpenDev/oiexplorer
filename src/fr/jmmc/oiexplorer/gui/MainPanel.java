@@ -30,12 +30,19 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
     /** Creates new form MainPanel */
     public MainPanel() {
         initComponents();
-        postInitComponents();
+        postInit();
     }
 
-    private void postInitComponents() {
 
-        this.jListOIFitsFiles.setCellRenderer(new OIFitsListRenderer());
+    /**
+     * This method is useful to set the models and specific features of initialized swing components :
+     */
+    private void postInit() {
+
+        this.plotPanel.init();
+        
+        this.jListOIFitsFiles.setCellRenderer(new OIFitsListRenderer());    
+        
      
         OIFitsCollectionManager.getInstance().register(this);                
     }
@@ -201,5 +208,6 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionLis
 
             return this;
         }
+        
     }
 }
