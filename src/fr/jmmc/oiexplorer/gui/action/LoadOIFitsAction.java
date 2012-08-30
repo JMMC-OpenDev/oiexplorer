@@ -12,12 +12,9 @@ import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.MimeType;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
-import fr.nom.tam.fits.FitsException;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,43 +76,23 @@ public class LoadOIFitsAction extends RegisteredAction {
         if (files != null) {
             final OIFitsChecker checker = new OIFitsChecker();
 
-            OIFitsCollectionManager.getInstance().setNotify(false);
-
-            final long startTime = System.nanoTime();
-
-            String fileLocation = null;
-            Exception e = null;
             try {
-                for (File file : files) {
-                    fileLocation = file.getAbsolutePath();
+                final long startTime = System.nanoTime();
 
-                    StatusBar.show("loading file: " + fileLocation);
+                OIFitsCollectionManager.getInstance().loadOIFitsFiles(files, checker);
 
-                    OIFitsCollectionManager.getInstance().loadOIFitsFile(fileLocation, checker);
-                }
-            } catch (MalformedURLException mue) {
-                e = mue;
-            } catch (IOException ioe) {
-                e = ioe;
-            } catch (FitsException fe) {
-                e = fe;
-            } finally {
                 logger.info("LoadOIFitsAction: duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
 
-                OIFitsCollectionManager.getInstance().setNotify(true);
-
-                if (e != null) {
-                    MessagePane.showErrorMessage("Could not load the file : " + fileLocation, e);
-                    StatusBar.show("Could not load the file : " + fileLocation);
-                }
-
+            } catch (IOException ioe) {
+                MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
+                StatusBar.show(ioe.getMessage());
+            } finally {
                 // display validation messages anyway:
                 final String checkReport = checker.getCheckReport();
                 logger.info("validation results:\n{}", checkReport);
-                
+
                 MessagePane.showMessage(checkReport);
             }
         }
-
     }
 }

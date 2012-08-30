@@ -61,20 +61,25 @@ public class SaveOIDataCollectionAction extends RegisteredAction {
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {
-            final long startTime = System.nanoTime();
+            final String fileLocation = file.getAbsolutePath();
 
-            String fileLocation = file.getAbsolutePath();
             Exception e = null;
             try {
-                OiDataCollection userCollection = OIFitsCollectionManager.getInstance().getUserCollection();
-                JAXBFactory jbf = JAXBFactory.getInstance(OiDataCollection.class.getPackage().getName());
+                final long startTime = System.nanoTime();
+
+                // TODO: move such JAXB code into OIFitsCollectionManager methods !!
+                final OiDataCollection userCollection = OIFitsCollectionManager.getInstance().getUserCollection();
+
+                final JAXBFactory jbf = JAXBFactory.getInstance(OiDataCollection.class.getPackage().getName());
+
                 JAXBUtils.saveObject(file, userCollection, jbf);
-            } catch (IOException ex) {
-                e=ex;
-            } catch (IllegalStateException ex) {
-                e=ex;
-            } finally {
+
                 logger.info("SaveOIDataCollectionAction in {} : duration = {} ms.", fileLocation, 1e-6d * (System.nanoTime() - startTime));
+            } catch (IOException ex) {
+                e = ex;
+            } catch (IllegalStateException ex) {
+                e = ex;
+            } finally {
                 if (e != null) {
                     MessagePane.showErrorMessage("Could not save the file : " + fileLocation, e);
                     StatusBar.show("Could not save the file : " + fileLocation);

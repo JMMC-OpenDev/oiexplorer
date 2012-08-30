@@ -15,11 +15,9 @@ import fr.jmmc.jmcs.util.MimeType;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.oi.OiDataCollection;
 import fr.jmmc.oitools.model.OIFitsChecker;
-import fr.nom.tam.fits.FitsException;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,43 +79,35 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
 
             final OIFitsChecker checker = new OIFitsChecker();
 
-            OIFitsCollectionManager.getInstance().setNotify(false);
+            final String fileLocation = file.getAbsolutePath();
 
-            final long startTime = System.nanoTime();
+            StatusBar.show("loading collection: " + fileLocation);
 
-            String fileLocation = file.getAbsolutePath();
-            Exception e = null;
             try {
-                JAXBFactory jbf = JAXBFactory.getInstance(OiDataCollection.class.getPackage().getName());
-                OiDataCollection userCollection = (OiDataCollection) JAXBUtils.loadObject(file.toURI().toURL(), jbf);
-                StatusBar.show("loading collection: " + fileLocation);
+                final long startTime = System.nanoTime();
+
+                // TODO: move such JAXB code into OIFitsCollectionManager methods !!
+                final JAXBFactory jbf = JAXBFactory.getInstance(OiDataCollection.class.getPackage().getName());
+
+                final OiDataCollection userCollection = (OiDataCollection) JAXBUtils.loadObject(file.toURI().toURL(), jbf);
 
                 OIFitsCollectionManager.getInstance().loadOIDataCollection(userCollection, checker);
-            } catch (MalformedURLException mue) {
-                e = mue;
+
+                logger.info("LoadOIDataCollectionAction: duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
+
+            } catch (IllegalStateException ise) {
+                MessagePane.showErrorMessage("Could not load collection: " + fileLocation, ise);
+                StatusBar.show("Could not load collection: " + fileLocation);
             } catch (IOException ioe) {
-                e = ioe;
-            } catch (FitsException fe) {
-                e = fe;
+                MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
+                StatusBar.show(ioe.getMessage());
             } finally {
-                logger.info("LoadOIFitsAction {} : duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
-
-                OIFitsCollectionManager.getInstance().setNotify(true);
-
-                final String checkReport = checker.getCheckReport();
-
-                if (e != null) {
-                    MessagePane.showErrorMessage("Error loading data from file : " + fileLocation, e);
-                    StatusBar.show("Error loading data from  file : " + fileLocation);
-                } else {
-                    MessagePane.showMessage(checkReport);
-
-                }
                 // display validation messages anyway:
+                final String checkReport = checker.getCheckReport();
                 logger.info("validation results:\n{}", checkReport);
 
+                MessagePane.showMessage(checkReport);
             }
         }
-
     }
 }
