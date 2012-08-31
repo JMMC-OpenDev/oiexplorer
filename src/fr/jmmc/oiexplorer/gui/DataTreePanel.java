@@ -5,16 +5,19 @@ package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
-import fr.jmmc.oiexplorer.OIFitsExplorer;
-import fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager.OIFitsCollectionListener;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager.OIFitsCollectionEventListener;
+import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
+import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
+import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
+import java.util.List;
 import java.util.Map;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -24,9 +27,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This panel contains the data tree
+ * 
+ * // TODO: add a subset selector and also support subset changed event !
+ * // TODO: support both multiple file and table selection(s)
+ * 
  * @author mella
  */
-public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCollectionListener, TreeSelectionListener {
+public final class DataTreePanel extends javax.swing.JPanel implements TreeSelectionListener,
+                                                                       OIFitsCollectionEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -34,6 +42,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCol
     private static final Logger logger = LoggerFactory.getLogger(DataTreePanel.class);
 
     /* members */
+    /** OIFitsCollectionManager singleton */
+    private OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** oiFits collection in use TODO: kill */
     private OIFitsCollection oiFitsCollection;
     /** subset */
@@ -74,22 +84,39 @@ public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCol
 
         genericTreePanel.add(dataTree);
 
-        OIFitsCollectionManager.getInstance().getOiFitsCollectionEventNotifier().register(this);
+        ocm.getOiFitsCollectionEventNotifier().register(this);
+    }
+
+    /**
+     * Update the data tree
+     * @param oiFitsCollection OIFitsCollection to process
+     */
+    private void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
+        this.oiFitsCollection = oiFitsCollection;
+
+        generateTree(oiFitsCollection);
+
+        // ALWAYS select a target
+        // TODO: the selection should be in sync with subset modification (load, external updates)
+        if (oiFitsCollection.isEmpty()) {
+            processTargetSelection(null);
+        } else {
+            // select first target :
+            dataTree.selectFirstChildNode(dataTree.getRootNode());
+        }
     }
 
     /**
      * Generate the tree from the current edited list of targets
-     * @param oifitsCollection OIFitsCollection to process
+     * @param oiFitsCollection OIFitsCollection to process
      */
-    private void generateTree(final OIFitsCollection oifitsCollection) {
-
-        this.oiFitsCollection = oifitsCollection;
+    private void generateTree(final OIFitsCollection oiFitsCollection) {
 
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.setUserObject("Targets");
         rootNode.removeAllChildren();
 
-        final Map<TargetUID, OIFitsFile> oiFitsPerTarget = oifitsCollection.getOiFitsPerTarget();
+        final Map<TargetUID, OIFitsFile> oiFitsPerTarget = oiFitsCollection.getOiFitsPerTarget();
 
         for (Map.Entry<TargetUID, OIFitsFile> entry : oiFitsPerTarget.entrySet()) {
             final TargetUID target = entry.getKey();
@@ -157,21 +184,13 @@ public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCol
     private void processTargetSelection(final TargetUID target) {
         logger.debug("processTargetSelection: {}", target);
 
-        // Get OIFitsFile structure for this target:
-        final OIFitsFile dataForTarget = this.oiFitsCollection.getOiDataList(target);
+        // update subset definition (use copy ?):
+        final SubsetDefinition subset = getSubsetDefinition();
+        subset.setTarget(target);
+        subset.getTables().clear(); // means all
 
-        // Get main container
-        final MainPanel mainPanel = OIFitsExplorer.getInstance().getMainPanel();
-
-        // Update Html output:        
-        final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
-
-        // update Html representation:
-        oiFitsHtmlPanel.updateOIFits(dataForTarget);
-
-        // Update plot panel:
-        mainPanel.getPlotPanel().updateOIFits(target, dataForTarget);
-
+        // fire subset changed event:
+        ocm.updateSubsetDefinition(subset);
     }
 
     /**
@@ -182,21 +201,19 @@ public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCol
     private void processTableSelection(final TargetUID target, final OITable oiTable) {
         logger.debug("processTableSelection: {}", oiTable);
 
-        // Get main container
-        final MainPanel mainPanel = OIFitsExplorer.getInstance().getMainPanel();
+        // update subset definition (use copy ?):
+        final SubsetDefinition subset = getSubsetDefinition();
+        subset.setTarget(target);
+        final List<TableUID> tables = subset.getTables();
+        tables.clear();
 
-        // Update Html output:
-        final OIFitsHtmlPanel oiFitsHtmlPanel = mainPanel.getOIFitsHtmlPanel();
+        final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
+        if (dataFile != null) {
+            tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+        }
 
-        // update Html representation:
-        oiFitsHtmlPanel.updateOIFits(oiTable);
-
-        // Prepare a container for the selected table
-        final OIFitsFile oiFitsFile = new OIFitsFile();
-        oiFitsFile.addOiTable(oiTable);
-
-        // Update plot panel:
-        mainPanel.getPlotPanel().updateOIFits(target, oiFitsFile);
+        // fire subset changed event:
+        ocm.updateSubsetDefinition(subset);
     }
 
     /**
@@ -204,17 +221,14 @@ public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCol
      * @param event OIFits collection event
      */
     @Override
-    public void onProcess(final OIFitsCollectionEvent event) {
+    public void onProcess(final GenericEvent<OIFitsCollectionEventType> event) {
         logger.debug("Received event to process {}", event);
 
-        generateTree(event.getOIFitsCollection());
-
-        // ALWAYS select a target
-        if (event.getOIFitsCollection().isEmpty()) {
-            processTargetSelection(null);
-        } else {
-            // select first target :
-            dataTree.selectFirstChildNode(dataTree.getRootNode());
+        switch (event.getType()) {
+            case CHANGED:
+                updateOIFitsCollection(((OIFitsCollectionEvent) event).getOIFitsCollection());
+                break;
+            default:
         }
     }
 
@@ -251,10 +265,23 @@ public final class DataTreePanel extends javax.swing.JPanel implements OIFitsCol
     // End of variables declaration//GEN-END:variables
 
     /**
+     * Define the subset definition or the current subset definition
+     * @return subsetDefinition subset definition
+     */
+    private SubsetDefinition getSubsetDefinition() {
+        if (this.subsetDefinition != null) {
+            return this.subsetDefinition;
+        }
+        return ocm.getCurrentSubsetDefinition();
+    }
+
+    /**
      * Define the subset definition
      * @param subsetDefinition subset definition
      */
     public void setSubsetDefinition(final SubsetDefinition subsetDefinition) {
         this.subsetDefinition = subsetDefinition;
+        
+        // TODO: refresh swing state according to the given subset ... (mimic load)
     }
 }
