@@ -4,13 +4,16 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
-import fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel;
 import fr.jmmc.oiexplorer.core.gui.PlotPanelEditor;
 import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager.OIFitsCollectionListener;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager.OIFitsCollectionEventListener;
+import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
+import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
+import fr.jmmc.oiexplorer.core.model.event.SubsetDefinitionEvent;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -24,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Main container of OIFits Explorer App
  * @author mella
  */
-public final class MainPanel extends javax.swing.JPanel implements OIFitsCollectionListener {
+public final class MainPanel extends javax.swing.JPanel implements OIFitsCollectionEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -34,6 +37,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     /** Creates new form MainPanel */
     public MainPanel() {
         OIFitsCollectionManager.getInstance().getOiFitsCollectionEventNotifier().register(this);
+        OIFitsCollectionManager.getInstance().getSubsetDefinitionEventNotifier().register(this);
 
         initComponents();
         postInit();
@@ -52,7 +56,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * Refresh the list of OIfits files
      */
     private void updateOIFitsList(final OIFitsCollection oiFitsCollection) {
-
         final Object oldValue = this.jListOIFitsFiles.getSelectedValue();
 
         this.jListOIFitsFiles.setModel(new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles()));
@@ -62,16 +65,27 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     }
 
     /**
+     * Refresh the html view
+     * @param subsetDefinition subset definition
+     */
+    private void updateHtmlView(final SubsetDefinition subsetDefinition) {
+        this.oIFitsHtmlPanel.updateOIFits(subsetDefinition.getOIFitsSubset());
+    }
+
+    /**
      * Handle the given OIFits collection event
      * @param event OIFits collection event
      */
     @Override
-    public void onProcess(final OIFitsCollectionEvent event) {
+    public void onProcess(final GenericEvent<OIFitsCollectionEventType> event) {
         logger.debug("Received event to process {}", event);
 
         switch (event.getType()) {
             case CHANGED:
-                updateOIFitsList(event.getOIFitsCollection());
+                updateOIFitsList(((OIFitsCollectionEvent) event).getOIFitsCollection());
+                break;
+            case SUBSET_CHANGED:
+                updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());
                 break;
             default:
         }
@@ -140,10 +154,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
     public DataTreePanel getDataTreePanel() {
         return dataTreePanel;
-    }
-
-    public OIFitsHtmlPanel getOIFitsHtmlPanel() {
-        return oIFitsHtmlPanel;
     }
 
     public PlotPanelEditor getPlotPanel() {
