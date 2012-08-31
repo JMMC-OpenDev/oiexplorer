@@ -44,8 +44,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     /* members */
     /** OIFitsCollectionManager singleton */
     private OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
-    /** oiFits collection in use TODO: kill */
-    private OIFitsCollection oiFitsCollection;
     /** subset */
     private SubsetDefinition subsetDefinition = null;
     /** Swing data tree */
@@ -92,7 +90,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      * @param oiFitsCollection OIFitsCollection to process
      */
     private void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
-        this.oiFitsCollection = oiFitsCollection;
+        // force clean up ...
+        this.subsetDefinition = null;
 
         generateTree(oiFitsCollection);
 
