@@ -189,7 +189,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         subset.getTables().clear(); // means all
 
         // fire subset changed event:
-        ocm.updateSubsetDefinition(subset);
+        ocm.updateSubsetDefinition(this, subset);
     }
 
     /**
@@ -212,7 +212,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         }
 
         // fire subset changed event:
-        ocm.updateSubsetDefinition(subset);
+        ocm.updateSubsetDefinition(this, subset);
     }
 
     /**
