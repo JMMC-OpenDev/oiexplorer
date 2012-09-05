@@ -65,7 +65,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     }
 
     /**
-     * Refresh the html view
+     * Refresh the HTML view
      * @param subsetDefinition subset definition
      */
     private void updateHtmlView(final SubsetDefinition subsetDefinition) {
