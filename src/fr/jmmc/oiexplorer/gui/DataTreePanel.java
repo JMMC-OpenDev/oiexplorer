@@ -6,8 +6,8 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     /* members */
     /** OIFitsCollectionManager singleton */
     private OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    /** subset name */
+    private String subsetName = OIFitsCollectionManager.CURRENT;
     /** subset */
     private SubsetDefinition subsetDefinition = null;
     /** Swing data tree */
@@ -91,17 +94,58 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      */
     private void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
         // force clean up ...
-        this.subsetDefinition = null;
+        setSubsetName(subsetName);
 
         generateTree(oiFitsCollection);
+
+        // Restore subset selection:
+        final SubsetDefinition subset = getSubsetDefinition();
 
         // ALWAYS select a target
         // TODO: the selection should be in sync with subset modification (load, external updates)
         if (oiFitsCollection.isEmpty()) {
             processTargetSelection(null);
         } else {
-            // select first target :
-            dataTree.selectFirstChildNode(dataTree.getRootNode());
+            boolean found = false;
+
+            if (subset.getTarget() != null) {
+                final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(subset.getTarget());
+
+                if (targetTreeNode != null) {
+                    DefaultMutableTreeNode tableTreeNode = null;
+
+                    if (!subset.getTables().isEmpty()) {
+                        // TODO: support multi selection:
+                        final TableUID tableUID = subset.getTables().get(0);
+                        final String filePath = tableUID.getFile().getFile();
+                        final Integer extNb = tableUID.getExtNb();
+
+                        for (int i = 0, size = targetTreeNode.getChildCount(); i < size; i++) {
+                            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) targetTreeNode.getChildAt(i);
+                            final OITable oiTable = (OITable) node.getUserObject();
+
+                            if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
+                                if (extNb != null && extNb.intValue() == oiTable.getExtNb()) {
+                                    tableTreeNode = node;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                    found = true;
+
+                    if (tableTreeNode != null) {
+                        dataTree.selectPath(new TreePath(tableTreeNode.getPath()));
+                    } else {
+                        dataTree.selectPath(new TreePath(targetTreeNode.getPath()));
+                    }
+                }
+            }
+            if (!found) {
+                // select first target :
+                dataTree.selectFirstChildNode(dataTree.getRootNode());
+            }
         }
     }
 
@@ -264,23 +308,24 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Define the subset definition or the current subset definition
+     * Return the subset definition given its subset name
      * @return subsetDefinition subset definition
      */
     private SubsetDefinition getSubsetDefinition() {
-        if (this.subsetDefinition != null) {
-            return this.subsetDefinition;
+        if (this.subsetDefinition == null) {
+            // get copy:
+            this.subsetDefinition = ocm.getSubsetDefinition(this.subsetName);
         }
-        return ocm.getCurrentSubsetDefinition();
+        return this.subsetDefinition;
     }
 
     /**
-     * Define the subset definition
-     * @param subsetDefinition subset definition
+     * Define the subset name and reset subset
+     * @param subsetName subset name
      */
-    public void setSubsetDefinition(final SubsetDefinition subsetDefinition) {
-        this.subsetDefinition = subsetDefinition;
-        
-        // TODO: refresh swing state according to the given subset ... (mimic load)
+    public void setSubsetName(final String subsetName) {
+        this.subsetName = subsetName;
+        // force reset:
+        this.subsetDefinition = null;
     }
 }

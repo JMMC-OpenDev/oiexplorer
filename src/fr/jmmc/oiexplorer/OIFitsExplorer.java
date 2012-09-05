@@ -112,9 +112,6 @@ public final class OIFitsExplorer extends App {
      */
     private void initServices() throws IllegalStateException, IllegalArgumentException {
 
-        // Initialize OIFitsManager:
-        OIFitsCollectionManager.getInstance();
-
         // Initialize tasks and the task executor :
         TaskSwingWorkerExecutor.start();
 
