@@ -13,7 +13,7 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.resource.image.ResourceImage;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.gui.MainPanel;
+import fr.jmmc.oiexplorer.gui.MainWindow;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
@@ -40,7 +40,7 @@ public final class OIFitsExplorer extends App {
 
     /* members */
     /** main Panel */
-    private MainPanel mainPanel;
+    private MainWindow _mainWindow;
 
     /**
      * Main entry point : use swing setup and then start the application
@@ -81,7 +81,7 @@ public final class OIFitsExplorer extends App {
      * Initialize application objects
      * @param args ignored arguments
      *
-     * @throws RuntimeException if the OifitsExplorerGui initialisation failed
+     * @throws RuntimeException if the OifitsExplorerGui initialization failed
      */
     @Override
     protected void init(final String[] args) throws RuntimeException {
@@ -97,7 +97,12 @@ public final class OIFitsExplorer extends App {
              */
             @Override
             public void run() {
+                final String programName = App.getSharedApplicationDataModel().getProgramName();
+                _mainWindow = new MainWindow(programName);
+                _mainWindow.init();
+                setFrame(_mainWindow);
                 prepareFrame(getFrame());
+                _mainWindow.display();
             }
         });
 
@@ -204,8 +209,6 @@ public final class OIFitsExplorer extends App {
     private void prepareFrame(final JFrame frame) {
         logger.debug("prepareFrame : enter");
 
-        frame.setTitle(App.getSharedApplicationDataModel().getProgramName());
-
         // handle frame icon
         final Image jmmcFavImage = ResourceImage.JMMC_FAVICON.icon().getImage();
         frame.setIconImage(jmmcFavImage);
@@ -233,9 +236,6 @@ public final class OIFitsExplorer extends App {
         // previous adapter manages the windowClosing(event) :
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        // init the main panel :
-        createContent();
-
         // initialize the actions :
         registerActions();
 
@@ -245,16 +245,6 @@ public final class OIFitsExplorer extends App {
         StatusBar.show("application started.");
 
         logger.debug("prepareFrame : exit");
-    }
-
-    /**
-     * Create the main content i.e. the setting panel
-     */
-    private void createContent() {
-        // adds the main panel in scrollPane
-        this.mainPanel = new MainPanel();
-
-        getFramePanel().add(this.mainPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -287,8 +277,8 @@ public final class OIFitsExplorer extends App {
      * Return the main panel
      * @return main panel
      */
-    public MainPanel getMainPanel() {
-        return this.mainPanel;
+    public MainWindow getMainWindow() {
+        return _mainWindow;
     }
 
     /**
