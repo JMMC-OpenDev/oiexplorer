@@ -3,10 +3,6 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
-import fr.jmmc.jmcs.data.preference.Preferences;
-import fr.jmmc.jmcs.data.preference.PreferencesException;
-import fr.jmmc.jmcs.gui.PreferencesView;
-import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.util.WindowUtils;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -116,14 +112,21 @@ public class MainWindow extends JFrame implements ActionListener {
 
         // If the "Restore to default settings" button has been pressed
         if (evt.getSource().equals(_plusButton)) {
-            MainPanel tmp = new MainPanel();
-            addPanel(tmp, null);
+            addView();
         }
 
         // If the "Save modifications" button has been pressed
         if (evt.getSource().equals(_minusButton)) {
             // TODO : remove the selected MainPanel
         }
+    }
+
+    /**
+     * Externalize such code using introspection ?? or use Wizard ?
+     */
+    public void addView() {
+        MainPanel tmp = new MainPanel();
+        addPanel(tmp, null);
     }
 
     public void addPanel(final JPanel panel, final String panelName) {
