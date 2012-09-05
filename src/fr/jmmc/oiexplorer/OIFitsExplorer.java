@@ -97,12 +97,13 @@ public final class OIFitsExplorer extends App {
              */
             @Override
             public void run() {
+                // create main window:
                 final String programName = App.getSharedApplicationDataModel().getProgramName();
                 _mainWindow = new MainWindow(programName);
                 _mainWindow.init();
                 setFrame(_mainWindow);
+                
                 prepareFrame(getFrame());
-                _mainWindow.display();
             }
         });
 
@@ -141,6 +142,9 @@ public final class OIFitsExplorer extends App {
 
                 // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
                 OIFitsCollectionManager.getInstance().reset();
+                
+                // create first view:
+                _mainWindow.addView();
 
                 getFrame().setVisible(true);
             }
