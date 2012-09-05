@@ -45,9 +45,9 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     /* members */
     /** OIFitsCollectionManager singleton */
     private OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
-    /** subset name */
-    private String subsetName = OIFitsCollectionManager.CURRENT;
-    /** subset */
+    /** subset identifier */
+    private String subsetId = OIFitsCollectionManager.CURRENT;
+    /** subset to edit */
     private SubsetDefinition subsetDefinition = null;
     /** Swing data tree */
     private GenericJTree<Object> dataTree;
@@ -94,7 +94,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      */
     private void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
         // force clean up ...
-        setSubsetName(subsetName);
+        setSubsetId(subsetId);
 
         generateTree(oiFitsCollection);
 
@@ -314,17 +314,17 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private SubsetDefinition getSubsetDefinition() {
         if (this.subsetDefinition == null) {
             // get copy:
-            this.subsetDefinition = ocm.getSubsetDefinition(this.subsetName);
+            this.subsetDefinition = ocm.getSubsetDefinition(this.subsetId);
         }
         return this.subsetDefinition;
     }
 
     /**
-     * Define the subset name and reset subset
-     * @param subsetName subset name
+     * Define the subset identifier and reset subset
+     * @param subsetId subset identifier
      */
-    public void setSubsetName(final String subsetName) {
-        this.subsetName = subsetName;
+    public void setSubsetId(final String subsetId) {
+        this.subsetId = subsetId;
         // force reset:
         this.subsetDefinition = null;
     }
