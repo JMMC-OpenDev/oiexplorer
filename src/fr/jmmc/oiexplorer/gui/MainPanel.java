@@ -3,9 +3,11 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
+import com.jidesoft.swing.JideTabbedPane;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.oiexplorer.core.gui.PlotPanelEditor;
 import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
+import fr.jmmc.oiexplorer.core.gui.action.ExportPDFAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -13,11 +15,16 @@ import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
 import fr.jmmc.oiexplorer.core.model.event.SubsetDefinitionEvent;
+import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import org.slf4j.Logger;
@@ -33,13 +40,20 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private static final long serialVersionUID = 1;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
+    /** panel counter  to display title without given name */
+    private static int panelCounter = 0;
+    /** OIFitsCollectionManager singleton reference */
+    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
     /** Creates new form MainPanel */
     public MainPanel() {
-        OIFitsCollectionManager.getInstance().getOiFitsCollectionEventNotifier().register(this);
-        OIFitsCollectionManager.getInstance().getSubsetDefinitionEventNotifier().register(this);
+        ocm.getOiFitsCollectionEventNotifier().register(this);
+        ocm.getSubsetDefinitionEventNotifier().register(this);
 
+        // Build GUI
         initComponents();
+        
+        // Finish init
         postInit();
     }
 
@@ -47,9 +61,41 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
+        // Add renderer to get short oifits filenames
         this.jListOIFitsFiles.setCellRenderer(new OIFitsListRenderer());
 
-        this.plotPanel.init();
+        // Link removeCurrentView to the tabpane close button
+        this.tabbedPane.setCloseAction(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                removeCurrentView();
+            }
+        });
+        /*
+         this.tabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
+         this.tabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
+         this.tabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
+         this.tabbedPane.setTabEditingAllowed(true);
+         // TODO : setTabEditingValidator(...)
+         this.tabbedPane.setTabLeadingComponent(_plusButton);
+         */
+
+        // Build toolBar
+        toolBar.add(OIFitsExplorerExportPDFAction.getInstance());
+
+    }
+
+    /**
+     * Synchronize tab and Views of OIFitsCollectionManager
+     * @see #onProcess(fr.jmmc.oiexplorer.core.model.event.GenericEvent) 
+     */
+    private void updateTabContent() {
+        // TODO handle case where tab where already present
+        logger.warn("prepareTabContent() for collection manager plots : {}", ocm.getUserCollection().getPlots());
+        for (Plot plot : ocm.getUserCollection().getPlots()) {            
+            final String plotId = plot.getName();                        
+            PlotView p = new PlotView(plotId);
+            addPanel(p, plotId);
+        }
     }
 
     /**
@@ -65,14 +111,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     }
 
     /**
-     * Refresh the HTML view
-     * @param subsetDefinition subset definition
-     */
-    private void updateHtmlView(final SubsetDefinition subsetDefinition) {
-        this.oIFitsHtmlPanel.updateOIFits(subsetDefinition.getOIFitsSubset());
-    }
-
-    /**
      * Handle the given OIFits collection event
      * @param event OIFits collection event
      */
@@ -82,10 +120,14 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         switch (event.getType()) {
             case CHANGED:
+                // Update info for oifits file list
                 updateOIFitsList(((OIFitsCollectionEvent) event).getOIFitsCollection());
+                // Update tabpane content
+                updateTabContent();
                 break;
             case SUBSET_CHANGED:
-                updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());
+                // now should be done in PlotView
+                // updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());
                 break;
             default:
         }
@@ -103,35 +145,49 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         java.awt.GridBagConstraints gridBagConstraints;
 
         mainSplitPane = new javax.swing.JSplitPane();
+        dataSplitPane = new javax.swing.JSplitPane();
+        dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
+        dataSplitTopPanel = new javax.swing.JPanel();
+        toolBar = new javax.swing.JToolBar();
         jScrollPaneList = new javax.swing.JScrollPane();
         jListOIFitsFiles = new javax.swing.JList();
-        rightSplitPane = new javax.swing.JSplitPane();
-        dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
-        jTabbedPaneViews = new javax.swing.JTabbedPane();
-        plotPanel = new fr.jmmc.oiexplorer.core.gui.PlotPanelEditor();
-        oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
+        tabbedPane = new com.jidesoft.swing.JideTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
 
-        mainSplitPane.setResizeWeight(0.1);
+        mainSplitPane.setResizeWeight(0.2);
+
+        dataSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        dataSplitPane.setResizeWeight(0.3);
+        dataSplitPane.setRightComponent(dataTreePanel);
+
+        dataSplitTopPanel.setLayout(new java.awt.GridBagLayout());
+
+        toolBar.setRollover(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        dataSplitTopPanel.add(toolBar, gridBagConstraints);
 
         jListOIFitsFiles.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPaneList.setViewportView(jListOIFitsFiles);
 
-        mainSplitPane.setLeftComponent(jScrollPaneList);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        dataSplitTopPanel.add(jScrollPaneList, gridBagConstraints);
 
-        rightSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        rightSplitPane.setResizeWeight(0.2);
-        rightSplitPane.setTopComponent(dataTreePanel);
+        dataSplitPane.setLeftComponent(dataSplitTopPanel);
 
-        jTabbedPaneViews.addTab("plots", plotPanel);
-        jTabbedPaneViews.addTab("data", oIFitsHtmlPanel);
+        mainSplitPane.setLeftComponent(dataSplitPane);
 
-        rightSplitPane.setBottomComponent(jTabbedPaneViews);
-        jTabbedPaneViews.getAccessibleContext().setAccessibleName("plots");
-        jTabbedPaneViews.getAccessibleContext().setAccessibleDescription("");
-
-        mainSplitPane.setRightComponent(rightSplitPane);
+        tabbedPane.setBoldActiveTab(true);
+        tabbedPane.setShowCloseButton(true);
+        tabbedPane.setShowCloseButtonOnSelectedTab(true);
+        tabbedPane.setShowCloseButtonOnTab(true);
+        mainSplitPane.setRightComponent(tabbedPane);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -142,26 +198,48 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         add(mainSplitPane, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JSplitPane dataSplitPane;
+    private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
     private javax.swing.JList jListOIFitsFiles;
     private javax.swing.JScrollPane jScrollPaneList;
-    private javax.swing.JTabbedPane jTabbedPaneViews;
     private javax.swing.JSplitPane mainSplitPane;
-    private fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel oIFitsHtmlPanel;
-    private fr.jmmc.oiexplorer.core.gui.PlotPanelEditor plotPanel;
-    private javax.swing.JSplitPane rightSplitPane;
+    private com.jidesoft.swing.JideTabbedPane tabbedPane;
+    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 
     public DataTreePanel getDataTreePanel() {
         return dataTreePanel;
     }
 
-    public PlotPanelEditor getPlotPanel() {
-        return plotPanel;
+    /**
+     * Return the current plot panel
+     * @return main panel
+     */
+    public PlotView getCurrentPanel() {
+        return (PlotView) tabbedPane.getSelectedComponent();
     }
 
-    public Vis2Panel getVis2PlotPanel() {
-        return plotPanel.getPlotPanel();
+    public void addPanel(final JPanel panel, final String panelName) {
+
+        final String name;
+        if ((panelName != null) && (panelName.length() > 0)) {
+            name = panelName;
+        } else {
+            name = panel.getClass().getSimpleName() + " " + panelCounter;
+            panelCounter++;
+        }
+
+        // To correctly match deeper background color of inner tab panes
+        panel.setOpaque(false);
+
+        tabbedPane.add(name, panel);
+
+        logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
+    }
+
+    public void removeCurrentView() {
+        logger.warn("removeCurrentView() TODO");
     }
 
     /**

@@ -13,7 +13,7 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.resource.image.ResourceImage;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.gui.MainWindow;
+import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
@@ -40,7 +40,7 @@ public final class OIFitsExplorer extends App {
 
     /* members */
     /** main Panel */
-    private MainWindow _mainWindow;
+    private MainPanel mainPanel;
 
     /**
      * Main entry point : use swing setup and then start the application
@@ -97,12 +97,6 @@ public final class OIFitsExplorer extends App {
              */
             @Override
             public void run() {
-                // create main window:
-                final String programName = App.getSharedApplicationDataModel().getProgramName();
-                _mainWindow = new MainWindow(programName);
-                _mainWindow.init();
-                setFrame(_mainWindow);
-                
                 prepareFrame(getFrame());
             }
         });
@@ -143,9 +137,6 @@ public final class OIFitsExplorer extends App {
                 // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
                 OIFitsCollectionManager.getInstance().reset();
                 
-                // create first view:
-                _mainWindow.addView();
-
                 getFrame().setVisible(true);
             }
         });
@@ -213,6 +204,11 @@ public final class OIFitsExplorer extends App {
     private void prepareFrame(final JFrame frame) {
         logger.debug("prepareFrame : enter");
 
+        // initialize the actions :
+        registerActions();
+        
+        frame.setTitle(App.getSharedApplicationDataModel().getProgramName());
+
         // handle frame icon
         final Image jmmcFavImage = ResourceImage.JMMC_FAVICON.icon().getImage();
         frame.setIconImage(jmmcFavImage);
@@ -240,15 +236,25 @@ public final class OIFitsExplorer extends App {
         // previous adapter manages the windowClosing(event) :
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-        // initialize the actions :
-        registerActions();
-
+        // init the main panel :
+        createContent();
+        
         // Handle status bar
         getFramePanel().add(new StatusBar(), BorderLayout.SOUTH);
 
         StatusBar.show("application started.");
 
         logger.debug("prepareFrame : exit");
+    }
+
+    /**
+     * Create the main content i.e. the setting panel
+     */
+    private void createContent() {
+        // adds the main panel in scrollPane
+         this.mainPanel = new MainPanel();
+
+        getFramePanel().add(this.mainPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -281,8 +287,8 @@ public final class OIFitsExplorer extends App {
      * Return the main panel
      * @return main panel
      */
-    public MainWindow getMainWindow() {
-        return _mainWindow;
+    public MainPanel getMainWindow() {
+        return mainPanel;
     }
 
     /**
