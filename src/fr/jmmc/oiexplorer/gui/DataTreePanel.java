@@ -98,7 +98,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         generateTree(oiFitsCollection);
 
-        // Restore subset selection:
+        // Restore subset selection (CURRENT):
         final SubsetDefinition subset = getSubsetDefinition();
 
         // ALWAYS select a target
