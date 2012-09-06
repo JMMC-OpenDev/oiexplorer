@@ -3,18 +3,20 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
+import com.jidesoft.swing.JideTabbedPane;
 import fr.jmmc.jmcs.gui.util.WindowUtils;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.plaf.UIResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,7 @@ public class MainWindow extends JFrame implements ActionListener {
     /** "Save Modifications" button */
     private JButton _minusButton = null;
     private LinkedHashMap<String, JPanel> _panels;
-    private JTabbedPane _tabbedPane;
+    private JideTabbedPane _tabbedPane;
     private static int panelCounter = 0;
 
     /**
@@ -50,20 +52,31 @@ public class MainWindow extends JFrame implements ActionListener {
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
+        _plusButton = new JButton("+");
+        contentPane.add(_plusButton);
+
         // Build the tabbed pane
-        _tabbedPane = new JTabbedPane();
+        _tabbedPane = new JideTabbedPane();
+        _tabbedPane.setBoldActiveTab(true);
+        _tabbedPane.setShowCloseButton(true);
+        _tabbedPane.setUseDefaultShowCloseButtonOnTab(true);
+        _tabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
+        _tabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
+        _tabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
+        _tabbedPane.setTabEditingAllowed(true);
+        // TODO : setTabEditingValidator(...)
+        _tabbedPane.setTabLeadingComponent(_plusButton);
+        _tabbedPane.setCloseAction(new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                System.out.println("Close button clicked");
+            }
+        });
         contentPane.add(_tabbedPane);
 
         // Add each preferences pane
         _panels = new LinkedHashMap<String, JPanel>();
-
-        // Add the restore and sace buttons
-        JPanel buttonsPanel = new JPanel();
-        _plusButton = new JButton("+");
-        buttonsPanel.add(_plusButton);
-        _minusButton = new JButton("-");
-        buttonsPanel.add(_minusButton);
-        contentPane.add(buttonsPanel);
 
         // only hide on close as this view is reused by the application:
         setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -71,7 +84,7 @@ public class MainWindow extends JFrame implements ActionListener {
 
     public void init() {
         _plusButton.addActionListener(this);
-        _minusButton.addActionListener(this);
+//        _minusButton.addActionListener(this);
 
         WindowUtils.centerOnMainScreen(this);
         WindowUtils.setClosingKeyboardShortcuts(this);
@@ -113,11 +126,6 @@ public class MainWindow extends JFrame implements ActionListener {
         // If the "Restore to default settings" button has been pressed
         if (evt.getSource().equals(_plusButton)) {
             addView();
-        }
-
-        // If the "Save modifications" button has been pressed
-        if (evt.getSource().equals(_minusButton)) {
-            // TODO : remove the selected MainPanel
         }
     }
 
