@@ -11,11 +11,13 @@ import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.plaf.UIResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,7 @@ public class MainWindow extends JFrame implements ActionListener {
     /** "Restore to Default Settings" button */
     private JButton _plusButton = null;
     /** "Save Modifications" button */
-    private JButton _minusButton = null;
+    private ButtonUIResource _minusButton = null;
     private LinkedHashMap<String, JPanel> _panels;
     private JideTabbedPane _tabbedPane;
     private static int panelCounter = 0;
@@ -52,7 +54,7 @@ public class MainWindow extends JFrame implements ActionListener {
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-        _plusButton = new JButton("+");
+        _plusButton = new ButtonUIResource("+");
         contentPane.add(_plusButton);
 
         // Build the tabbed pane
@@ -67,7 +69,6 @@ public class MainWindow extends JFrame implements ActionListener {
         // TODO : setTabEditingValidator(...)
         _tabbedPane.setTabLeadingComponent(_plusButton);
         _tabbedPane.setCloseAction(new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 System.out.println("Close button clicked");
@@ -180,5 +181,16 @@ public class MainWindow extends JFrame implements ActionListener {
         mainWindow.init();
         mainWindow.restore(panels);
         mainWindow.display();
+    }
+}
+
+class ButtonUIResource extends JButton implements UIResource {
+
+    public ButtonUIResource(String text) {
+        super(text);
+    }
+
+    public ButtonUIResource(Action action) {
+        super(action);
     }
 }
