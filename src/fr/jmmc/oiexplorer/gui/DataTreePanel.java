@@ -54,6 +54,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
+        ocm.getOiFitsCollectionEventNotifier().register(this);
+        
         initComponents();
         postInit();
     }
@@ -84,8 +86,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         dataTree.addTreeSelectionListener(this);
 
         genericTreePanel.add(dataTree);
-
-        ocm.getOiFitsCollectionEventNotifier().register(this);
     }
 
     /**
@@ -227,7 +227,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private void processTargetSelection(final TargetUID target) {
         logger.debug("processTargetSelection: {}", target);
 
-        // update subset definition (use copy ?):
+        // update subset definition (copy):
         final SubsetDefinition subset = getSubsetDefinition();
         subset.setTarget(target);
         subset.getTables().clear(); // means all
@@ -244,7 +244,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private void processTableSelection(final TargetUID target, final OITable oiTable) {
         logger.debug("processTableSelection: {}", oiTable);
 
-        // update subset definition (use copy ?):
+        // update subset definition (copy):
         final SubsetDefinition subset = getSubsetDefinition();
         subset.setTarget(target);
         final List<TableUID> tables = subset.getTables();
