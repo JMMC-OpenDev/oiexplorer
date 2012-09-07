@@ -46,7 +46,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     /** OIFitsCollectionManager singleton */
     private OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** subset identifier */
-    private String subsetId = OIFitsCollectionManager.CURRENT;
+    private String subsetId = OIFitsCollectionManager.CURRENT_SUBSET_DEFINITION;
     /** subset to edit */
     private SubsetDefinition subsetDefinition = null;
     /** Swing data tree */
