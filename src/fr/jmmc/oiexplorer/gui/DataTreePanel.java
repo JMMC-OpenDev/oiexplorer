@@ -259,6 +259,18 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         ocm.updateSubsetDefinition(this, subset);
     }
 
+    /* --- OIFitsCollectionEventListener implementation --- */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @see GenericEvent#subjectId
+     * @param type event type
+     * @return subject id i.e. related object id (null allowed)
+     */
+    public String getSubjectId(final OIFitsCollectionEventType type) {
+        // useless
+        return null;
+    }
+
     /**
      * Handle the given OIFits collection event
      * @param event OIFits collection event

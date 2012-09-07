@@ -9,6 +9,7 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
 import fr.jmmc.oiexplorer.core.model.event.SubsetDefinitionEvent;
+import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,25 +18,31 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class PlotView extends javax.swing.JPanel implements OIFitsCollectionEventListener {
-    /* members */
+public final class PlotView extends javax.swing.JPanel implements OIFitsCollectionEventListener {
 
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
     /** Class logger */
     protected static final Logger logger = LoggerFactory.getLogger(PlotView.class.getName());
-    /** Associated plot identifier*/
-    private final String plotId;
+
+    /* members */
     /** OIFitsCollectionManager singleton reference */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    /** related plot identifier */
+    private final String plotId;
 
-    /** Creates new form PlotView */
+    /** 
+     * Creates new form PlotView 
+     * @param plotId plot identifier
+     */
     public PlotView(final String plotId) {
         ocm.getSubsetDefinitionEventNotifier().register(this);
 
         // Build GUI
         initComponents();
+
         this.plotId = plotId;
 
-        
         // Finish init
         postInit();
     }
@@ -56,7 +63,38 @@ public class PlotView extends javax.swing.JPanel implements OIFitsCollectionEven
         this.oIFitsHtmlPanel.updateOIFits(subsetDefinition.getOIFitsSubset());
     }
 
-   
+    /* --- OIFitsCollectionEventListener implementation --- */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @see GenericEvent#subjectId
+     * @param type event type
+     * @return subject id i.e. related object id (null allowed)
+     */
+    public String getSubjectId(final OIFitsCollectionEventType type) {
+        // Get SubsetId corresponding to the latest plot instance:
+        final Plot plot = ocm.getPlotRef(this.plotId);
+        if (plot != null) {
+            return (plot.getSubsetDefinition() != null) ? plot.getSubsetDefinition().getName() : null;
+        }
+        return null;
+    }
+
+    /**
+     * Handle the given OIFits collection event
+     * @param event OIFits collection event
+     */
+    @Override
+    public void onProcess(GenericEvent<OIFitsCollectionEventType> event) {
+        logger.warn("onProcess : {}", event);
+
+        switch (event.getType()) {
+            case SUBSET_CHANGED:
+                updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());
+                break;
+            default:
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -94,19 +132,8 @@ public class PlotView extends javax.swing.JPanel implements OIFitsCollectionEven
     public Vis2Panel getPlotPanel() {
         return vis2Panel;
     }
-    
-     /**
-     * Handle the given OIFits collection event
-     * @param event OIFits collection event
-     */
-    @Override
-    public void onProcess(GenericEvent<OIFitsCollectionEventType> event) {
-        logger.warn("onProcess : {}", event);
 
-        switch (event.getType()) {
-            case SUBSET_CHANGED:
-                updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());                
-            default:
-        }
-    }    
+    public String getPlotId() {
+        return plotId;
+    }
 }
