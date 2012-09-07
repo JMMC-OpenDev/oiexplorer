@@ -3,30 +3,25 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
-import com.jidesoft.swing.JideTabbedPane;
+import com.jidesoft.swing.JideButton;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
-import fr.jmmc.oiexplorer.core.gui.PlotPanelEditor;
-import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
-import fr.jmmc.oiexplorer.core.gui.action.ExportPDFAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
-import fr.jmmc.oiexplorer.core.model.event.SubsetDefinitionEvent;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
-import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
+import javax.swing.JTabbedPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,19 +35,19 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private static final long serialVersionUID = 1;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
-    /** panel counter  to display title without given name */
+    /** panel counter to display title without given name */
     private static int panelCounter = 0;
+    /* members */
     /** OIFitsCollectionManager singleton reference */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
     /** Creates new form MainPanel */
     public MainPanel() {
         ocm.getOiFitsCollectionEventNotifier().register(this);
-        ocm.getSubsetDefinitionEventNotifier().register(this);
 
         // Build GUI
         initComponents();
-        
+
         // Finish init
         postInit();
     }
@@ -66,10 +61,14 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // Link removeCurrentView to the tabpane close button
         this.tabbedPane.setCloseAction(new AbstractAction() {
+            /** default serial UID for Serializable interface */
+            private static final long serialVersionUID = 1;
+
             public void actionPerformed(ActionEvent e) {
                 removeCurrentView();
             }
         });
+
         /*
          this.tabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
          this.tabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
@@ -82,6 +81,16 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         // Build toolBar
         toolBar.add(OIFitsExplorerExportPDFAction.getInstance());
 
+        final JideButton plusButton = new JideButton("+");
+        plusButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                final String plotId = OIFitsCollectionManager.CURRENT;
+                final PlotView p = new PlotView(plotId);
+                addPanel(p, plotId);
+            }
+        });
+
+        toolBar.add(plusButton);
     }
 
     /**
@@ -89,12 +98,16 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * @see #onProcess(fr.jmmc.oiexplorer.core.model.event.GenericEvent) 
      */
     private void updateTabContent() {
-        // TODO handle case where tab where already present
         logger.warn("prepareTabContent() for collection manager plots : {}", ocm.getUserCollection().getPlots());
-        for (Plot plot : ocm.getUserCollection().getPlots()) {            
-            final String plotId = plot.getName();                        
-            PlotView p = new PlotView(plotId);
-            addPanel(p, plotId);
+
+        for (Plot plot : ocm.getUserCollection().getPlots()) {
+            final String plotId = plot.getName();
+
+            // check where tab is already present:
+            if (findPlotView(tabbedPane, plotId) == -1) {
+                final PlotView p = new PlotView(plotId);
+                addPanel(p, plotId);
+            }
         }
     }
 
@@ -108,6 +121,18 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // restore previous selected item :
         this.jListOIFitsFiles.setSelectedValue(oldValue, true);
+    }
+
+    /* --- OIFitsCollectionEventListener implementation --- */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @see GenericEvent#subjectId
+     * @param type event type
+     * @return subject id i.e. related object id (null allowed)
+     */
+    public String getSubjectId(final OIFitsCollectionEventType type) {
+        // useless
+        return null;
     }
 
     /**
@@ -124,10 +149,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
                 updateOIFitsList(((OIFitsCollectionEvent) event).getOIFitsCollection());
                 // Update tabpane content
                 updateTabContent();
-                break;
-            case SUBSET_CHANGED:
-                // now should be done in PlotView
-                // updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());
                 break;
             default:
         }
@@ -239,7 +260,30 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     }
 
     public void removeCurrentView() {
-        logger.warn("removeCurrentView() TODO");
+        logger.warn("removeCurrentView(): {}", tabbedPane.getSelectedIndex());
+
+        // simply remove current tab:
+        // as EventNotifier use weak references:
+        if (tabbedPane.getSelectedIndex() != -1) {
+            tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
+        }
+    }
+
+    private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
+        logger.warn("findPlotView: {}", plotId);
+
+        Component com;
+        for (int i = 0, len = tabbedPane.getTabCount(); i < len; i++) {
+            com = tabbedPane.getComponentAt(i);
+            if (com instanceof PlotView) {
+                final PlotView plotView = (PlotView) com;
+                logger.warn("findPlotView: plotView = {}", plotView.getPlotId());
+                if (plotId.equals(plotView.getPlotId())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     /**
