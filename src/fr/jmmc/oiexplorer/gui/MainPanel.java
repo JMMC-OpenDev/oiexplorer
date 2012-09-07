@@ -4,6 +4,7 @@
 package fr.jmmc.oiexplorer.gui;
 
 import com.jidesoft.swing.JideButton;
+import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
@@ -12,16 +13,19 @@ import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
 import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.plaf.UIResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +44,8 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     /* members */
     /** OIFitsCollectionManager singleton reference */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    /** Add a new plot tab action */
+    private NewPlotTabAction newPlotTabAction;
 
     /** Creates new form MainPanel */
     public MainPanel() {
@@ -56,6 +62,9 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
+
+        registerActions();
+
         // Add renderer to get short oifits filenames
         this.jListOIFitsFiles.setCellRenderer(new OIFitsListRenderer());
 
@@ -69,28 +78,26 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             }
         });
 
-        /*
-         this.tabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
-         this.tabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
-         this.tabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
-         this.tabbedPane.setTabEditingAllowed(true);
-         // TODO : setTabEditingValidator(...)
-         this.tabbedPane.setTabLeadingComponent(_plusButton);
-         */
+        tabbedPane.setTabShape(tabbedPane.SHAPE_ROUNDED_VSNET);
+        tabbedPane.setTabResizeMode(tabbedPane.RESIZE_MODE_NONE);
+        tabbedPane.setColorTheme(tabbedPane.COLOR_THEME_VSNET);
+        tabbedPane.setTabEditingAllowed(true);
+        // TODO : setTabEditingValidator(...)         
+        final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
+        tabbedPane.setTabLeadingComponent(plusButton);
+    }
+
+    /**
+     * Create the main actions and/or present in the toolbar
+     */
+    private void registerActions() {
+
+        newPlotTabAction = new NewPlotTabAction(NewPlotTabAction.class.getName(), "newPlotTabAction");
+        newPlotTabAction.putValue(Action.NAME, "+");
 
         // Build toolBar
         toolBar.add(OIFitsExplorerExportPDFAction.getInstance());
-
-        final JideButton plusButton = new JideButton("+");
-        plusButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                final String plotId = OIFitsCollectionManager.CURRENT;
-                final PlotView p = new PlotView(plotId);
-                addPanel(p, plotId);
-            }
-        });
-
-        toolBar.add(plusButton);
+        toolBar.add(newPlotTabAction);
     }
 
     /**
@@ -100,6 +107,22 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private void updateTabContent() {
         logger.warn("prepareTabContent() for collection manager plots : {}", ocm.getUserCollection().getPlots());
 
+        // remove dead plot views:
+        for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
+            final Component com = tabbedPane.getComponentAt(i);
+            if (com instanceof PlotView) {
+                final PlotView plotView = (PlotView) com;
+                logger.warn("updateTabContent: plotView = {}", plotView.getPlotId());
+                
+                if (!ocm.hasPlot(plotView.getPlotId())) {
+                    tabbedPane.removeTabAt(i);
+                    tabCount--;
+                    i--;
+                }
+            }
+        }        
+        
+        // add missing plot views:
         for (Plot plot : ocm.getUserCollection().getPlots()) {
             final String plotId = plot.getName();
 
@@ -111,6 +134,112 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
     }
 
+    
+    public DataTreePanel getDataTreePanel() {
+        return dataTreePanel;
+    }
+
+    /**
+     * Return the current plot panel
+     * @return main panel
+     */
+    public PlotView getCurrentPanel() {
+        return (PlotView) tabbedPane.getSelectedComponent();
+    }
+
+    /**
+     * Add the given panel or one new if null given.
+     * @param panel Panel to add (PlotView instance)
+     * @param panelName name of panel to be added
+     */
+    private void addPanel(final JPanel panel, final String panelName) {
+        JPanel panelToAdd = panel;
+        
+        if (panelToAdd == null) {
+            String plotId = getNewPlot();
+            panelToAdd = new PlotView(plotId);
+        }
+
+        final String name;
+        if ((panelName != null) && (panelName.length() > 0)) {
+            name = panelName;
+        } else {
+            name = panelToAdd.getClass().getSimpleName() + " " + panelCounter;
+            panelCounter++;
+        }
+
+        // To correctly match deeper background color of inner tab panes
+        panelToAdd.setOpaque(false);
+
+        tabbedPane.add(name, panelToAdd);
+        logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
+    }
+
+    /** 
+     * Create a new plot (plotDef,subset copied from current).
+     * The created objects are added to the manager and 
+     * @return plotId of created Plot
+     */
+    public String getNewPlot() {
+        // TODO: find something less stupid for ids
+        final String plotId = "plot" + panelCounter;
+
+        // TODO: what to do if add return false ??
+
+        final SubsetDefinition subset = new SubsetDefinition();
+        subset.setName("subset" + panelCounter);
+        subset.copy(ocm.getCurrentSubsetDefinition());
+        if (!ocm.addSubsetDefinition(subset)) {
+            throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
+        }
+
+        final PlotDefinition plotDef = new PlotDefinition();
+        plotDef.setName("plotDef" + panelCounter);
+        plotDef.copy(ocm.getCurrentPlotDefinition());
+        if (!ocm.addPlotDefinition(plotDef)) {
+            throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
+        }
+
+        // Create new Plot with subset and plotdefinition
+        final Plot plot = new Plot();
+        plot.setName(plotId);
+        plot.setPlotDefinition(plotDef);
+        plot.setSubsetDefinition(subset);
+
+        if (!ocm.addPlot(plot)) {
+            throw new IllegalStateException("unable to addPlot : " + plot);
+        }
+
+        return plotId;
+    }
+
+    public void removeCurrentView() {
+        logger.warn("removeCurrentView(): {}", tabbedPane.getSelectedIndex());
+
+        // simply remove current tab:
+        // as EventNotifier use weak references:
+        if (tabbedPane.getSelectedIndex() != -1) {
+            tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
+        }
+    }
+
+    private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
+        logger.warn("findPlotView: {}", plotId);
+
+        Component com;
+        for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
+            com = tabbedPane.getComponentAt(i);
+            if (com instanceof PlotView) {
+                final PlotView plotView = (PlotView) com;
+                logger.warn("findPlotView: plotView = {}", plotView.getPlotId());
+                if (plotId.equals(plotView.getPlotId())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+    
     /**
      * Refresh the list of OIfits files
      */
@@ -229,61 +358,18 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 
-    public DataTreePanel getDataTreePanel() {
-        return dataTreePanel;
-    }
-
-    /**
-     * Return the current plot panel
-     * @return main panel
+    /** 
+     * This action open prepare plot objects and open one new tab.
      */
-    public PlotView getCurrentPanel() {
-        return (PlotView) tabbedPane.getSelectedComponent();
-    }
+    private class NewPlotTabAction extends RegisteredAction {
 
-    public void addPanel(final JPanel panel, final String panelName) {
-
-        final String name;
-        if ((panelName != null) && (panelName.length() > 0)) {
-            name = panelName;
-        } else {
-            name = panel.getClass().getSimpleName() + " " + panelCounter;
-            panelCounter++;
+        public NewPlotTabAction(final String className, final String actionName) {
+            super(className, actionName);
         }
 
-        // To correctly match deeper background color of inner tab panes
-        panel.setOpaque(false);
-
-        tabbedPane.add(name, panel);
-
-        logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
-    }
-
-    public void removeCurrentView() {
-        logger.warn("removeCurrentView(): {}", tabbedPane.getSelectedIndex());
-
-        // simply remove current tab:
-        // as EventNotifier use weak references:
-        if (tabbedPane.getSelectedIndex() != -1) {
-            tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
+        public void actionPerformed(ActionEvent e) {
+            addPanel(null, null);
         }
-    }
-
-    private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
-        logger.warn("findPlotView: {}", plotId);
-
-        Component com;
-        for (int i = 0, len = tabbedPane.getTabCount(); i < len; i++) {
-            com = tabbedPane.getComponentAt(i);
-            if (com instanceof PlotView) {
-                final PlotView plotView = (PlotView) com;
-                logger.warn("findPlotView: plotView = {}", plotView.getPlotId());
-                if (plotId.equals(plotView.getPlotId())) {
-                    return i;
-                }
-            }
-        }
-        return -1;
     }
 
     /**
@@ -344,5 +430,16 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
             return this;
         }
+    }
+}
+
+class JideButtonUIResource extends JideButton implements UIResource {
+
+    public JideButtonUIResource(String text) {
+        super(text);
+    }
+
+    public JideButtonUIResource(Action action) {
+        super(action);
     }
 }
