@@ -39,8 +39,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private static final long serialVersionUID = 1;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
-    /** panel counter to display title without given name */
-    private static int panelCounter = 0;
     /* members */
     /** OIFitsCollectionManager singleton reference */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
@@ -105,23 +103,23 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * @see #onProcess(fr.jmmc.oiexplorer.core.model.event.GenericEvent) 
      */
     private void updateTabContent() {
-        logger.warn("prepareTabContent() for collection manager plots : {}", ocm.getUserCollection().getPlots());
+        if (logger.isDebugEnabled()) {
+            logger.debug("prepareTabContent() for collection manager plots : {}", ocm.getUserCollection().getPlots());
+        }
 
         // remove dead plot views:
         for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
             final Component com = tabbedPane.getComponentAt(i);
             if (com instanceof PlotView) {
                 final PlotView plotView = (PlotView) com;
-                logger.warn("updateTabContent: plotView = {}", plotView.getPlotId());
-                
                 if (!ocm.hasPlot(plotView.getPlotId())) {
                     tabbedPane.removeTabAt(i);
                     tabCount--;
                     i--;
                 }
             }
-        }        
-        
+        }
+
         // add missing plot views:
         for (Plot plot : ocm.getUserCollection().getPlots()) {
             final String plotId = plot.getName();
@@ -134,7 +132,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
     }
 
-    
     public DataTreePanel getDataTreePanel() {
         return dataTreePanel;
     }
@@ -154,9 +151,10 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      */
     private void addPanel(final JPanel panel, final String panelName) {
         JPanel panelToAdd = panel;
-        
+
+        String plotId = null;
         if (panelToAdd == null) {
-            String plotId = getNewPlot();
+            plotId = getNewPlot();
             panelToAdd = new PlotView(plotId);
         }
 
@@ -164,8 +162,11 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         if ((panelName != null) && (panelName.length() > 0)) {
             name = panelName;
         } else {
-            name = panelToAdd.getClass().getSimpleName() + " " + panelCounter;
-            panelCounter++;
+            if (plotId != null) {
+                name = plotId;
+            } else {
+                name = panelToAdd.getClass().getSimpleName();
+            }
         }
 
         // To correctly match deeper background color of inner tab panes
@@ -181,28 +182,52 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * @return plotId of created Plot
      */
     public String getNewPlot() {
-        // TODO: find something less stupid for ids
-        final String plotId = "plot" + panelCounter;
+        String id;
 
-        // TODO: what to do if add return false ??
+        // find subset id:
+        for (int count = 1;;) {
+            id = "subset" + count;
+            if (!ocm.hasSubsetDefinition(id)) {
+                break;
+            }
+            count++;
+        }
 
         final SubsetDefinition subset = new SubsetDefinition();
-        subset.setName("subset" + panelCounter);
+        subset.setName(id);
         subset.copy(ocm.getCurrentSubsetDefinition());
         if (!ocm.addSubsetDefinition(subset)) {
             throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
         }
 
+        // find plotDef id:
+        for (int count = 1;;) {
+            id = "plotDef" + count;
+            if (!ocm.hasPlotDefinition(id)) {
+                break;
+            }
+            count++;
+        }
+
         final PlotDefinition plotDef = new PlotDefinition();
-        plotDef.setName("plotDef" + panelCounter);
+        plotDef.setName(id);
         plotDef.copy(ocm.getCurrentPlotDefinition());
         if (!ocm.addPlotDefinition(plotDef)) {
             throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
         }
 
+        // find plot id:
+        for (int count = 1;;) {
+            id = "plot" + count;
+            if (!ocm.hasPlot(id)) {
+                break;
+            }
+            count++;
+        }
+
         // Create new Plot with subset and plotdefinition
         final Plot plot = new Plot();
-        plot.setName(plotId);
+        plot.setName(id);
         plot.setPlotDefinition(plotDef);
         plot.setSubsetDefinition(subset);
 
@@ -210,11 +235,11 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             throw new IllegalStateException("unable to addPlot : " + plot);
         }
 
-        return plotId;
+        return id;
     }
 
     public void removeCurrentView() {
-        logger.warn("removeCurrentView(): {}", tabbedPane.getSelectedIndex());
+        logger.debug("removeCurrentView(): {}", tabbedPane.getSelectedIndex());
 
         // simply remove current tab:
         // as EventNotifier use weak references:
@@ -224,14 +249,11 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     }
 
     private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
-        logger.warn("findPlotView: {}", plotId);
-
         Component com;
         for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
             com = tabbedPane.getComponentAt(i);
             if (com instanceof PlotView) {
                 final PlotView plotView = (PlotView) com;
-                logger.warn("findPlotView: plotView = {}", plotView.getPlotId());
                 if (plotId.equals(plotView.getPlotId())) {
                     return i;
                 }
@@ -239,7 +261,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
         return -1;
     }
-    
+
     /**
      * Refresh the list of OIfits files
      */
