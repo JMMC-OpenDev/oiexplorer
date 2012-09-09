@@ -53,6 +53,10 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     private void postInit() {
         vis2Panel.setPlotId(plotId);
         plotEditor.setPlotId(plotId);
+                
+        // hide PlotDefinitionEditor by default
+        editToggleButton.setSelected(false);
+        editToggleButtonActionPerformed(null);
     }
 
     /**
@@ -106,24 +110,54 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
 
         jTabbedPaneViews = new javax.swing.JTabbedPane();
         plotPanel = new javax.swing.JPanel();
+        northPanel = new javax.swing.JPanel();
         plotEditor = new fr.jmmc.oiexplorer.core.gui.PlotEditor();
+        editToggleButton = new javax.swing.JToggleButton();
         vis2Panel = new fr.jmmc.oiexplorer.core.gui.Vis2Panel();
+        plotDefinitionEditor = new fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor();
         oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
 
         setLayout(new java.awt.BorderLayout());
 
         plotPanel.setLayout(new java.awt.BorderLayout());
-        plotPanel.add(plotEditor, java.awt.BorderLayout.NORTH);
+
+        northPanel.add(plotEditor);
+
+        editToggleButton.setText("edit");
+        editToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editToggleButtonActionPerformed(evt);
+            }
+        });
+        northPanel.add(editToggleButton);
+
+        plotPanel.add(northPanel, java.awt.BorderLayout.NORTH);
         plotPanel.add(vis2Panel, java.awt.BorderLayout.CENTER);
+        plotPanel.add(plotDefinitionEditor, java.awt.BorderLayout.SOUTH);
 
         jTabbedPaneViews.addTab("plot", plotPanel);
         jTabbedPaneViews.addTab("data", oIFitsHtmlPanel);
 
         add(jTabbedPaneViews, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void editToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editToggleButtonActionPerformed
+        final boolean displayPlotDefEditor = editToggleButton.isSelected();
+        plotDefinitionEditor.setVisible(displayPlotDefEditor);
+        if(displayPlotDefEditor){
+            plotDefinitionEditor.setPlotId(plotId);
+        }else{
+            plotDefinitionEditor.setPlotId(null);
+        }
+        
+    }//GEN-LAST:event_editToggleButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton editToggleButton;
     private javax.swing.JTabbedPane jTabbedPaneViews;
+    private javax.swing.JPanel northPanel;
     private fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel oIFitsHtmlPanel;
+    private fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor plotDefinitionEditor;
     private fr.jmmc.oiexplorer.core.gui.PlotEditor plotEditor;
     private javax.swing.JPanel plotPanel;
     private fr.jmmc.oiexplorer.core.gui.Vis2Panel vis2Panel;
