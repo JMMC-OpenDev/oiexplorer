@@ -7,11 +7,12 @@ import com.jidesoft.swing.JideButton;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
-import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
-import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
+import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
@@ -19,12 +20,15 @@ import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.plaf.UIResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * Main container of OIFits Explorer App
  * @author mella
  */
-public final class MainPanel extends javax.swing.JPanel implements OIFitsCollectionEventListener {
+public final class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -47,7 +51,9 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
     /** Creates new form MainPanel */
     public MainPanel() {
-        ocm.getOiFitsCollectionEventNotifier().register(this);
+        // always bind at the beginning of the constructor (to maintain correct ordering):
+        ocm.bindCollectionChangedEvent(this);
+        ocm.bindPlotListChangedEvent(this);
 
         // Build GUI
         initComponents();
@@ -80,6 +86,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         tabbedPane.setTabResizeMode(tabbedPane.RESIZE_MODE_NONE);
         tabbedPane.setColorTheme(tabbedPane.COLOR_THEME_VSNET);
         tabbedPane.setTabEditingAllowed(true);
+
         // TODO : setTabEditingValidator(...)         
         final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
         tabbedPane.setTabLeadingComponent(plusButton);
@@ -101,18 +108,19 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     /**
      * Synchronize tab and Views of OIFitsCollectionManager
      * @see #onProcess(fr.jmmc.oiexplorer.core.model.event.GenericEvent) 
+     * 
+     * @param plotList plot list
      */
-    private void updateTabContent() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("prepareTabContent() for collection manager plots : {}", ocm.getUserCollection().getPlots());
-        }
+    private void updateTabContent(final List<Plot> plotList) {
+        logger.warn("updateTabContent - plots : {}", plotList);
 
         // remove dead plot views:
         for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
             final Component com = tabbedPane.getComponentAt(i);
             if (com instanceof PlotView) {
                 final PlotView plotView = (PlotView) com;
-                if (!ocm.hasPlot(plotView.getPlotId())) {
+
+                if (!Identifiable.hasIdentifiable(plotView.getPlotId(), plotList)) {
                     tabbedPane.removeTabAt(i);
                     tabCount--;
                     i--;
@@ -121,7 +129,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
 
         // add missing plot views:
-        for (Plot plot : ocm.getUserCollection().getPlots()) {
+        for (Plot plot : plotList) {
             final String plotId = plot.getName();
 
             // check where tab is already present:
@@ -152,21 +160,18 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private void addPanel(final JPanel panel, final String panelName) {
         JPanel panelToAdd = panel;
 
-        String plotId = null;
         if (panelToAdd == null) {
-            plotId = getNewPlot();
-            panelToAdd = new PlotView(plotId);
+            // note: as a plot is added, then updateTabContent() is called by event notifier:
+            getNewPlot();
+
+            return;
         }
 
         final String name;
         if ((panelName != null) && (panelName.length() > 0)) {
             name = panelName;
         } else {
-            if (plotId != null) {
-                name = plotId;
-            } else {
-                name = panelToAdd.getClass().getSimpleName();
-            }
+            name = panelToAdd.getClass().getSimpleName();
         }
 
         // To correctly match deeper background color of inner tab panes
@@ -231,6 +236,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         plot.setPlotDefinition(plotDef);
         plot.setSubsetDefinition(subset);
 
+        // fire PlotListChanged ie will call updateTabContent():
         if (!ocm.addPlot(plot)) {
             throw new IllegalStateException("unable to addPlot : " + plot);
         }
@@ -272,37 +278,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // restore previous selected item :
         this.jListOIFitsFiles.setSelectedValue(oldValue, true);
-    }
-
-    /* --- OIFitsCollectionEventListener implementation --- */
-    /**
-     * Return the optional subject id i.e. related object id that this listener accepts
-     * @see GenericEvent#subjectId
-     * @param type event type
-     * @return subject id i.e. related object id (null allowed)
-     */
-    public String getSubjectId(final OIFitsCollectionEventType type) {
-        // useless
-        return null;
-    }
-
-    /**
-     * Handle the given OIFits collection event
-     * @param event OIFits collection event
-     */
-    @Override
-    public void onProcess(final GenericEvent<OIFitsCollectionEventType> event) {
-        logger.debug("Received event to process {}", event);
-
-        switch (event.getType()) {
-            case CHANGED:
-                // Update info for oifits file list
-                updateOIFitsList(((OIFitsCollectionEvent) event).getOIFitsCollection());
-                // Update tabpane content
-                updateTabContent();
-                break;
-            default:
-        }
     }
 
     /** 
@@ -453,15 +428,50 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             return this;
         }
     }
-}
 
-class JideButtonUIResource extends JideButton implements UIResource {
+    class JideButtonUIResource extends JideButton implements UIResource {
 
-    public JideButtonUIResource(String text) {
-        super(text);
+        public JideButtonUIResource(String text) {
+            super(text);
+        }
+
+        public JideButtonUIResource(Action action) {
+            super(action);
+        }
     }
 
-    public JideButtonUIResource(Action action) {
-        super(action);
+    /*
+     * OIFitsCollectionManagerEventListener implementation 
+     */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @param type event type
+     * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
+     */
+    public String getSubjectId(final OIFitsCollectionManagerEventType type) {
+        // accept all
+        return null;
+    }
+
+    /**
+     * Handle the given OIFits collection event
+     * @param event OIFits collection event
+     */
+    @Override
+    public void onProcess(final OIFitsCollectionManagerEvent event) {
+        logger.debug("onProcess {}", event);
+
+        switch (event.getType()) {
+            case COLLECTION_CHANGED:
+                // Update info for oifits file list
+                updateOIFitsList(event.getOIFitsCollection());
+                break;
+            case PLOT_LIST_CHANGED:
+                // Update tabpane content
+                updateTabContent(event.getPlotList());
+                break;
+            default:
+        }
+        logger.debug("onProcess {} - done", event);
     }
 }

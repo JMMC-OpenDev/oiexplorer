@@ -4,11 +4,10 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
-import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
-import fr.jmmc.oiexplorer.core.model.event.SubsetDefinitionEvent;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import org.slf4j.Logger;
@@ -18,12 +17,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public final class PlotView extends javax.swing.JPanel implements OIFitsCollectionEventListener {
+public final class PlotView extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
     /** Class logger */
-    protected static final Logger logger = LoggerFactory.getLogger(PlotView.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PlotView.class.getName());
 
     /* members */
     /** OIFitsCollectionManager singleton reference */
@@ -36,7 +35,7 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      * @param plotId plot identifier
      */
     public PlotView(final String plotId) {
-        ocm.getSubsetDefinitionEventNotifier().register(this);
+        ocm.getSubsetDefinitionChangedEventNotifier().register(this);
 
         // Build GUI
         initComponents();
@@ -51,9 +50,9 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
+        plotEditor.initialize(plotId);
         vis2Panel.setPlotId(plotId);
-        plotEditor.setPlotId(plotId);
-                
+
         // hide PlotDefinitionEditor by default
         editToggleButton.setSelected(false);
         editToggleButtonActionPerformed(null);
@@ -65,38 +64,6 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      */
     private void updateHtmlView(final SubsetDefinition subsetDefinition) {
         this.oIFitsHtmlPanel.updateOIFits(subsetDefinition.getOIFitsSubset());
-    }
-
-    /* --- OIFitsCollectionEventListener implementation --- */
-    /**
-     * Return the optional subject id i.e. related object id that this listener accepts
-     * @see GenericEvent#subjectId
-     * @param type event type
-     * @return subject id i.e. related object id (null allowed)
-     */
-    public String getSubjectId(final OIFitsCollectionEventType type) {
-        // Get SubsetId corresponding to the latest plot instance:
-        final Plot plot = ocm.getPlotRef(this.plotId);
-        if (plot != null) {
-            return (plot.getSubsetDefinition() != null) ? plot.getSubsetDefinition().getName() : null;
-        }
-        return null;
-    }
-
-    /**
-     * Handle the given OIFits collection event
-     * @param event OIFits collection event
-     */
-    @Override
-    public void onProcess(GenericEvent<OIFitsCollectionEventType> event) {
-        logger.warn("onProcess : {}", event);
-
-        switch (event.getType()) {
-            case SUBSET_CHANGED:
-                updateHtmlView(((SubsetDefinitionEvent) event).getSubsetDefinition());
-                break;
-            default:
-        }
     }
 
     /** This method is called from within the constructor to
@@ -144,14 +111,13 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     private void editToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editToggleButtonActionPerformed
         final boolean displayPlotDefEditor = editToggleButton.isSelected();
         plotDefinitionEditor.setVisible(displayPlotDefEditor);
-        if(displayPlotDefEditor){
+        if (displayPlotDefEditor) {
             plotDefinitionEditor.setPlotId(plotId);
-        }else{
+        } else {
             plotDefinitionEditor.setPlotId(null);
         }
-        
-    }//GEN-LAST:event_editToggleButtonActionPerformed
 
+    }//GEN-LAST:event_editToggleButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton editToggleButton;
     private javax.swing.JTabbedPane jTabbedPaneViews;
@@ -169,5 +135,45 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
 
     public String getPlotId() {
         return plotId;
+    }
+
+    /*
+     * OIFitsCollectionManagerEventListener implementation 
+     */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @param type event type
+     * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
+     */
+    public String getSubjectId(final OIFitsCollectionManagerEventType type) {
+        // TODO: find better solution (plot ?)
+        switch (type) {
+            case SUBSET_CHANGED:
+                // Get SubsetId corresponding to the latest plot instance:
+                final Plot plot = ocm.getPlotRef(plotId);
+                if (plot != null && plot.getSubsetDefinition() != null) {
+                    return plot.getSubsetDefinition().getName();
+                }
+                break;
+            default:
+        }
+        return DISCARDED_SUBJECT_ID;
+    }
+
+    /**
+     * Handle the given OIFits collection event
+     * @param event OIFits collection event
+     */
+    @Override
+    public void onProcess(final OIFitsCollectionManagerEvent event) {
+        logger.debug("onProcess {}", event);
+
+        switch (event.getType()) {
+            case SUBSET_CHANGED:
+                updateHtmlView(event.getSubsetDefinition());
+                break;
+            default:
+        }
+        logger.debug("onProcess {} - done", event);
     }
 }

@@ -6,11 +6,10 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollectionEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
-import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEvent;
-import fr.jmmc.oiexplorer.core.model.event.OIFitsCollectionEventType;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
+import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
@@ -34,8 +33,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author mella
  */
-public final class DataTreePanel extends javax.swing.JPanel implements TreeSelectionListener,
-                                                                       OIFitsCollectionEventListener {
+public final class DataTreePanel extends javax.swing.JPanel implements TreeSelectionListener, OIFitsCollectionManagerEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -44,7 +42,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
     /* members */
     /** OIFitsCollectionManager singleton */
-    private OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** subset identifier */
     private String subsetId = OIFitsCollectionManager.CURRENT_SUBSET_DEFINITION;
     /** subset to edit */
@@ -54,8 +52,9 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
-        ocm.getOiFitsCollectionEventNotifier().register(this);
-        
+        // always bind at the beginning of the constructor (to maintain correct ordering):
+        ocm.bindCollectionChangedEvent(this);
+
         initComponents();
         postInit();
     }
@@ -259,34 +258,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         ocm.updateSubsetDefinition(this, subset);
     }
 
-    /* --- OIFitsCollectionEventListener implementation --- */
-    /**
-     * Return the optional subject id i.e. related object id that this listener accepts
-     * @see GenericEvent#subjectId
-     * @param type event type
-     * @return subject id i.e. related object id (null allowed)
-     */
-    public String getSubjectId(final OIFitsCollectionEventType type) {
-        // useless
-        return null;
-    }
-
-    /**
-     * Handle the given OIFits collection event
-     * @param event OIFits collection event
-     */
-    @Override
-    public void onProcess(final GenericEvent<OIFitsCollectionEventType> event) {
-        logger.debug("Received event to process {}", event);
-
-        switch (event.getType()) {
-            case CHANGED:
-                updateOIFitsCollection(((OIFitsCollectionEvent) event).getOIFitsCollection());
-                break;
-            default:
-        }
-    }
-
     /** 
      * This method is called from within the constructor to
      * initialize the form.
@@ -339,5 +310,35 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         this.subsetId = subsetId;
         // force reset:
         this.subsetDefinition = null;
+    }
+
+    /*
+     * OIFitsCollectionManagerEventListener implementation 
+     */
+    /**
+     * Return the optional subject id i.e. related object id that this listener accepts
+     * @param type event type
+     * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
+     */
+    public String getSubjectId(final OIFitsCollectionManagerEventType type) {
+        // accept all
+        return null;
+    }
+
+    /**
+     * Handle the given OIFits collection event
+     * @param event OIFits collection event
+     */
+    @Override
+    public void onProcess(final OIFitsCollectionManagerEvent event) {
+        logger.debug("onProcess {}", event);
+
+        switch (event.getType()) {
+            case COLLECTION_CHANGED:
+                updateOIFitsCollection(event.getOIFitsCollection());
+                break;
+            default:
+        }
+        logger.debug("onProcess {} - done", event);
     }
 }
