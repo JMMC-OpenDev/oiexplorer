@@ -135,7 +135,7 @@ public final class OIFitsExplorer extends App {
                 logger.debug("OifitsExplorerGui.ready : handler called.");
 
                 // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
-                OIFitsCollectionManager.getInstance().reset();
+                OIFitsCollectionManager.getInstance().start();
                 
                 getFrame().setVisible(true);
             }
