@@ -136,7 +136,7 @@ public final class OIFitsExplorer extends App {
 
                 // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
                 OIFitsCollectionManager.getInstance().start();
-                
+
                 getFrame().setVisible(true);
             }
         });
@@ -187,6 +187,10 @@ public final class OIFitsExplorer extends App {
      */
     @Override
     public void cleanup() {
+        // dispose GUI:
+        if (this.mainPanel != null) {
+            this.mainPanel.dispose();
+        }
 
         // stop the task executor :
         TaskSwingWorkerExecutor.stop();
@@ -206,7 +210,7 @@ public final class OIFitsExplorer extends App {
 
         // initialize the actions :
         registerActions();
-        
+
         frame.setTitle(App.getSharedApplicationDataModel().getProgramName());
 
         // handle frame icon
@@ -238,7 +242,7 @@ public final class OIFitsExplorer extends App {
 
         // init the main panel :
         createContent();
-        
+
         // Handle status bar
         getFramePanel().add(new StatusBar(), BorderLayout.SOUTH);
 
@@ -252,7 +256,7 @@ public final class OIFitsExplorer extends App {
      */
     private void createContent() {
         // adds the main panel in scrollPane
-         this.mainPanel = new MainPanel();
+        this.mainPanel = new MainPanel();
 
         getFramePanel().add(this.mainPanel, BorderLayout.CENTER);
     }
@@ -287,7 +291,7 @@ public final class OIFitsExplorer extends App {
      * Return the main panel
      * @return main panel
      */
-    public MainPanel getMainWindow() {
+    public MainPanel getMainPanel() {
         return mainPanel;
     }
 
