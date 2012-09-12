@@ -45,8 +45,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** subset identifier */
     private String subsetId = OIFitsCollectionManager.CURRENT_SUBSET_DEFINITION;
-    /** subset to edit */
-    private SubsetDefinition subsetDefinition = null;
     /** Swing data tree */
     private GenericJTree<Object> dataTree;
 
@@ -97,9 +95,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         generateTree(oiFitsCollection);
 
-        // Restore subset selection (CURRENT):
-        final SubsetDefinition subset = getSubsetDefinition();
-
         // ALWAYS select a target
         // TODO: the selection should be in sync with subset modification (load, external updates)
         if (oiFitsCollection.isEmpty()) {
@@ -107,15 +102,18 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         } else {
             boolean found = false;
 
-            if (subset.getTarget() != null) {
-                final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(subset.getTarget());
+            // Restore subset selection:
+            final SubsetDefinition subsetRef = getSubsetDefinitionRef();
+
+            if (subsetRef != null && subsetRef.getTarget() != null) {
+                final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(subsetRef.getTarget());
 
                 if (targetTreeNode != null) {
                     DefaultMutableTreeNode tableTreeNode = null;
 
-                    if (!subset.getTables().isEmpty()) {
+                    if (!subsetRef.getTables().isEmpty()) {
                         // TODO: support multi selection:
-                        final TableUID tableUID = subset.getTables().get(0);
+                        final TableUID tableUID = subsetRef.getTables().get(0);
                         final String filePath = tableUID.getFile().getFile();
                         final Integer extNb = tableUID.getExtNb();
 
@@ -227,12 +225,14 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         logger.debug("processTargetSelection: {}", target);
 
         // update subset definition (copy):
-        final SubsetDefinition subset = getSubsetDefinition();
-        subset.setTarget(target);
-        subset.getTables().clear(); // means all
+        final SubsetDefinition subsetCopy = getSubsetDefinition();
+        if (subsetCopy != null) {
+            subsetCopy.setTarget(target);
+            subsetCopy.getTables().clear(); // means all
 
-        // fire subset changed event:
-        ocm.updateSubsetDefinition(this, subset);
+            // fire subset changed event:
+            ocm.updateSubsetDefinition(this, subsetCopy);
+        }
     }
 
     /**
@@ -291,15 +291,19 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Return the subset definition given its subset name
-     * @return subsetDefinition subset definition
+     * Return a new copy of the SubsetDefinition given its identifier (to update it)
+     * @return copy of the SubsetDefinition or null if not found
      */
     private SubsetDefinition getSubsetDefinition() {
-        if (this.subsetDefinition == null) {
-            // get copy:
-            this.subsetDefinition = ocm.getSubsetDefinition(this.subsetId);
-        }
-        return this.subsetDefinition;
+        return ocm.getSubsetDefinition(this.subsetId);
+    }
+
+    /**
+     * Return a the SubsetDefinition reference given its identifier (to read it)
+     * @return SubsetDefinition reference or null if not found
+     */
+    private SubsetDefinition getSubsetDefinitionRef() {
+        return ocm.getSubsetDefinitionRef(this.subsetId);
     }
 
     /**
@@ -308,8 +312,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      */
     public void setSubsetId(final String subsetId) {
         this.subsetId = subsetId;
-        // force reset:
-        this.subsetDefinition = null;
     }
 
     /*
