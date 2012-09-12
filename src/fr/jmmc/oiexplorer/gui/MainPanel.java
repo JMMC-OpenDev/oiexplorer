@@ -6,6 +6,7 @@ package fr.jmmc.oiexplorer.gui;
 import com.jidesoft.swing.JideButton;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
@@ -60,6 +61,33 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // Finish init
         postInit();
+    }
+
+    /**
+     * Free any ressource or reference to this instance :
+     * remove this instance from OIFitsCollectionManager event notifiers
+     * dispose also child components
+     */
+    @Override
+    public void dispose() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dispose: {}", ObjectUtils.getObjectInfo(this));
+        }
+
+        ocm.unbind(this);
+
+        // forward dispose() to child components:
+        if (dataTreePanel != null) {
+            dataTreePanel.dispose();
+        }
+
+        for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
+            final Component com = tabbedPane.getComponentAt(i);
+            if (com instanceof PlotView) {
+                final PlotView plotView = (PlotView) com;
+                plotView.dispose();
+            }
+        }
     }
 
     /**
@@ -121,8 +149,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
                 final PlotView plotView = (PlotView) com;
 
                 if (!Identifiable.hasIdentifiable(plotView.getPlotId(), plotList)) {
-                    logger.warn("updateTabContent - remove plot view : {}", plotView.getPlotId());
-
                     removeView(i);
 
                     tabCount--;
@@ -265,13 +291,29 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      */
     private void removeView(final int index) {
         // Note: views should be freed by GC soon
-        // EventNotifier will remove them from its listeners (weak reference) 
+        // EventNotifier can remove them automatically from its listeners (weak reference) 
         // BUT not immediately so such phantom views can still process useless events !
-        tabbedPane.removeTabAt(index);
 
-        // maybe Views could have a dispose() method to explicitely free resources (unregister from EventNotifier ...)
+        // CONCLUSION: it is better to do it explicitely even if EventNotifier could do it but asynchronously:
+        final Component com = tabbedPane.getComponentAt(index);
+        if (com instanceof PlotView) {
+            final PlotView plotView = (PlotView) com;
+
+            logger.warn("removeView: {}", plotView.getPlotId());
+
+            // free resources (unregister event notifiers):
+            plotView.dispose();
+        }
+
+        tabbedPane.removeTabAt(index);
     }
 
+    /**
+     * Find the plot view given its plot identifier
+     * @param tabbedPane tabbed pane
+     * @param plotId plot identifier
+     * @return PlotView instance or null if not found
+     */
     private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
         Component com;
         for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {

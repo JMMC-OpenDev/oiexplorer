@@ -29,6 +29,6 @@ public final class OIFitsExplorerExportPDFAction extends ExportPDFAction {
      * @return selected GUI panel
      */
     protected Component getSelectedComponent() {
-        return OIFitsExplorer.getInstance().getMainWindow().getCurrentPanel().getPlotPanel();
+        return OIFitsExplorer.getInstance().getMainPanel().getCurrentPanel().getPlotPanel();
     }
 }

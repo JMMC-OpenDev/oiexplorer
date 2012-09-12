@@ -3,6 +3,8 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
+import fr.jmmc.jmcs.gui.component.Disposable;
+import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
@@ -14,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Plot view implementation
  * @author mella
  */
 public final class PlotView extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
@@ -44,6 +46,31 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
 
         // Finish init
         postInit();
+    }
+
+    /**
+     * Free any ressource or reference to this instance :
+     * remove this instance from OIFitsCollectionManager event notifiers
+     * dispose also child components
+     */
+    @Override
+    public void dispose() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dispose: {}", ObjectUtils.getObjectInfo(this));
+        }
+
+        ocm.unbind(this);
+
+        // forward dispose() to child components:
+        if (plotEditor != null) {
+            plotEditor.dispose();
+        }
+        if (vis2Panel != null) {
+            vis2Panel.dispose();
+        }
+        if (plotDefinitionEditor != null) {
+            plotDefinitionEditor.dispose();
+        }
     }
 
     /**

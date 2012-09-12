@@ -5,6 +5,7 @@ package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
@@ -55,6 +56,19 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         initComponents();
         postInit();
+    }
+
+    /**
+     * Free any ressource or reference to this instance :
+     * remove this instance from OIFitsCollectionManager event notifiers
+     */
+    @Override
+    public void dispose() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dispose: {}", ObjectUtils.getObjectInfo(this));
+        }
+
+        ocm.unbind(this);
     }
 
     /**
