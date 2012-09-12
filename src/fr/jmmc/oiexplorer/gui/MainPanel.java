@@ -121,7 +121,10 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
                 final PlotView plotView = (PlotView) com;
 
                 if (!Identifiable.hasIdentifiable(plotView.getPlotId(), plotList)) {
-                    tabbedPane.removeTabAt(i);
+                    logger.warn("updateTabContent - remove plot view : {}", plotView.getPlotId());
+
+                    removeView(i);
+
                     tabCount--;
                     i--;
                 }
@@ -186,7 +189,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * The created objects are added to the manager and 
      * @return plotId of created Plot
      */
-    public String getNewPlot() {
+    private String getNewPlot() {
         String id;
 
         // find subset id:
@@ -244,14 +247,29 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         return id;
     }
 
-    public void removeCurrentView() {
-        logger.debug("removeCurrentView(): {}", tabbedPane.getSelectedIndex());
+    /**
+     * Remove the current view
+     */
+    private void removeCurrentView() {
+        final int index = tabbedPane.getSelectedIndex();
+        if (index != -1) {
+            logger.debug("removeCurrentView(): {}", index);
 
-        // simply remove current tab:
-        // as EventNotifier use weak references:
-        if (tabbedPane.getSelectedIndex() != -1) {
-            tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
+            removeView(index);
         }
+    }
+
+    /**
+     * Remove view at the given index
+     * @param index view index
+     */
+    private void removeView(final int index) {
+        // Note: views should be freed by GC soon
+        // EventNotifier will remove them from its listeners (weak reference) 
+        // BUT not immediately so such phantom views can still process useless events !
+        tabbedPane.removeTabAt(index);
+
+        // maybe Views could have a dispose() method to explicitely free resources (unregister from EventNotifier ...)
     }
 
     private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
