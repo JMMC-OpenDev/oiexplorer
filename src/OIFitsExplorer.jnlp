@@ -16,6 +16,9 @@
   </security>
   <resources>
     <j2se version="1.5+" initial-heap-size="256m" max-heap-size="512m"/>
+    
+    <!-- increase integer cache -->
+    <property name="java.lang.Integer.IntegerCache.high" value="32768"/> 
 
     <!-- Application module first (main class) -->
     <jar href="jar/oiexplorer.jar" />
@@ -30,7 +33,7 @@
     <extension href="../JmcsLibs/JmcsLibs.jnlp"/>
     <extension href="../JmalLibs/JmalLibs.jnlp"/>
     <extension href="../OIExplorerCoreLibs/OIExplorerCoreLibs.jnlp"/>
-
+    
   </resources>
   <application-desc main-class="fr.jmmc.oiexplorer.OIFitsExplorer"/>
 </jnlp>
