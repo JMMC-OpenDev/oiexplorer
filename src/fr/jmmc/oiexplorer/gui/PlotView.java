@@ -3,14 +3,13 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
-import fr.jmmc.jmcs.gui.component.Disposable;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
+import fr.jmmc.oiexplorer.core.model.IdentifiableVersion;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
-import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +30,15 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** related plot identifier */
     private final String plotId;
+    /** last version of the subset of the plot */
+    private IdentifiableVersion lastSubsetVersion = null;
 
     /** 
      * Creates new form PlotView 
      * @param plotId plot identifier
      */
     public PlotView(final String plotId) {
-        ocm.getSubsetDefinitionChangedEventNotifier().register(this);
+        ocm.getPlotChangedEventNotifier().register(this);
 
         // Build GUI
         initComponents();
@@ -90,7 +91,20 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      * @param subsetDefinition subset definition
      */
     private void updateHtmlView(final SubsetDefinition subsetDefinition) {
-        this.oIFitsHtmlPanel.updateOIFits(subsetDefinition.getOIFitsSubset());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateHtmlView: lastSubsetVersion {} vs subsetVersion {}", this.lastSubsetVersion,
+                    (subsetDefinition != null) ? subsetDefinition.getIdentifiableVersion() : null);
+        }
+
+        // compare last version with the subset itself (see IdentifiableVersion.equals):
+        if (!ObjectUtils.areEquals(this.lastSubsetVersion, subsetDefinition)) {
+
+            this.lastSubsetVersion = (subsetDefinition != null) ? subsetDefinition.getIdentifiableVersion() : null;
+            logger.debug("subsetVersion changed: {}", this.lastSubsetVersion);
+
+            this.oIFitsHtmlPanel.updateOIFits(subsetDefinition.getOIFitsSubset());
+        }
     }
 
     /** This method is called from within the constructor to
@@ -156,10 +170,18 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     private fr.jmmc.oiexplorer.core.gui.Vis2Panel vis2Panel;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Return the Plot panel (used by PDF export)
+     * @return Plot panel
+     */
     public Vis2Panel getPlotPanel() {
         return vis2Panel;
     }
 
+    /**
+     * Return the related plot identifier
+     * @return related plot identifier
+     */
     public String getPlotId() {
         return plotId;
     }
@@ -173,15 +195,9 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
      */
     public String getSubjectId(final OIFitsCollectionManagerEventType type) {
-        // TODO: find better solution (plot ?)
         switch (type) {
-            case SUBSET_CHANGED:
-                // Get SubsetId corresponding to the latest plot instance:
-                final Plot plot = ocm.getPlotRef(plotId);
-                if (plot != null && plot.getSubsetDefinition() != null) {
-                    return plot.getSubsetDefinition().getName();
-                }
-                break;
+            case PLOT_CHANGED:
+                return plotId;
             default:
         }
         return DISCARDED_SUBJECT_ID;
@@ -196,8 +212,8 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
         logger.debug("onProcess {}", event);
 
         switch (event.getType()) {
-            case SUBSET_CHANGED:
-                updateHtmlView(event.getSubsetDefinition());
+            case PLOT_CHANGED:
+                updateHtmlView(event.getPlot().getSubsetDefinition());
                 break;
             default:
         }
