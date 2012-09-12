@@ -140,7 +140,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * @param plotList plot list
      */
     private void updateTabContent(final List<Plot> plotList) {
-        logger.warn("updateTabContent - plots : {}", plotList);
+        logger.debug("updateTabContent - plots : {}", plotList);
 
         // remove dead plot views:
         for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
