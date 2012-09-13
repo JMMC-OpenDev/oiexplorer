@@ -4,7 +4,7 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.util.ObjectUtils;
-import fr.jmmc.oiexplorer.core.gui.Vis2Panel;
+import fr.jmmc.oiexplorer.core.gui.PlotChartPanel;
 import fr.jmmc.oiexplorer.core.model.IdentifiableVersion;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
@@ -66,8 +66,8 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
         if (plotEditor != null) {
             plotEditor.dispose();
         }
-        if (vis2Panel != null) {
-            vis2Panel.dispose();
+        if (plotChartPanel != null) {
+            plotChartPanel.dispose();
         }
         if (plotDefinitionEditor != null) {
             plotDefinitionEditor.dispose();
@@ -79,7 +79,7 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      */
     private void postInit() {
         plotEditor.initialize(plotId);
-        vis2Panel.setPlotId(plotId);
+        plotChartPanel.setPlotId(plotId);
 
         // hide PlotDefinitionEditor by default
         editToggleButton.setSelected(false);
@@ -121,7 +121,7 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
         northPanel = new javax.swing.JPanel();
         plotEditor = new fr.jmmc.oiexplorer.core.gui.PlotEditor();
         editToggleButton = new javax.swing.JToggleButton();
-        vis2Panel = new fr.jmmc.oiexplorer.core.gui.Vis2Panel();
+        plotChartPanel = new fr.jmmc.oiexplorer.core.gui.PlotChartPanel();
         plotDefinitionEditor = new fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor();
         oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
 
@@ -140,7 +140,7 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
         northPanel.add(editToggleButton);
 
         plotPanel.add(northPanel, java.awt.BorderLayout.NORTH);
-        plotPanel.add(vis2Panel, java.awt.BorderLayout.CENTER);
+        plotPanel.add(plotChartPanel, java.awt.BorderLayout.CENTER);
         plotPanel.add(plotDefinitionEditor, java.awt.BorderLayout.SOUTH);
 
         jTabbedPaneViews.addTab("plot", plotPanel);
@@ -164,18 +164,18 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     private javax.swing.JTabbedPane jTabbedPaneViews;
     private javax.swing.JPanel northPanel;
     private fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel oIFitsHtmlPanel;
+    private fr.jmmc.oiexplorer.core.gui.PlotChartPanel plotChartPanel;
     private fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor plotDefinitionEditor;
     private fr.jmmc.oiexplorer.core.gui.PlotEditor plotEditor;
     private javax.swing.JPanel plotPanel;
-    private fr.jmmc.oiexplorer.core.gui.Vis2Panel vis2Panel;
     // End of variables declaration//GEN-END:variables
 
     /**
      * Return the Plot panel (used by PDF export)
      * @return Plot panel
      */
-    public Vis2Panel getPlotPanel() {
-        return vis2Panel;
+    public PlotChartPanel getPlotPanel() {
+        return plotChartPanel;
     }
 
     /**
