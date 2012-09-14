@@ -9,11 +9,8 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
-import fr.jmmc.jmcs.jaxb.JAXBFactory;
-import fr.jmmc.jmcs.jaxb.JAXBUtils;
 import fr.jmmc.jmcs.util.MimeType;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import fr.jmmc.oiexplorer.core.model.oi.OiDataCollection;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -25,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Load one (or more) files from xml file.
  * @author mella
  */
-public class LoadOIDataCollectionAction extends RegisteredAction {
+public final class LoadOIDataCollectionAction extends RegisteredAction {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -35,8 +32,8 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
     public final static String actionName = "loadOIDataCollection";
     /** Class logger */
     private static final Logger logger = LoggerFactory.getLogger(className);
-    /** TODO create new MimeType */
-    private final static MimeType mimeType = null;
+    /** OIFitsExplorer MimeType */
+    private final static MimeType mimeType = MimeType.OIFITS_EXPLORER_COLLECTION;
 
     /**
      * Public constructor that automatically register the action in RegisteredAction.
@@ -53,6 +50,8 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
+
+        final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
         File file;
 
@@ -71,7 +70,18 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
             }
 
         } else {
-            file = FileChooser.showOpenFileChooser("Load oiexplorer data collection file", null, mimeType, null);
+
+            final File oiFitsCollectionFile = ocm.getOiFitsCollectionFile();
+
+            final String defaultFileName;
+
+            if (oiFitsCollectionFile != null) {
+                defaultFileName = oiFitsCollectionFile.getName();
+            } else {
+                defaultFileName = null;
+            }
+
+            file = FileChooser.showOpenFileChooser("Load an OIFits Explorer Collection", null, mimeType, defaultFileName);
         }
 
         // If a file was defined (No cancel in the dialog)
@@ -81,32 +91,30 @@ public class LoadOIDataCollectionAction extends RegisteredAction {
 
             final String fileLocation = file.getAbsolutePath();
 
-            StatusBar.show("loading collection: " + fileLocation);
+            StatusBar.show("loading OIFits Explorer Collection: " + fileLocation);
 
+            Exception e = null;
             try {
-                final long startTime = System.nanoTime();
-
-                // TODO: move such JAXB code into OIFitsCollectionManager methods !!
-                final JAXBFactory jbf = JAXBFactory.getInstance(OiDataCollection.class.getPackage().getName());
-
-                final OiDataCollection userCollection = (OiDataCollection) JAXBUtils.loadObject(file.toURI().toURL(), jbf);
-
-                OIFitsCollectionManager.getInstance().loadOIDataCollection(userCollection, checker);
-
-                logger.info("LoadOIDataCollectionAction: duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
+                ocm.loadOIFitsCollection(file, checker);
 
             } catch (IllegalStateException ise) {
-                MessagePane.showErrorMessage("Could not load collection: " + fileLocation, ise);
-                StatusBar.show("Could not load collection: " + fileLocation);
+                e = ise;
             } catch (IOException ioe) {
-                MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
-                StatusBar.show(ioe.getMessage());
+                e = ioe;
             } finally {
-                // display validation messages anyway:
-                final String checkReport = checker.getCheckReport();
-                logger.info("validation results:\n{}", checkReport);
+                if (e != null) {
+                    StatusBar.show("Could not load OIFits Explorer Collection: " + fileLocation);
+                    MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);
+                }
 
-                MessagePane.showMessage(checkReport);
+                // TODO: use a preference to show or hide the validation report:
+                if (false) {
+                    // display validation messages anyway:
+                    final String checkReport = checker.getCheckReport();
+                    logger.info("validation results:\n{}", checkReport);
+
+                    MessagePane.showMessage(checkReport);
+                }
             }
         }
     }

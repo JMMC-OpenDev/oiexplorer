@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Load one (or more) files.
  * @author mella
  */
-public class LoadOIFitsAction extends RegisteredAction {
+public final class LoadOIFitsAction extends RegisteredAction {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
