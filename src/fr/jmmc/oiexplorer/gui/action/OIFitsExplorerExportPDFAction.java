@@ -28,6 +28,7 @@ public final class OIFitsExplorerExportPDFAction extends ExportPDFAction {
      * Return the currently selected GUI panel (JPanel ...) to determine if it is possible to export it (PDFExportable)
      * @return selected GUI panel
      */
+    @Override
     protected Component getSelectedComponent() {
         return OIFitsExplorer.getInstance().getMainPanel().getCurrentPanel().getPlotPanel();
     }

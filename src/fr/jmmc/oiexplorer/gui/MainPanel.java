@@ -4,6 +4,7 @@
 package fr.jmmc.oiexplorer.gui;
 
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.swing.JideTabbedPane;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.util.ObjectUtils;
@@ -105,14 +106,15 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             /** default serial UID for Serializable interface */
             private static final long serialVersionUID = 1;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 removeCurrentView();
             }
         });
 
-        tabbedPane.setTabShape(tabbedPane.SHAPE_ROUNDED_VSNET);
-        tabbedPane.setTabResizeMode(tabbedPane.RESIZE_MODE_NONE);
-        tabbedPane.setColorTheme(tabbedPane.COLOR_THEME_VSNET);
+        tabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
+        tabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
+        tabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
         tabbedPane.setTabEditingAllowed(true);
 
         // TODO : setTabEditingValidator(...)         
@@ -424,6 +426,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             super(className, actionName);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             addPanel(null, null);
         }
@@ -508,6 +511,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
      * @param type event type
      * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
      */
+    @Override
     public String getSubjectId(final OIFitsCollectionManagerEventType type) {
         // accept all
         return null;

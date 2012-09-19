@@ -50,7 +50,7 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     }
 
     /**
-     * Free any ressource or reference to this instance :
+     * Free any resource or reference to this instance :
      * remove this instance from OIFitsCollectionManager event notifiers
      * dispose also child components
      */
@@ -194,6 +194,7 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      * @param type event type
      * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
      */
+    @Override
     public String getSubjectId(final OIFitsCollectionManagerEventType type) {
         switch (type) {
             case PLOT_CHANGED:

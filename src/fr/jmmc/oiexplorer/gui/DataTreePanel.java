@@ -336,6 +336,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      * @param type event type
      * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
      */
+    @Override
     public String getSubjectId(final OIFitsCollectionManagerEventType type) {
         // accept all
         return null;
