@@ -107,12 +107,12 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                     MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);
                 }
 
+                // log validation messages anyway:
+                final String checkReport = checker.getCheckReport();
+                logger.info("validation results:\n{}", checkReport);
+
                 // TODO: use a preference to show or hide the validation report:
                 if (false) {
-                    // display validation messages anyway:
-                    final String checkReport = checker.getCheckReport();
-                    logger.info("validation results:\n{}", checkReport);
-
                     MessagePane.showMessage(checkReport);
                 }
             }
