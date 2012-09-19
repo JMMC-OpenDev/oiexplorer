@@ -177,7 +177,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             final DefaultMutableTreeNode targetTreeNode = dataTree.addNode(rootNode, target);
 
             final OIFitsFile dataForTarget = entry.getValue();
-            for (OITable table : dataForTarget.getOiTables()) {
+            for (OITable table : dataForTarget.getOiDataList()) {
                 dataTree.addNode(targetTreeNode, table);
             }
         }
