@@ -10,6 +10,8 @@ import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.SwingSettings;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.network.interop.SampCapability;
+import fr.jmmc.jmcs.network.interop.SampMessageHandler;
 import fr.jmmc.jmcs.resource.image.ResourceImage;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -25,7 +27,10 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import javax.swing.JFrame;
+import org.astrogrid.samp.Message;
+import org.astrogrid.samp.client.SampException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,7 +289,25 @@ public final class OIFitsExplorer extends App {
      */
     @Override
     protected void declareInteroperability() {
-        // TODO Add handler to load oifits
+
+        // Add handler to load one new oifits
+        new SampMessageHandler(SampCapability.LOAD_FITS_TABLE) {
+            @Override
+            protected void processMessage(final String senderId, final Message message) throws SampException {
+                // bring this application to front and load data
+                SwingUtils.invokeLaterEDT(new Runnable() {
+                    public void run() {
+                        App.showFrameToFront();
+                        try {
+                            final String url = (String) message.getParam("url");                            
+                            OIFitsCollectionManager.getInstance().loadOIFitsFile(url, null);
+                        } catch (IOException ex) {
+                            MessagePane.showErrorMessage("Could not load file from samp message : " + message, ex);
+                        }
+                    }
+                });
+            }
+        };
     }
 
     /**
