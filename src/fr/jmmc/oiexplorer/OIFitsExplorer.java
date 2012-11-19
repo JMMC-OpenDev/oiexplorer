@@ -84,12 +84,11 @@ public final class OIFitsExplorer extends App {
 
     /**
      * Initialize application objects
-     * @param args ignored arguments
      *
      * @throws RuntimeException if the OifitsExplorerGui initialization failed
      */
     @Override
-    protected void init(final String[] args) throws RuntimeException {
+    protected void init() throws RuntimeException {
         logger.debug("OifitsExplorerGui.init() handler : enter");
 
         this.initServices();
