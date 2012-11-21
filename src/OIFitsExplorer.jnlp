@@ -5,7 +5,7 @@
     <vendor>JMMC</vendor>
     <homepage href="http://www.jmmc.fr/oifitsexplorer"/>
     <description>Explore your interferometric observations data files (OIFits)</description>
-    <icon href="OIFitsExplorer.png"/>
+    <icon href="OIFitsExplorer.jpg"/>
     <offline-allowed/>    
     <shortcut>
       <desktop/>
