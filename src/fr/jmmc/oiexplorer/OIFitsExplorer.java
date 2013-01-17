@@ -4,6 +4,7 @@
 package fr.jmmc.oiexplorer;
 
 import fr.jmmc.jmcs.App;
+import fr.jmmc.jmcs.gui.action.internal.InternalActionFactory;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
@@ -153,7 +154,7 @@ public final class OIFitsExplorer extends App {
      * to cancel exit.
      */
     @Override
-    protected boolean finish() {
+    public boolean shouldFinish() {
         logger.debug("OifitsExplorerGui.finish() handler called.");
 
         // Ask the user if he wants to save modifications       
@@ -298,7 +299,7 @@ public final class OIFitsExplorer extends App {
                     public void run() {
                         App.showFrameToFront();
                         try {
-                            final String url = (String) message.getParam("url");                            
+                            final String url = (String) message.getParam("url");
                             OIFitsCollectionManager.getInstance().loadOIFitsFile(url, null);
                         } catch (IOException ex) {
                             MessagePane.showErrorMessage("Could not load file from samp message : " + message, ex);
@@ -325,7 +326,7 @@ public final class OIFitsExplorer extends App {
         @Override
         public void windowClosing(final WindowEvent e) {
             // callback on exit :
-            App.quitAction().actionPerformed(null);
+            App.quit();
         }
     }
 }
