@@ -4,12 +4,11 @@
 package fr.jmmc.oiexplorer;
 
 import fr.jmmc.jmcs.App;
-import fr.jmmc.jmcs.gui.action.internal.InternalActionFactory;
+import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
-import fr.jmmc.jmcs.gui.util.SwingSettings;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.network.interop.SampCapability;
 import fr.jmmc.jmcs.network.interop.SampMessageHandler;
@@ -26,8 +25,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import javax.swing.JFrame;
 import org.astrogrid.samp.Message;
@@ -49,22 +46,12 @@ public final class OIFitsExplorer extends App {
     private MainPanel mainPanel;
 
     /**
-     * Main entry point : use swing setup and then start the application
+     * Main entry point : use swing setup and then launch the application
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        // init swing application for science
-        SwingSettings.setup();
-
-        final long start = System.nanoTime();
-        try {
-            // Start application with the command line arguments
-            new OIFitsExplorer(args);
-        } finally {
-            if (logger.isInfoEnabled()) {
-                logger.info("startup : duration = {} ms.", 1e-6d * (System.nanoTime() - start));
-            }
-        }
+        // Start application with the command line arguments
+        Bootstrapper.launch(new OIFitsExplorer(args));
     }
 
     /**
@@ -239,12 +226,6 @@ public final class OIFitsExplorer extends App {
         frame.setPreferredSize(new Dimension(appWidth, appHeightPref));
         frame.addComponentListener(new ComponentResizeAdapter(dim));
 
-        // handle closing by mouse :
-        frame.addWindowListener(new CloseFrameAdapter());
-
-        // previous adapter manages the windowClosing(event) :
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
         // init the main panel :
         createContent();
 
@@ -252,6 +233,7 @@ public final class OIFitsExplorer extends App {
         getFramePanel().add(new StatusBar(), BorderLayout.SOUTH);
 
         StatusBar.show("application started.");
+        App.setFrame(frame);
 
         logger.debug("prepareFrame : exit");
     }
@@ -316,17 +298,5 @@ public final class OIFitsExplorer extends App {
      */
     public MainPanel getMainPanel() {
         return mainPanel;
-    }
-
-    /**
-     * Window adapter to handle windowClosing event.
-     */
-    private static final class CloseFrameAdapter extends WindowAdapter {
-
-        @Override
-        public void windowClosing(final WindowEvent e) {
-            // callback on exit :
-            App.quit();
-        }
     }
 }
