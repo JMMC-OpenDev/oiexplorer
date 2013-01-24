@@ -141,7 +141,7 @@ public final class OIFitsExplorer extends App {
      * to cancel exit.
      */
     @Override
-    public boolean shouldFinish() {
+    public boolean canBeTerminatedNow() {
         logger.debug("OifitsExplorerGui.finish() handler called.");
 
         // Ask the user if he wants to save modifications       
