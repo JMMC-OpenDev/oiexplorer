@@ -5,6 +5,7 @@ package fr.jmmc.oiexplorer;
 
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
+import fr.jmmc.jmcs.data.ApplicationDescription;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
@@ -203,7 +204,7 @@ public final class OIFitsExplorer extends App {
         // initialize the actions :
         registerActions();
 
-        frame.setTitle(App.getSharedApplicationDataModel().getProgramName());
+        frame.setTitle(ApplicationDescription.getInstance().getProgramName());
 
         // handle frame icon
         final Image jmmcFavImage = ResourceImage.JMMC_FAVICON.icon().getImage();
