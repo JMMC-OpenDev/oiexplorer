@@ -72,15 +72,29 @@ public final class OIFitsExplorer extends App {
     }
 
     /**
+     * Initialize services before the GUI
+     *
+     * @throws IllegalStateException if the configuration files are not found or IO failure
+     * @throws IllegalArgumentException if the load configuration failed
+     */
+    @Override
+    protected void initServices() throws IllegalStateException, IllegalArgumentException {
+
+        // Initialize tasks and the task executor :
+        TaskSwingWorkerExecutor.start();
+
+        // Initialize the parallel job executor:
+        ParallelJobExecutor.getInstance();
+    }
+
+    /**
      * Initialize application objects
      *
      * @throws RuntimeException if the OifitsExplorerGui initialization failed
      */
     @Override
-    protected void init() throws RuntimeException {
+    protected void setupGui() throws RuntimeException {
         logger.debug("OifitsExplorerGui.init() handler : enter");
-
-        this.initServices();
 
         // Using invokeAndWait to be in sync with this thread :
         // note: invokeAndWaitEDT throws an IllegalStateException if any exception occurs
@@ -95,21 +109,6 @@ public final class OIFitsExplorer extends App {
         });
 
         logger.debug("OifitsExplorerGui.init() handler : exit");
-    }
-
-    /**
-     * Initialize services before the GUI
-     *
-     * @throws IllegalStateException if the configuration files are not found or IO failure
-     * @throws IllegalArgumentException if the load configuration failed
-     */
-    private void initServices() throws IllegalStateException, IllegalArgumentException {
-
-        // Initialize tasks and the task executor :
-        TaskSwingWorkerExecutor.start();
-
-        // Initialize the parallel job executor:
-        ParallelJobExecutor.getInstance();
     }
 
     /**
