@@ -60,7 +60,7 @@ public final class OIFitsExplorer extends App {
      * @return OIFitsExplorer singleton
      */
     public static OIFitsExplorer getInstance() {
-        return (OIFitsExplorer) App.getSharedInstance();
+        return (OIFitsExplorer) App.getInstance();
     }
 
     /**
