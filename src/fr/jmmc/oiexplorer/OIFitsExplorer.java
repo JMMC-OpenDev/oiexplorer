@@ -52,7 +52,7 @@ public final class OIFitsExplorer extends App {
      */
     public static void main(final String[] args) {
         // Start application with the command line arguments
-        Bootstrapper.launch(new OIFitsExplorer(args));
+        Bootstrapper.launchApp(new OIFitsExplorer(args));
     }
 
     /**
@@ -183,14 +183,6 @@ public final class OIFitsExplorer extends App {
         if (this.mainPanel != null) {
             this.mainPanel.dispose();
         }
-
-        // stop the task executor :
-        TaskSwingWorkerExecutor.stop();
-
-        // stop the parallel job executor:
-        ParallelJobExecutor.shutdown();
-
-        super.cleanup();
     }
 
     /**
