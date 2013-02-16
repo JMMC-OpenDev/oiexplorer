@@ -98,7 +98,8 @@ JARFILES        = oiexplorer
 #
 #  iexplorer jar files
 oiexplorer_DIRS     = fr
-oiexplorer_EXTRAS   = fr/jmmc/oiexplorer/resource/*.xml
+oiexplorer_EXTRAS   = jmmc-app-logback.xml \
+                      fr/jmmc/oiexplorer/resource/*.xml
 
 #
 # Java programs
