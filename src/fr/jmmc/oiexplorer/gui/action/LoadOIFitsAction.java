@@ -9,7 +9,7 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
-import fr.jmmc.jmcs.util.MimeType;
+import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
