@@ -5,7 +5,7 @@ package fr.jmmc.oiexplorer;
 
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
-import fr.jmmc.jmcs.data.ApplicationDescription;
+import fr.jmmc.jmcs.data.app.ApplicationDescription;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
