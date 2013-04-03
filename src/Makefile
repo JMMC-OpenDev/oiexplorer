@@ -98,7 +98,7 @@ JARFILES        = oiexplorer
 #
 #  iexplorer jar files
 oiexplorer_DIRS     = fr
-oiexplorer_EXTRAS   = jmmc-app-logback.xml \
+oiexplorer_EXTRAS   = LogbackConfiguration.xml \
                       fr/jmmc/oiexplorer/resource/*.xml
 
 #
