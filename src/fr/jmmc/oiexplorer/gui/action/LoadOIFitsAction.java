@@ -3,7 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui.action;
 
-import fr.jmmc.jmcs.data.preference.SessionPersistencePreferences;
+import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
@@ -63,7 +63,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
 
             if (file != null) {
                 // update current directory for oidata:
-                SessionPersistencePreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
+                SessionSettingsPreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
 
                 files = new File[]{file};
             }
