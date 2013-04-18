@@ -5,6 +5,7 @@ package fr.jmmc.oiexplorer.gui;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
+import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.util.ObjectUtils;
@@ -18,6 +19,7 @@ import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
+import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
@@ -132,7 +134,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // Build toolBar
         toolBar.add(OIFitsExplorerExportPDFAction.getInstance());
-        toolBar.add(newPlotTabAction);
+        toolBar.add(ActionRegistrar.getInstance().get(LoadOIFitsAction.className, LoadOIFitsAction.actionName));
     }
 
     /**
