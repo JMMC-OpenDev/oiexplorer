@@ -95,19 +95,7 @@ public final class OIFitsExplorer extends App {
     @Override
     protected void setupGui() throws RuntimeException {
         logger.debug("OifitsExplorerGui.init() handler : enter");
-
-        // Using invokeAndWait to be in sync with this thread :
-        // note: invokeAndWaitEDT throws an IllegalStateException if any exception occurs
-        SwingUtils.invokeAndWaitEDT(new Runnable() {
-            /**
-             * Initializes the swing components with their actions in EDT
-             */
-            @Override
-            public void run() {
-                prepareFrame(getFrame());
-            }
-        });
-
+        prepareFrame();
         logger.debug("OifitsExplorerGui.init() handler : exit");
     }
 
@@ -189,8 +177,10 @@ public final class OIFitsExplorer extends App {
      * Prepare the frame widgets and define its minimum size
      * @param frame
      */
-    private void prepareFrame(final JFrame frame) {
+    private void prepareFrame() {
         logger.debug("prepareFrame : enter");
+
+        final JFrame frame = new JFrame();
 
         // initialize the actions :
         registerActions();
@@ -222,7 +212,7 @@ public final class OIFitsExplorer extends App {
         createContent();
 
         // Handle status bar
-        getFramePanel().add(new StatusBar(), BorderLayout.SOUTH);
+        frame.getContentPane().add(new StatusBar(), BorderLayout.SOUTH);
 
         StatusBar.show("application started.");
         App.setFrame(frame);
