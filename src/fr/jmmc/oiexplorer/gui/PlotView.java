@@ -79,11 +79,8 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
      */
     private void postInit() {
         plotEditor.initialize(plotId);
-        plotChartPanel.setPlotId(plotId);
-
-        // hide PlotDefinitionEditor by default
-        editToggleButton.setSelected(false);
-        editToggleButtonActionPerformed(null);
+        plotChartPanel.setPlotId(plotId); 
+        plotDefinitionEditor.setPlotId(plotId);
     }
 
     /**
@@ -115,33 +112,34 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        plotEditor = new fr.jmmc.oiexplorer.core.gui.PlotEditor();
         jTabbedPaneViews = new javax.swing.JTabbedPane();
         plotPanel = new javax.swing.JPanel();
-        northPanel = new javax.swing.JPanel();
-        plotEditor = new fr.jmmc.oiexplorer.core.gui.PlotEditor();
-        editToggleButton = new javax.swing.JToggleButton();
         plotChartPanel = new fr.jmmc.oiexplorer.core.gui.PlotChartPanel();
         plotDefinitionEditor = new fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor();
         oIFitsHtmlPanel = new fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        plotPanel.setLayout(new java.awt.BorderLayout());
+        jTabbedPaneViews.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        northPanel.add(plotEditor);
-
-        editToggleButton.setText("edit");
-        editToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editToggleButtonActionPerformed(evt);
-            }
-        });
-        northPanel.add(editToggleButton);
-
-        plotPanel.add(northPanel, java.awt.BorderLayout.NORTH);
-        plotPanel.add(plotChartPanel, java.awt.BorderLayout.CENTER);
-        plotPanel.add(plotDefinitionEditor, java.awt.BorderLayout.SOUTH);
+        plotPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        plotPanel.add(plotChartPanel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        plotPanel.add(plotDefinitionEditor, gridBagConstraints);
 
         jTabbedPaneViews.addTab("plot", plotPanel);
         jTabbedPaneViews.addTab("data", oIFitsHtmlPanel);
@@ -149,20 +147,8 @@ public final class PlotView extends javax.swing.JPanel implements OIFitsCollecti
         add(jTabbedPaneViews, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void editToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editToggleButtonActionPerformed
-        final boolean displayPlotDefEditor = editToggleButton.isSelected();
-        plotDefinitionEditor.setVisible(displayPlotDefEditor);
-        if (displayPlotDefEditor) {
-            plotDefinitionEditor.setPlotId(plotId);
-        } else {
-            plotDefinitionEditor.setPlotId(null);
-        }
-
-    }//GEN-LAST:event_editToggleButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JToggleButton editToggleButton;
     private javax.swing.JTabbedPane jTabbedPaneViews;
-    private javax.swing.JPanel northPanel;
     private fr.jmmc.oiexplorer.core.gui.OIFitsHtmlPanel oIFitsHtmlPanel;
     private fr.jmmc.oiexplorer.core.gui.PlotChartPanel plotChartPanel;
     private fr.jmmc.oiexplorer.core.gui.PlotDefinitionEditor plotDefinitionEditor;
