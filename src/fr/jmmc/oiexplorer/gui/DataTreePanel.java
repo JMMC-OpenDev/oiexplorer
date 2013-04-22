@@ -101,9 +101,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
     /**
      * Update the data tree
+     * TODO make it protected back so it is called in the futur from an event request
      * @param oiFitsCollection OIFitsCollection to process
      */
-    private void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
+    public void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
         // force clean up ...
         setSubsetId(subsetId);
 
