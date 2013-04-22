@@ -23,6 +23,7 @@ import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -209,10 +210,11 @@ public final class OIFitsExplorer extends App {
         frame.addComponentListener(new ComponentResizeAdapter(dim));
 
         // init the main panel :
-        createContent();
+        final Container container = frame.getContentPane();
+        createContent(container);
 
         // Handle status bar
-        frame.getContentPane().add(new StatusBar(), BorderLayout.SOUTH);
+        container.add(new StatusBar(), BorderLayout.SOUTH);
 
         StatusBar.show("application started.");
         App.setFrame(frame);
@@ -223,11 +225,11 @@ public final class OIFitsExplorer extends App {
     /**
      * Create the main content i.e. the setting panel
      */
-    private void createContent() {
+    private void createContent(final Container container) {
         // adds the main panel in scrollPane
         this.mainPanel = new MainPanel();
 
-        getFramePanel().add(this.mainPanel, BorderLayout.CENTER);
+        container.add(this.mainPanel, BorderLayout.CENTER);
     }
 
     /**
