@@ -33,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +121,16 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         tabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
         tabbedPane.setTabEditingAllowed(true);
 
-        // TODO : setTabEditingValidator(...)         
+        // TODO : setTabEditingValidator(...)       
+        
         final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
         tabbedPane.setTabLeadingComponent(plusButton);
+        
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                updateDataTree();
+            }
+        });                
     }
 
     /**
@@ -176,6 +185,29 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     public DataTreePanel getDataTreePanel() {
         return dataTreePanel;
     }
+    
+    private Plot getSelectedPlot(){
+        PlotView currentPlotView = getCurrentPanel();
+        if(currentPlotView==null){
+            // TODO disable dataRreePanel ?
+            return null;
+        }
+        return ocm.getPlotRef(currentPlotView.getPlotId());
+    }
+    
+    private void updateDataTree() {             
+        Plot selectedPlot = getSelectedPlot();
+        if(selectedPlot==null){
+            return;
+        }        
+        // Get Subset of selected plot
+        SubsetDefinition subset = selectedPlot.getSubsetDefinition();
+        
+        // Request an update of the dataTreePanel
+        // TODO Replace 2 following lines by an event based management
+        dataTreePanel.setSubsetId(subset.getName());
+        dataTreePanel.updateOIFitsCollection(ocm.getOIFitsCollection());        
+    }
 
     /**
      * Return the current plot panel
@@ -184,7 +216,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     public PlotView getCurrentPanel() {
         return (PlotView) tabbedPane.getSelectedComponent();
     }
-
+        
     /**
      * Add the given panel or one new if null given.
      * @param panel Panel to add (PlotView instance)
@@ -285,7 +317,8 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         if (index != -1) {
             logger.debug("removeCurrentView(): {}", index);
 
-            removeView(index);
+            // list will be refresh by fired event inside removePlot
+            ocm.removePlot(getSelectedPlot().getName());            
         }
     }
 
@@ -301,12 +334,9 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         // CONCLUSION: it is better to do it explicitely even if EventNotifier could do it but asynchronously:
         final Component com = tabbedPane.getComponentAt(index);
         if (com instanceof PlotView) {
-            final PlotView plotView = (PlotView) com;
-
-            logger.warn("removeView: {}", plotView.getPlotId());
-
+            final PlotView plotView = (PlotView) com;            
             // free resources (unregister event notifiers):
-            plotView.dispose();
+            plotView.dispose();            
         }
 
         tabbedPane.removeTabAt(index);
@@ -366,10 +396,9 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         setLayout(new java.awt.GridBagLayout());
 
-        mainSplitPane.setResizeWeight(0.2);
-
         dataSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         dataSplitPane.setResizeWeight(0.3);
+        dataSplitPane.setMinimumSize(new java.awt.Dimension(150, 58));
         dataSplitPane.setRightComponent(dataTreePanel);
 
         dataSplitTopPanel.setLayout(new java.awt.GridBagLayout());
