@@ -46,6 +46,9 @@ public final class OIFitsExplorer extends App {
     /* members */
     /** main Panel */
     private MainPanel mainPanel;
+    /* Minimal size of main component */
+    private static final Dimension INITIAL_DIMENSION = new java.awt.Dimension(1200, 700);  
+   
 
     /**
      * Main entry point : use swing setup and then launch the application
@@ -218,6 +221,9 @@ public final class OIFitsExplorer extends App {
 
         StatusBar.show("application started.");
         App.setFrame(frame);
+                              
+        App.getFrame().setPreferredSize(INITIAL_DIMENSION);
+        App.getFrame().pack();
 
         logger.debug("prepareFrame : exit");
     }
