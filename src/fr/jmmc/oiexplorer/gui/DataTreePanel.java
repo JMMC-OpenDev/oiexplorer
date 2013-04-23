@@ -12,6 +12,7 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
+import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
@@ -53,6 +54,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     public DataTreePanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
         ocm.bindCollectionChangedEvent(this);
+        ocm.getActivePlotChangedEventNotifier().register(this);
 
         initComponents();
         postInit();
@@ -101,10 +103,9 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
     /**
      * Update the data tree
-     * TODO make it protected back so it is called in the futur from an event request
      * @param oiFitsCollection OIFitsCollection to process
      */
-    public void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
+    protected void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
         // force clean up ...
         setSubsetId(subsetId);
 
@@ -158,6 +159,18 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 // select first target :
                 dataTree.selectFirstChildNode(dataTree.getRootNode());
             }
+        }
+    }
+    
+     /**
+     * Update the data tree
+     * @param activePlot plot used to initialize tree element.
+     */
+    protected void updateOIFitsCollection(Plot activePlot) {
+        if (activePlot != null) {
+            SubsetDefinition subset = activePlot.getSubsetDefinition();
+            setSubsetId(subset.getName());
+            updateOIFitsCollection(ocm.getOIFitsCollection());
         }
     }
 
@@ -355,6 +368,9 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             case COLLECTION_CHANGED:
                 updateOIFitsCollection(event.getOIFitsCollection());
                 break;
+            case ACTIVE_PLOT_CHANGED:
+                updateOIFitsCollection(event.getActivePlot());                                              
+                break;            
             default:
         }
         logger.debug("onProcess {} - done", event);
