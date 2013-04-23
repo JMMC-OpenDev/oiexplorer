@@ -30,8 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This panel contains the data tree
  * 
- * // TODO: add a subset selector and also support subset changed event !
- * // TODO: support both multiple file and table selection(s)
+ * // TODO: support multiple table selections
  * 
  * @author mella
  */
