@@ -7,13 +7,12 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
-import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.util.ObjectUtils;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
+import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.PLOT_LIST_CHANGED;
 import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
@@ -21,18 +20,13 @@ import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
-import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
@@ -58,7 +52,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     /** Creates new form MainPanel */
     public MainPanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
-        ocm.bindCollectionChangedEvent(this);
+        ocm.bindCollectionChangedEvent(this);        
         ocm.bindPlotListChangedEvent(this);
 
         // Build GUI
@@ -101,10 +95,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private void postInit() {
 
         registerActions();
-
-        // Add renderer to get short oifits filenames
-        this.jListOIFitsFiles.setCellRenderer(new OIFitsListRenderer());
-
+        
         // Link removeCurrentView to the tabpane close button
         this.tabbedPane.setCloseAction(new AbstractAction() {
             /** default serial UID for Serializable interface */
@@ -122,15 +113,15 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         tabbedPane.setTabEditingAllowed(true);
 
         // TODO : setTabEditingValidator(...)       
-        
+
         final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
         tabbedPane.setTabLeadingComponent(plusButton);
-        
+
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                updateDataTree();
+                updateActivePlot();
             }
-        });                
+        });
     }
 
     /**
@@ -185,28 +176,21 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     public DataTreePanel getDataTreePanel() {
         return dataTreePanel;
     }
-    
-    private Plot getSelectedPlot(){
+
+    private String getSelectedPlotId() {
         PlotView currentPlotView = getCurrentPanel();
-        if(currentPlotView==null){
-            // TODO disable dataRreePanel ?
+        if (currentPlotView == null) {
+            // TODO disable dataTreePanel ?
             return null;
         }
-        return ocm.getPlotRef(currentPlotView.getPlotId());
+        return currentPlotView.getPlotId();
     }
-    
-    private void updateDataTree() {             
-        Plot selectedPlot = getSelectedPlot();
-        if(selectedPlot==null){
-            return;
-        }        
-        // Get Subset of selected plot
-        SubsetDefinition subset = selectedPlot.getSubsetDefinition();
-        
-        // Request an update of the dataTreePanel
-        // TODO Replace 2 following lines by an event based management
-        dataTreePanel.setSubsetId(subset.getName());
-        dataTreePanel.updateOIFitsCollection(ocm.getOIFitsCollection());        
+
+    private void updateActivePlot() {
+        String selectedPlotId = getSelectedPlotId();
+        if (selectedPlotId != null) {
+            ocm.fireActivePlotChanged(this, selectedPlotId, null);
+        }
     }
 
     /**
@@ -216,7 +200,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     public PlotView getCurrentPanel() {
         return (PlotView) tabbedPane.getSelectedComponent();
     }
-        
+
     /**
      * Add the given panel or one new if null given.
      * @param panel Panel to add (PlotView instance)
@@ -318,7 +302,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             logger.debug("removeCurrentView(): {}", index);
 
             // list will be refresh by fired event inside removePlot
-            ocm.removePlot(getSelectedPlot().getName());            
+            ocm.removePlot(getSelectedPlotId());
         }
     }
 
@@ -334,9 +318,9 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         // CONCLUSION: it is better to do it explicitely even if EventNotifier could do it but asynchronously:
         final Component com = tabbedPane.getComponentAt(index);
         if (com instanceof PlotView) {
-            final PlotView plotView = (PlotView) com;            
+            final PlotView plotView = (PlotView) com;
             // free resources (unregister event notifiers):
-            plotView.dispose();            
+            plotView.dispose();
         }
 
         tabbedPane.removeTabAt(index);
@@ -361,19 +345,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
         return -1;
     }
-
-    /**
-     * Refresh the list of OIfits files
-     */
-    private void updateOIFitsList(final OIFitsCollection oiFitsCollection) {
-        final Object oldValue = this.jListOIFitsFiles.getSelectedValue();
-
-        this.jListOIFitsFiles.setModel(new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles()));
-
-        // restore previous selected item :
-        this.jListOIFitsFiles.setSelectedValue(oldValue, true);
-    }
-
+    
     /** 
      * This method is called from within the constructor to
      * initialize the form.
@@ -390,8 +362,8 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
         dataSplitTopPanel = new javax.swing.JPanel();
         toolBar = new javax.swing.JToolBar();
-        jScrollPaneList = new javax.swing.JScrollPane();
-        jListOIFitsFiles = new javax.swing.JList();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        oifitsFileListPanel1 = new fr.jmmc.oiexplorer.gui.OifitsFileListPanel();
         tabbedPane = new com.jidesoft.swing.JideTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
@@ -408,8 +380,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         dataSplitTopPanel.add(toolBar, gridBagConstraints);
 
-        jListOIFitsFiles.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPaneList.setViewportView(jListOIFitsFiles);
+        jScrollPane1.setViewportView(oifitsFileListPanel1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -417,7 +388,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        dataSplitTopPanel.add(jScrollPaneList, gridBagConstraints);
+        dataSplitTopPanel.add(jScrollPane1, gridBagConstraints);
 
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
 
@@ -441,9 +412,9 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private javax.swing.JSplitPane dataSplitPane;
     private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
-    private javax.swing.JList jListOIFitsFiles;
-    private javax.swing.JScrollPane jScrollPaneList;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane mainSplitPane;
+    private fr.jmmc.oiexplorer.gui.OifitsFileListPanel oifitsFileListPanel1;
     private com.jidesoft.swing.JideTabbedPane tabbedPane;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
@@ -462,67 +433,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             addPanel(null, null);
         }
     }
-
-    /**
-     * This custom renderer defines the target icon (calibrator or science) and use the target Name
-     * @author bourgesl
-     */
-    private static final class OIFitsListRenderer extends DefaultListCellRenderer {
-
-        /** default serial UID for Serializable interface */
-        private static final long serialVersionUID = 1;
-
-        /**
-         * Public constructor
-         */
-        private OIFitsListRenderer() {
-            super();
-        }
-
-        /**
-         * Return a component that has been configured to display the specified
-         * value. That component's <code>paint</code> method is then called to
-         * "render" the cell.  If it is necessary to compute the dimensions
-         * of a list because the list cells do not have a fixed size, this method
-         * is called to generate a component on which <code>getPreferredSize</code>
-         * can be invoked.
-         *
-         * @param list The JList we're painting.
-         * @param value The value returned by list.getModel().getElementAt(index).
-         * @param index The cells index.
-         * @param isSelected True if the specified cell was selected.
-         * @param cellHasFocus True if the specified cell has the focus.
-         * @return A component whose paint() method will render the specified value.
-         *
-         * @see JList
-         * @see ListSelectionModel
-         * @see ListModel
-         */
-        @Override
-        public Component getListCellRendererComponent(
-                final JList list,
-                final Object value,
-                final int index,
-                final boolean isSelected,
-                final boolean cellHasFocus) {
-
-            final String val;
-            if (value == null) {
-                val = null;
-            } else if (value instanceof OIFitsFile) {
-                val = ((OIFitsFile) value).getName(); // or getAbsoluteFilePath()
-            } else {
-                val = value.toString();
-            }
-
-            super.getListCellRendererComponent(
-                    list, val, index,
-                    isSelected, cellHasFocus);
-
-            return this;
-        }
-    }
-
+    
     class JideButtonUIResource extends JideButton implements UIResource {
 
         public JideButtonUIResource(String text) {
@@ -558,8 +469,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         switch (event.getType()) {
             case COLLECTION_CHANGED:
-                // Update info for oifits file list
-                updateOIFitsList(event.getOIFitsCollection());
+                // TODO init first tab if empty ?
                 break;
             case PLOT_LIST_CHANGED:
                 // Update tabpane content
