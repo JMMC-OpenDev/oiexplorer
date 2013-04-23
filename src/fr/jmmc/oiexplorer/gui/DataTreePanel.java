@@ -161,7 +161,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         }
     }
     
-     /**
+    /**
      * Update the data tree
      * @param activePlot plot used to initialize tree element.
      */
