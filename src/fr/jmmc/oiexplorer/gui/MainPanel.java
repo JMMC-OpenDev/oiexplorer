@@ -240,7 +240,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // find subset id:
         for (int count = 1;;) {
-            id = "subset" + count;
+            id = "SUBSET_" + count;
             if (!ocm.hasSubsetDefinition(id)) {
                 break;
             }
@@ -249,6 +249,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         final SubsetDefinition subset = new SubsetDefinition();
         subset.setId(id);
+        subset.setName(id);
         subset.copy(ocm.getCurrentSubsetDefinition());
         if (!ocm.addSubsetDefinition(subset)) {
             throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
@@ -256,7 +257,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // find plotDef id:
         for (int count = 1;;) {
-            id = "plotDef" + count;
+            id = "PLOT_DEF_" + count;
             if (!ocm.hasPlotDefinition(id)) {
                 break;
             }
@@ -265,6 +266,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         final PlotDefinition plotDef = new PlotDefinition();
         plotDef.setId(id);
+        plotDef.setName(id);
         plotDef.copy(ocm.getCurrentPlotDefinition());
         if (!ocm.addPlotDefinition(plotDef)) {
             throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
@@ -272,7 +274,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // find plot id:
         for (int count = 1;;) {
-            id = "plot" + count;
+            id = "VIEW_" + count;
             if (!ocm.hasPlot(id)) {
                 break;
             }
@@ -282,6 +284,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         // Create new Plot with subset and plotdefinition
         final Plot plot = new Plot();
         plot.setId(id);
+        plot.setName(id);
         plot.setPlotDefinition(plotDef);
         plot.setSubsetDefinition(subset);
 
