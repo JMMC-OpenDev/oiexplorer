@@ -5,6 +5,7 @@ package fr.jmmc.oiexplorer.gui;
 
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
+import com.jidesoft.swing.TabEditingValidator;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.util.ObjectUtils;
@@ -22,6 +23,7 @@ import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -52,7 +54,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     /** Creates new form MainPanel */
     public MainPanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
-        ocm.bindCollectionChangedEvent(this);        
+        ocm.bindCollectionChangedEvent(this);
         ocm.bindPlotListChangedEvent(this);
 
         // Build GUI
@@ -95,7 +97,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private void postInit() {
 
         registerActions();
-        
+
         // Link removeCurrentView to the tabpane close button
         this.tabbedPane.setCloseAction(new AbstractAction() {
             /** default serial UID for Serializable interface */
@@ -113,6 +115,23 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         tabbedPane.setTabEditingAllowed(true);
 
         // TODO : setTabEditingValidator(...)       
+        tabbedPane.setTabEditingValidator(new TabEditingValidator() {
+            @Override
+            public boolean shouldStartEdit(int tabIndex, MouseEvent event) {
+                return true;
+            }
+
+            @Override
+            public boolean isValid(int tabIndex, String tabText) {
+                return true;
+            }
+
+            @Override
+            public boolean alertIfInvalid(int tabIndex, String tabText) {
+                setActivePlotName(tabText);
+                return true;
+            }
+        });
 
         final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
         tabbedPane.setTabLeadingComponent(plusButton);
@@ -171,11 +190,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
                 addPanel(p, plotId);
             }
         }
-    }
-
-    public DataTreePanel getDataTreePanel() {
-        return dataTreePanel;
-    }
+    } 
 
     private String getSelectedPlotId() {
         PlotView currentPlotView = getCurrentPanel();
@@ -191,6 +206,16 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         if (selectedPlotId != null) {
             ocm.fireActivePlotChanged(this, selectedPlotId, null);
         }
+    }
+
+    /*
+     * Called by jideTab to change plot name.
+     * @param name futur name of active plot
+     */
+    private void setActivePlotName(String name) {
+        final String plotId = getCurrentPanel().getPlotId();
+        ocm.getPlotRef(plotId).setName(name);
+        ocm.firePlotChanged(this, plotId, null);
     }
 
     /**
@@ -348,7 +373,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
         return -1;
     }
-    
+
     /** 
      * This method is called from within the constructor to
      * initialize the form.
@@ -431,7 +456,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
             addPanel(null, null);
         }
     }
-    
+
     class JideButtonUIResource extends JideButton implements UIResource {
 
         public JideButtonUIResource(String text) {
