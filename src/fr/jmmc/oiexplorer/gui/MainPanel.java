@@ -362,7 +362,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
         dataSplitTopPanel = new javax.swing.JPanel();
         toolBar = new javax.swing.JToolBar();
-        jScrollPane1 = new javax.swing.JScrollPane();
         oifitsFileListPanel1 = new fr.jmmc.oiexplorer.gui.OifitsFileListPanel();
         tabbedPane = new com.jidesoft.swing.JideTabbedPane();
 
@@ -379,16 +378,13 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         dataSplitTopPanel.add(toolBar, gridBagConstraints);
-
-        jScrollPane1.setViewportView(oifitsFileListPanel1);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        dataSplitTopPanel.add(jScrollPane1, gridBagConstraints);
+        dataSplitTopPanel.add(oifitsFileListPanel1, gridBagConstraints);
 
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
 
@@ -412,7 +408,6 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private javax.swing.JSplitPane dataSplitPane;
     private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane mainSplitPane;
     private fr.jmmc.oiexplorer.gui.OifitsFileListPanel oifitsFileListPanel1;
     private com.jidesoft.swing.JideTabbedPane tabbedPane;
