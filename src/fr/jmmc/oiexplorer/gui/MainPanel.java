@@ -163,7 +163,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // add missing plot views:
         for (Plot plot : plotList) {
-            final String plotId = plot.getName();
+            final String plotId = plot.getId();
 
             // check where tab is already present:
             if (findPlotView(tabbedPane, plotId) == -1) {
@@ -248,7 +248,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
 
         final SubsetDefinition subset = new SubsetDefinition();
-        subset.setName(id);
+        subset.setId(id);
         subset.copy(ocm.getCurrentSubsetDefinition());
         if (!ocm.addSubsetDefinition(subset)) {
             throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
@@ -264,7 +264,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         }
 
         final PlotDefinition plotDef = new PlotDefinition();
-        plotDef.setName(id);
+        plotDef.setId(id);
         plotDef.copy(ocm.getCurrentPlotDefinition());
         if (!ocm.addPlotDefinition(plotDef)) {
             throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
@@ -281,7 +281,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // Create new Plot with subset and plotdefinition
         final Plot plot = new Plot();
-        plot.setName(id);
+        plot.setId(id);
         plot.setPlotDefinition(plotDef);
         plot.setSubsetDefinition(subset);
 

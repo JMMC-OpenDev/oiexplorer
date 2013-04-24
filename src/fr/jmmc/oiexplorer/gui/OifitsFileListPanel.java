@@ -171,7 +171,7 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
      */
     protected void updateOIFitsList(SubsetDefinition subset) {
         if (subset != null) {
-            setSubsetId(subset.getName());
+            setSubsetId(subset.getId());
             updateOIFitsList(ocm.getOIFitsCollection());
         }
     }

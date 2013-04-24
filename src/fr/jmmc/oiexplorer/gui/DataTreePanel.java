@@ -168,7 +168,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     protected void updateOIFitsCollection(Plot activePlot) {
         if (activePlot != null) {
             SubsetDefinition subset = activePlot.getSubsetDefinition();
-            setSubsetId(subset.getName());
+            setSubsetId(subset.getId());
             updateOIFitsCollection(ocm.getOIFitsCollection());
         }
     }
