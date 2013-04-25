@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-  <program name="OIFits Explorer" version="0.1 beta 2"/>
+  <program name="OIFitsExplorer" version="0.1 beta 2"/>
   <compilation date="25/04/2013" compiler="JDK 1.5.0_16"/>
   
   <text>OIFitsExplorer is the JMMC tool to explore your interferometric observations reduced data.</text>
