@@ -15,9 +15,11 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-  <program name="OIFits Explorer" version="0.1 beta 1"/>
-  <compilation date="13/07/2012" compiler="JDK 1.5.0_16"/>
+  <program name="OIFits Explorer" version="0.1 beta 2"/>
+  <compilation date="25/04/2013" compiler="JDK 1.5.0_16"/>
+  
   <text>OIFitsExplorer is the JMMC tool to explore your interferometric observations reduced data.</text>
+  
   <authors>the JMMC Technical Group</authors>
   <jnlp>http://apps.jmmc.fr/~swmgr/OifitsExplorer/OifitsExplorer.jnlp</jnlp>
   <sampdescription>Explore your interferometric observations data files (OIFits)</sampdescription>
@@ -147,9 +149,10 @@
   </menubar>
 
   <releasenotes>
-    <release version="0.1">
-      <prerelease version="0.1 beta 1">
-        <change type="FEATURE">First prototype</change>        
+    <release version="0.1 beta 2">
+      <pubDate>Thu, 25 Apr 2013 15:15:00 GMT</pubDate>
+      <prerelease version="0.1 beta 2">
+        <change type="FEATURE">First prototype minimal (working) features</change>        
       </prerelease>
     </release>
   </releasenotes>
