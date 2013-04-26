@@ -234,6 +234,7 @@ public final class OIFitsExplorer extends App {
     private void createContent(final Container container) {
         // adds the main panel in scrollPane
         this.mainPanel = new MainPanel();
+        this.mainPanel.setName("mainPanel"); // Fest
 
         container.add(this.mainPanel, BorderLayout.CENTER);
     }
