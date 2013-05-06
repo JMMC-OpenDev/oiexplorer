@@ -15,14 +15,14 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-  <program name="OIFitsExplorer" version="0.1"/>
-  <compilation date="26/04/2013" compiler="JDK 1.5.0_16"/>
+  <program name="OIFitsExplorer" version="0.1.1"/>
+  <compilation date="06/05/2013" compiler="JDK 1.6.0_24"/>
   
-  <text>OIFitsExplorer is the JMMC tool to explore your interferometric observations reduced data.</text>
+  <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
   
   <authors>the JMMC Technical Group</authors>
   <jnlp>http://apps.jmmc.fr/~swmgr/OifitsExplorer/OifitsExplorer.jnlp</jnlp>
-  <sampdescription>Explore your interferometric observations data files (OIFits)</sampdescription>
+  <sampdescription>Explore your interferometric observation data files (OIFits)</sampdescription>
 
   <dependences>
 
@@ -150,9 +150,17 @@
 
   <releasenotes>
     <release version="0.1">
-      <pubDate>Thu, 26 Apr 2013 16:50:00 GMT</pubDate>
+      <pubDate>Thu, 06 Mai 2013 12:00:00 GMT</pubDate>
+      <prerelease version="0.1.1">
+        <change type="FEATURE">Enhanced renderer settings to have a shape per serie's item: 
+            triangle for flagged data or invalid error (negative); square for valid data points</change>
+        <change type="BUGFIX">Improved plotting performance on huge datasets</change>
+        <change type="BUGFIX">Fixed min/max ranges for the plot's data area</change>        
+      </prerelease>
+      
       <prerelease version="0.1 beta 2">
-        <change type="FEATURE">First prototype with minimal (working) features</change>        
+        <pubDate>Thu, 26 Apr 2013 16:50:00 GMT</pubDate>
+        <change type="FEATURE">First release with minimal (working) features</change>        
       </prerelease>
     </release>
   </releasenotes>
