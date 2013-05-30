@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-  <program name="OIFitsExplorer" version="0.1.1"/>
-  <compilation date="06/05/2013" compiler="JDK 1.6.0_24"/>
+  <program name="OIFitsExplorer" version="0.1.2"/>
+  <compilation date="30/05/2013" compiler="JDK 1.6.0_24"/>
   
   <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
   
@@ -150,8 +150,13 @@
 
   <releasenotes>
     <release version="0.1">
-      <pubDate>Thu, 06 Mai 2013 12:00:00 GMT</pubDate>
+      <prerelease version="0.1.2">
+        <change type="FEATURE">Show label 'No data to plot.' on the plot panel when no data matches criteria (flagged data, invalid columns ...)</change>
+        <change type="BUGFIX">Fixed empty column choices occuring when the plot is updated using presets</change>
+        <change type="BUGFIX">Improved layout of the plot editor (margin, auto-fit panel's width)</change>
+      </prerelease>
       <prerelease version="0.1.1">
+        <pubDate>Thu, 06 Mai 2013 12:00:00 GMT</pubDate>
         <change type="FEATURE">Enhanced renderer settings to have a shape per serie's item: 
             triangle for flagged data or invalid error (negative); square for valid data points</change>
         <change type="BUGFIX">Improved plotting performance on huge datasets</change>
