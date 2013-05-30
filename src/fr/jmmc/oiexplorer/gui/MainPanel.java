@@ -3,6 +3,7 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
+import fr.jmmc.oiexplorer.core.gui.PlotView;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import com.jidesoft.swing.TabEditingValidator;
