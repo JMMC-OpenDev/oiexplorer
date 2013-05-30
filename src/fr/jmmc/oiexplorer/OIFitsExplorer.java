@@ -98,9 +98,9 @@ public final class OIFitsExplorer extends App {
      */
     @Override
     protected void setupGui() throws RuntimeException {
-        logger.debug("OifitsExplorerGui.init() handler : enter");
+        logger.debug("OifitsExplorerGui.setupGui() handler : enter");
         prepareFrame();
-        logger.debug("OifitsExplorerGui.init() handler : exit");
+        logger.debug("OifitsExplorerGui.setupGui() handler : exit");
     }
 
     /**
@@ -108,7 +108,6 @@ public final class OIFitsExplorer extends App {
      */
     @Override
     protected void execute() {
-        logger.debug("OifitsExplorerGui.execute() handler called.");
 
         SwingUtils.invokeLaterEDT(new Runnable() {
             /**
@@ -116,7 +115,7 @@ public final class OIFitsExplorer extends App {
              */
             @Override
             public void run() {
-                logger.debug("OifitsExplorerGui.ready : handler called.");
+                logger.debug("OifitsExplorerGui.execute() handler called.");
 
                 // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
                 OIFitsCollectionManager.getInstance().start();
@@ -269,6 +268,7 @@ public final class OIFitsExplorer extends App {
             protected void processMessage(final String senderId, final Message message) throws SampException {
                 // bring this application to front and load data
                 SwingUtils.invokeLaterEDT(new Runnable() {
+                    @Override
                     public void run() {
                         App.showFrameToFront();
                         try {
