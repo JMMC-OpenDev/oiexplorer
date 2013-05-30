@@ -78,7 +78,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private void postInit() {
 
         // dataTree contains TargetUID or OITable objects:
-        dataTree = new GenericJTree<Object>(Object.class) {
+        dataTree = new GenericJTree<Object>(null) {
             /** default serial UID for Serializable interface */
             private static final long serialVersionUID = 1;
 
@@ -93,6 +93,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 return toString(userObject);
             }
         };
+        
+        // Define root node once:
+        final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
+        rootNode.setUserObject("Targets");
 
         // tree selection listener :
         dataTree.addTreeSelectionListener(this);
@@ -104,7 +108,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      * Update the data tree
      * @param oiFitsCollection OIFitsCollection to process
      */
-    protected void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
+    private void updateOIFitsCollection(final OIFitsCollection oiFitsCollection) {
         // force clean up ...
         setSubsetId(subsetId);
 
@@ -165,7 +169,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      * Update the data tree
      * @param activePlot plot used to initialize tree element.
      */
-    protected void updateOIFitsCollection(Plot activePlot) {
+    private void updateOIFitsCollection(Plot activePlot) {
         if (activePlot != null) {
             SubsetDefinition subset = activePlot.getSubsetDefinition();
             setSubsetId(subset.getId());
@@ -180,7 +184,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private void generateTree(final OIFitsCollection oiFitsCollection) {
 
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
-        rootNode.setUserObject("Targets");
         rootNode.removeAllChildren();
 
         final Map<TargetUID, OIFitsFile> oiFitsPerTarget = oiFitsCollection.getOiFitsPerTarget();
