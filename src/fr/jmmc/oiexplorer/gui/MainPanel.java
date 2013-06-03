@@ -276,7 +276,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         final SubsetDefinition subset = new SubsetDefinition();
         subset.setId(id);
         subset.setName(id);
-        subset.copyValues(ocm.getCurrentSubsetDefinition());
+        subset.copyValues(ocm.getCurrentSubsetDefinition()); // TODO: fix double copy !!
         if (!ocm.addSubsetDefinition(subset)) {
             throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
         }
@@ -293,7 +293,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         final PlotDefinition plotDef = new PlotDefinition();
         plotDef.setId(id);
         plotDef.setName(id);
-        plotDef.copyValues(ocm.getCurrentPlotDefinition());
+        plotDef.copyValues(ocm.getCurrentPlotDefinition()); // TODO: fix double copy !!
         if (!ocm.addPlotDefinition(plotDef)) {
             throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
         }
