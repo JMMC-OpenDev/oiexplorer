@@ -3,8 +3,6 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
-import fr.jmmc.jmcs.gui.FeedbackReport;
-import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
@@ -15,7 +13,6 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.ACTIVE_PLOT_CHANGED;
 import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.COLLECTION_CHANGED;
-import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.SUBSET_CHANGED;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oitools.model.OIFitsFile;
@@ -24,8 +21,8 @@ import java.awt.Component;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TreeSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,21 +121,21 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         // always init default content
         final GenericListModel lm = new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles());
         oifitsFileList.setModel(lm);
-        
+
         //ignore if subset has not been set (by ACTIVE_PLOT_CHANGED)
         if (this.subsetId == null) {
             return;
         }
 
-        final SubsetDefinition subset = getSubsetDefinition();
+        final SubsetDefinition subset = getSubsetDefinitionRef();
         // ignore for non valid oifitsSubset associated
-        if (subset==null || subset.getOIFitsSubset() == null) {
+        if (subset == null || subset.getOIFitsSubset() == null) {
             return;
         }
 
 
         // select element present in both lists
-        final List<OITable> oiFitsOfSubset = subset.getOIFitsSubset().getOITableList();                
+        final List<OITable> oiFitsOfSubset = subset.getOIFitsSubset().getOITableList();
         oifitsFileList.clearSelection();
         ListSelectionModel sm = oifitsFileList.getSelectionModel();
 
@@ -159,7 +156,7 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         SwingUtils.invokeAndWaitEDT(new Runnable() {
             @Override
             public void run() {
-                oifitsFileList.ensureIndexIsVisible(lm.getSize()-1);
+                oifitsFileList.ensureIndexIsVisible(lm.getSize() - 1);
             }
         });
         oifitsFileList.ensureIndexIsVisible(found);
@@ -195,11 +192,11 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
     }
 
     /**
-     * Return a new copy of the SubsetDefinition given its identifier (to update it)
-     * @return copy of the SubsetDefinition or null if not found
+     * Return a the SubsetDefinition reference given its identifier (to read it)
+     * @return SubsetDefinition reference or null if not found
      */
-    private SubsetDefinition getSubsetDefinition() {
-        return ocm.getSubsetDefinition(this.subsetId);
+    private SubsetDefinition getSubsetDefinitionRef() {
+        return ocm.getSubsetDefinitionRef(this.subsetId);
     }
 
     /**
@@ -276,8 +273,8 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
                 break;
             /* TODO make it work
              * case SUBSET_CHANGED:
-                updateOIFitsList(event.getSubsetDefinition());
-                break;
+             updateOIFitsList(event.getSubsetDefinition());
+             break;
              */
             case PLOT_CHANGED:
                 updateOIFitsList(event.getPlot());
