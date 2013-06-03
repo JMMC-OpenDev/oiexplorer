@@ -16,7 +16,7 @@
     </company>
 
   <program name="OIFitsExplorer" version="0.1.2"/>
-  <compilation date="30/05/2013" compiler="JDK 1.6.0_24"/>
+  <compilation date="03/06/2013" compiler="JDK 1.6.0_24"/>
   
   <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
   
@@ -151,8 +151,12 @@
   <releasenotes>
     <release version="0.1">
       <prerelease version="0.1.2">
+        <change type="FEATURE">Improved axis editor to adjust its converter and reset the log scale when the selected column changes</change>
+        <change type="FEATURE">Added plot presets with RADIUS (baseline length) and POS_ANGLE (position angle) as x axis</change>
+        <change type="FEATURE">Fixed default converters (MegaLambda, Micrometers) when choosing (SPATIAL_FREQ, EFF_WAVE) columns in the plot editor</change>
         <change type="FEATURE">Show label 'No data to plot.' on the plot panel when no data matches criteria (flagged data, invalid columns ...)</change>
-        <change type="BUGFIX">Fixed empty column choices occuring when the plot is updated using presets</change>
+        <change type="BUGFIX">Improved plot's display name to show appropriate X and Y axis names in the 'Show' combo box</change>
+        <change type="BUGFIX">Fixed empty column choices occuring when selecting a plot preset</change>
         <change type="BUGFIX">Improved layout of the plot editor (margin, auto-fit panel's width)</change>
       </prerelease>
       <prerelease version="0.1.1">
