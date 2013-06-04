@@ -150,7 +150,8 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private void registerActions() {
 
         newPlotTabAction = new NewPlotTabAction(NewPlotTabAction.class.getName(), "newPlotTabAction");
-        newPlotTabAction.putValue(Action.NAME, "+");
+        newPlotTabAction.putValue(Action.NAME, " + ");
+        newPlotTabAction.putValue(Action.SHORT_DESCRIPTION, "add a new plot view ...");
 
         // Build toolBar
         toolBar.add(OIFitsExplorerExportPDFAction.getInstance());
@@ -265,46 +266,45 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         String id;
 
         // find subset id:
-        for (int count = 1;;) {
+        for (int count = 1;;count++) {
             id = "SUBSET_" + count;
             if (!ocm.hasSubsetDefinition(id)) {
                 break;
             }
-            count++;
         }
 
         final SubsetDefinition subset = new SubsetDefinition();
         subset.setId(id);
         subset.setName(id);
-        subset.copyValues(ocm.getCurrentSubsetDefinition()); // TODO: fix double copy !!
+        subset.copyValues(ocm.getCurrentSubsetDefinitionRef());
+        
         if (!ocm.addSubsetDefinition(subset)) {
             throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
         }
 
         // find plotDef id:
-        for (int count = 1;;) {
+        for (int count = 1;;count++) {
             id = "PLOT_DEF_" + count;
             if (!ocm.hasPlotDefinition(id)) {
                 break;
             }
-            count++;
         }
 
         final PlotDefinition plotDef = new PlotDefinition();
         plotDef.setId(id);
         plotDef.setName(id);
-        plotDef.copyValues(ocm.getCurrentPlotDefinition()); // TODO: fix double copy !!
+        plotDef.copyValues(ocm.getCurrentPlotDefinitionRef());
+        
         if (!ocm.addPlotDefinition(plotDef)) {
             throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
         }
 
         // find plot id:
-        for (int count = 1;;) {
+        for (int count = 1;;count++) {
             id = "VIEW_" + count;
             if (!ocm.hasPlot(id)) {
                 break;
             }
-            count++;
         }
 
         // Create new Plot with subset and plotdefinition
@@ -391,7 +391,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
         dataSplitTopPanel = new javax.swing.JPanel();
         toolBar = new javax.swing.JToolBar();
-        oifitsFileListPanel1 = new fr.jmmc.oiexplorer.gui.OifitsFileListPanel();
+        oifitsFileListPanel1 = new fr.jmmc.oiexplorer.gui.OIFitsFileListPanel();
         tabbedPane = new com.jidesoft.swing.JideTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
@@ -438,7 +438,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
     private javax.swing.JSplitPane mainSplitPane;
-    private fr.jmmc.oiexplorer.gui.OifitsFileListPanel oifitsFileListPanel1;
+    private fr.jmmc.oiexplorer.gui.OIFitsFileListPanel oifitsFileListPanel1;
     private com.jidesoft.swing.JideTabbedPane tabbedPane;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
