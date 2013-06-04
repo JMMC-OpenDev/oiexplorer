@@ -31,20 +31,20 @@ import org.slf4j.LoggerFactory;
  * and hightligh the files used by active plot.
  * @author mella
  */
-public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
+public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
     /** Logger */
-    private static final Logger logger = LoggerFactory.getLogger(OifitsFileListPanel.class);
+    private static final Logger logger = LoggerFactory.getLogger(OIFitsFileListPanel.class);
     /* members */
     /** OIFitsCollectionManager singleton */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** subset identifier */
     private String subsetId = null;
 
-    /** Creates new form OifitsFileListPanel */
-    public OifitsFileListPanel() {
+    /** Creates new form OIFitsFileListPanel */
+    public OIFitsFileListPanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
         ocm.bindCollectionChangedEvent(this);
         ocm.getPlotChangedEventNotifier().register(this);
@@ -122,7 +122,7 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         final GenericListModel lm = new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles());
         oifitsFileList.setModel(lm);
 
-        //ignore if subset has not been set (by ACTIVE_PLOT_CHANGED)
+        // ignore if subset has not been set (by ACTIVE_PLOT_CHANGED)
         if (this.subsetId == null) {
             return;
         }
@@ -132,7 +132,6 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         if (subset == null || subset.getOIFitsSubset() == null) {
             return;
         }
-
 
         // select element present in both lists
         final List<OITable> oiFitsOfSubset = subset.getOIFitsSubset().getOITableList();
@@ -144,7 +143,7 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
             for (OITable table : oiFitsOfSubset) {
                 if (table.getOIFitsFile() == lm.getElementAt(i)) {
                     sm.addSelectionInterval(i, i);
-                    if (found < 0) {
+                    if (found == -1) {
                         found = i;
                     }
                     break;
@@ -152,14 +151,21 @@ public class OifitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
             }
         }
 
+        final int lastIndex = lm.getSize();
+        final int firstSelectedIndex = found;
+        
         // display first item on top of the list
-        SwingUtils.invokeAndWaitEDT(new Runnable() {
+        SwingUtils.invokeEDT(new Runnable() {
             @Override
             public void run() {
-                oifitsFileList.ensureIndexIsVisible(lm.getSize() - 1);
+                if (lastIndex != 0) {
+                    oifitsFileList.ensureIndexIsVisible(lastIndex - 1);
+                }
+                if (firstSelectedIndex != -1) {
+                    oifitsFileList.ensureIndexIsVisible(firstSelectedIndex);
+                }
             }
         });
-        oifitsFileList.ensureIndexIsVisible(found);
     }
 
     /**
