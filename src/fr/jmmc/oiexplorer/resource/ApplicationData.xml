@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-  <program name="OIFitsExplorer" version="0.1.2"/>
-  <compilation date="03/06/2013" compiler="JDK 1.6.0_24"/>
+  <program name="OIFitsExplorer" version="0.1.3"/>
+  <compilation date="10/06/2013" compiler="JDK 1.6.0_24"/>
   
   <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
   
@@ -150,6 +150,10 @@
 
   <releasenotes>
     <release version="0.1">
+      <prerelease version="0.1.3">
+        <change type="FEATURE">Added plot preset for UV spatial coverage (symmetry support)</change>
+        <change type="BUGFIX">Fixed plot's x-axis margins when including zero</change>
+      </prerelease>
       <prerelease version="0.1.2">
         <change type="FEATURE">Improved axis editor to adjust its converter and reset the log scale when the selected column changes</change>
         <change type="FEATURE">Added plot presets with RADIUS (baseline length) and POS_ANGLE (position angle) as x axis</change>
