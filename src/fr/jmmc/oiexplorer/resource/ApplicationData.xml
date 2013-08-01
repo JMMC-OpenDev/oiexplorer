@@ -7,13 +7,13 @@
 
 <ApplicationData link="http://www.jmmc.fr/oifitsexplorer">
 
-    <company>
-        <short_name>JMMC</short_name>
-        <legal_name>Jean-Marie Mariotti Center</legal_name>
-        <logo_resource>fr/jmmc/jmcs/resource/image/jmmc_logo.png</logo_resource>
-        <homepage_url>http://www.jmmc.fr/</homepage_url>
-        <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
-    </company>
+  <company>
+    <short_name>JMMC</short_name>
+    <legal_name>Jean-Marie Mariotti Center</legal_name>
+    <logo_resource>fr/jmmc/jmcs/resource/image/jmmc_logo.png</logo_resource>
+    <homepage_url>http://www.jmmc.fr/</homepage_url>
+    <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
+  </company>
 
   <program name="OIFitsExplorer" version="0.1.3"/>
   <compilation date="10/06/2013" compiler="JDK 1.6.0_24"/>
@@ -117,34 +117,27 @@
       <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewAction" action="newCollection" accelerator="N" />
       <menu/> <!-- menu separator -->
       <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="A"
-            icon="/fr/jmmc/jmcs/resource/image/file_add.png"  description="Add an OIFits file"/>      
+            icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add an OIFits file"/>
+
       <menu/> <!-- menu separator -->
       <menu label="Open OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction" action="loadOIDataCollection" 
-            accelerator="O" icon="/fr/jmmc/jmcs/resource/image/folder.png" description="load an OIFits Collection settings"/>
+            accelerator="O" icon="fr/jmmc/jmcs/resource/image/folder.png" description="load an OIFits Collection settings"/>
       <menu label="Save OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction" action="saveOIDataCollection" 
             accelerator="S" description="save the current OIFits Collection settings"/>
-      
-      <!--
-      <menu label="Save observation" classpath="fr.jmmc.oiexplorer.gui.action.SaveObservationAction" action="saveObservation" accelerator="S"
-            icon="/fr/jmmc/oiexplorer/gui/icons/filesaveas.png" description="save the current observation as an observation file"/>
-      -->
-      <!--
-      <menu label="Export to OIFits" classpath="fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction" action="exportOIFits" accelerator="F"
-            description="Export your target observables to an OIFits file"/>
-      -->      
+
       <menu/> <!-- menu separator -->
       <menu label="Export plot to PDF" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportPDFAction" action="exportPDF" accelerator="P"
-            icon="/fr/jmmc/oiexplorer/core/resource/image/icon_pdf.gif" description="Export the current plot to a PDF document"/>
+            icon="fr/jmmc/oiexplorer/core/resource/image/icon_pdf.gif" description="Export the current plot to a PDF document"/>
     </menu>
 
-    <menu label="Edit">      
+    <menu label="Edit">
     </menu>
 
     <menu label="Interop">
-        <!--
+    <!--
       <menu label="Send OIFits" classpath="fr.jmmc." action=""
             description=""/>
-            -->
+    -->
     </menu>
   </menubar>
 
@@ -168,12 +161,11 @@
         <change type="FEATURE">Enhanced renderer settings to have a shape per serie's item: 
             triangle for flagged data or invalid error (negative); square for valid data points</change>
         <change type="BUGFIX">Improved plotting performance on huge datasets</change>
-        <change type="BUGFIX">Fixed min/max ranges for the plot's data area</change>        
+        <change type="BUGFIX">Fixed min/max ranges for the plot's data area</change>
       </prerelease>
-      
       <prerelease version="0.1 beta 2">
         <pubDate>Thu, 26 Apr 2013 16:50:00 GMT</pubDate>
-        <change type="FEATURE">First release with minimal (working) features</change>        
+        <change type="FEATURE">First release with minimal (working) features</change>
       </prerelease>
     </release>
   </releasenotes>
