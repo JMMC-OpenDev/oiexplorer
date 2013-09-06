@@ -16,7 +16,7 @@
   </company>
 
   <program name="OIFitsExplorer" version="0.1.4"/>
-  <compilation date="05/09/2013" compiler="JDK 1.6.0_24"/>
+  <compilation date="06/09/2013" compiler="JDK 1.6.0_24"/>
   
   <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
   
@@ -144,6 +144,7 @@
   <releasenotes>
     <release version="0.1">
       <prerelease version="0.1.4">
+        <pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>
         <change type="FEATURE">Modified plot presets to use computed hour angles instead of MJD as x-axis</change>
         <change type="FEATURE">Added hour angle estimation from MJD (using array coordinates and target RA)</change>
         <change type="BUGFIX">Hide plot's legend in case of too many legend items (100)</change>
