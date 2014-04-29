@@ -216,7 +216,7 @@ public final class OIFitsExplorer extends App {
         createContent(container);
 
         // Handle status bar
-        container.add(new StatusBar(), BorderLayout.SOUTH);
+        container.add(StatusBar.getInstance(), BorderLayout.SOUTH);
 
         StatusBar.show("application started.");
         App.setFrame(frame);
