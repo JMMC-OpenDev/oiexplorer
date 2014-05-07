@@ -5,9 +5,9 @@ package fest;
 
 import com.mortennobel.imagescaling.AdvancedResizeOp;
 import com.mortennobel.imagescaling.ResampleOp;
-import fest.common.JmcsApplicationSetup;
 import fest.common.JmcsFestSwingJUnitTestCase;
 import fr.jmmc.jmcs.Bootstrapper;
+import fr.jmmc.jmcs.gui.component.MessagePane;
 import static java.awt.event.KeyEvent.*;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
@@ -20,6 +20,7 @@ import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
 import org.fest.swing.util.Platform;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -30,29 +31,26 @@ import org.junit.Test;
 public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
     /** absolute path to test folder to load OIFits collection */
-    private final static String TEST_FOLDER = "/home/bourgesl/dev/oiexplorer/test/";
+    private final static String USER_HOME = SystemUtils.USER_HOME;
+    private final static String TEST_FOLDER = USER_HOME + "/dev/oiexplorer/src/test/resources/";
 
     /**
-     * Define the application
+     * Initialize system properties & static variables and finally starts the application
      */
-    static {
+    @BeforeClass
+    public static void intializeAndStartApplication() {
+
+        // invoke Bootstrapper method to initialize logback now:
+        Bootstrapper.getState();
+
         // Test JDK 1.6
-
         if (!SystemUtils.IS_JAVA_1_6) {
-            logger.warning("Please use a JVM 1.6 (Sun) before running tests (fonts and LAF may be wrong) !");
-            System.exit(1);
+            MessagePane.showErrorMessage("Please use a JVM 1.6 (Sun) before running tests (fonts and LAF may be wrong) !");
+            Bootstrapper.stopApp(1);
         }
-
-
-        // disable dev LAF menu :
-        System.setProperty("jmcs.laf.menu", "false");
 
         // Initialize logs first:
         Bootstrapper.getState();
-
-        JmcsApplicationSetup.define(
-                fr.jmmc.oiexplorer.OIFitsExplorer.class,
-                "-open", TEST_FOLDER + "mystery.oixp");
 
         // define robot delays :
         defineRobotDelayBetweenEvents(SHORT_DELAY);
@@ -62,6 +60,11 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
 
         // disable tooltips :
         enableTooltips(false);
+
+        // Start application:
+        JmcsFestSwingJUnitTestCase.startApplication(
+                fr.jmmc.oiexplorer.OIFitsExplorer.class,
+                "-open", TEST_FOLDER + "mystery.oixp");
     }
 
     /**
@@ -77,7 +80,6 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
         saveImage(image, "OIFitsExplorer-screen.png");
 
         // TODO : refactor that code :
-
         // miniature for aspro web page : 350px width :
         final int width = 350;
         final int height = Math.round(1f * width * image.getHeight() / image.getWidth());
@@ -188,7 +190,7 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
     @Test
     @GUITest
     public void shouldExit() {
-        logger.severe("shouldExit test");
+        logger.info("shouldExit test");
 
         window.close();
 
@@ -206,7 +208,7 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
         window.pressAndReleaseKey(keyCode(VK_P).modifiers(Platform.controlOrCommandMask()));
 
         // use image folder to store PDF and validate :
-        window.fileChooser().setCurrentDirectory(getScreenshotFolder()).approve();
+        fileChooserJmcs().setCurrentDirectory(getScreenshotFolder()).approve();
 
         // overwrite any existing file :
         confirmDialogFileOverwrite();
