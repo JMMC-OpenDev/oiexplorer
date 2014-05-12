@@ -10,14 +10,12 @@ import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import static java.awt.event.KeyEvent.*;
 import java.awt.image.BufferedImage;
-import javax.swing.JComponent;
 import org.apache.commons.lang.SystemUtils;
 import org.fest.swing.annotation.GUITest;
 import static org.fest.swing.core.KeyPressInfo.*;
 import static org.fest.swing.core.matcher.DialogMatcher.*;
 import org.fest.swing.core.matcher.JTextComponentMatcher;
 import org.fest.swing.fixture.DialogFixture;
-import org.fest.swing.fixture.FrameFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
 import org.fest.swing.util.Platform;
 import org.junit.BeforeClass;
@@ -225,31 +223,5 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
         exportPDF();
 
         return image;
-    }
-
-    /**
-     * Capture a screenshot of the main form using the given file name
-     * @param fileName the file name (including the png extension)
-     */
-    private void captureMainForm(final String fileName) {
-        saveCroppedScreenshotOf(fileName, 0, 0, -1, getMainFormHeight(window));
-    }
-
-    /**
-     * Determine the height of the main form
-     * @param window window fixture
-     * @return height of the main form
-     */
-    private static int getMainFormHeight(final FrameFixture window) {
-        int height = 32 + 10;
-
-        JComponent com;
-        com = window.panel("mainPanel").component();
-        height += com.getHeight();
-
-        com = window.menuItemWithPath("File").component();
-        height += com.getHeight();
-
-        return height;
     }
 }
