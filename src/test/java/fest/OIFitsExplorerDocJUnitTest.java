@@ -206,7 +206,7 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
         window.pressAndReleaseKey(keyCode(VK_P).modifiers(Platform.controlOrCommandMask()));
 
         // use image folder to store PDF and validate :
-        fileChooserJmcs().setCurrentDirectory(getScreenshotFolder()).approve();
+        window.fileChooser().setCurrentDirectory(getScreenshotFolder()).approve();
 
         // overwrite any existing file :
         confirmDialogFileOverwrite();
