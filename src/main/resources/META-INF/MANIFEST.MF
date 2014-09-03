@@ -7,5 +7,6 @@ Implementation-URL: http://www.jmmc.fr/oifitsexplorer
 Application-Name: OIFits Explorer
 Permissions: all-permissions
 Codebase: http://apps.jmmc.fr
+Application-Library-Allowable-Codebase: http://apps.jmmc.fr
 Main-Class: fr.jmmc.oiexplorer.OIFitsExplorer
 
