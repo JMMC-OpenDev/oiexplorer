@@ -15,9 +15,12 @@ import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.ACT
 import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.COLLECTION_CHANGED;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.util.OIFitsFileComparator;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -93,7 +96,7 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        oifitsFileList = new javax.swing.JList();
+        oifitsFileList = createOIFitsFileList();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -118,8 +121,12 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
      * @param oiFitsCollection OIFitsCollection to process
      */
     protected void updateOIFitsList(final OIFitsCollection oiFitsCollection) {
-        // always init default content
-        final GenericListModel lm = new GenericListModel<OIFitsFile>(oiFitsCollection.getOIFitsFiles());
+        final List<OIFitsFile> oifitsFiles = oiFitsCollection.getOIFitsFiles();
+
+        Collections.sort(oifitsFiles, OIFitsFileComparator.INSTANCE);
+
+        // Sort OIFits files by file name (not path):
+        final GenericListModel lm = new GenericListModel<OIFitsFile>(oifitsFiles);
         oifitsFileList.setModel(lm);
 
         // ignore if subset has not been set (by ACTIVE_PLOT_CHANGED)
@@ -136,10 +143,12 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         // select element present in both lists
         final List<OITable> oiFitsOfSubset = subset.getOIFitsSubset().getOITableList();
         oifitsFileList.clearSelection();
-        ListSelectionModel sm = oifitsFileList.getSelectionModel();
+
+        final ListSelectionModel sm = oifitsFileList.getSelectionModel();
+        final int size = lm.size();
 
         int found = -1;
-        for (int i = 0; i < lm.getSize(); i++) {
+        for (int i = 0; i < size; i++) {
             for (OITable table : oiFitsOfSubset) {
                 if (table.getOIFitsFile() == lm.getElementAt(i)) {
                     sm.addSelectionInterval(i, i);
@@ -151,9 +160,9 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
             }
         }
 
-        final int lastIndex = lm.getSize();
+        final int lastIndex = size;
         final int firstSelectedIndex = found;
-        
+
         // display first item on top of the list
         SwingUtils.invokeEDT(new Runnable() {
             @Override
@@ -172,20 +181,13 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
      * Update the file list
      * @param activePlot plot used to initialize file list.
      */
-    protected void updateOIFitsList(SubsetDefinition subset) {
-        if (subset != null) {
-            setSubsetId(subset.getId());
-            updateOIFitsList(ocm.getOIFitsCollection());
-        }
-    }
-
-    /**
-     * Update the file list
-     * @param activePlot plot used to initialize file list.
-     */
-    protected void updateOIFitsList(Plot activePlot) {
+    protected void updateOIFitsList(final Plot activePlot) {
         if (activePlot != null) {
-            updateOIFitsList(activePlot.getSubsetDefinition());
+            final SubsetDefinition subset = activePlot.getSubsetDefinition();
+            if (subset != null) {
+                setSubsetId(subset.getId());
+                updateOIFitsList(ocm.getOIFitsCollection());
+            }
         }
     }
 
@@ -291,5 +293,38 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
             default:
         }
         logger.debug("onProcess {} - done", event);
+    }
+
+    /**
+     * Create the custom JList to support tooltips for OIFitsFile
+     * @return JList
+     */
+    private static JList createOIFitsFileList() {
+        final JList list = new JList() {
+            /** default serial UID for Serializable interface */
+            private static final long serialVersionUID = 1;
+
+            /** This method is called as the cursor moves within the list */
+            @Override
+            public String getToolTipText(final MouseEvent evt) {
+                // Get item index :
+                final int index = locationToIndex(evt.getPoint());
+                if (index != -1) {
+                    String tooltip = null;
+
+                    // Get OIFitsFile:
+                    final OIFitsFile oifitsFile = (OIFitsFile) getModel().getElementAt(index);
+                    if (oifitsFile != null) {
+                        // Return the absolute file path:
+                        tooltip = oifitsFile.getAbsoluteFilePath();
+                    }
+
+                    return tooltip;
+                }
+                return getToolTipText();
+            }
+        };
+
+        return list;
     }
 }

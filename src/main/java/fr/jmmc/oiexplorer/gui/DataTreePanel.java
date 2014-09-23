@@ -16,8 +16,11 @@ import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
+import fr.jmmc.oiexplorer.core.model.util.TargetUIDComparator;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.TreeSelectionEvent;
@@ -93,7 +96,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 return toString(userObject);
             }
         };
-        
+
         // Define root node once:
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.setUserObject("Targets");
@@ -164,7 +167,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             }
         }
     }
-    
+
     /**
      * Update the data tree
      * @param activePlot plot used to initialize tree element.
@@ -188,13 +191,20 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         final Map<TargetUID, OIFitsFile> oiFitsPerTarget = oiFitsCollection.getOiFitsPerTarget();
 
-        for (Map.Entry<TargetUID, OIFitsFile> entry : oiFitsPerTarget.entrySet()) {
-            final TargetUID target = entry.getKey();
+        // Sort target by their name:
+        final List<TargetUID> targetUIDs = new ArrayList<TargetUID>(oiFitsPerTarget.size());
+        targetUIDs.addAll(oiFitsPerTarget.keySet());
+        Collections.sort(targetUIDs, TargetUIDComparator.INSTANCE);
+
+        // Add targets and their data tables:
+        for (TargetUID target : targetUIDs) {
             final DefaultMutableTreeNode targetTreeNode = dataTree.addNode(rootNode, target);
 
-            final OIFitsFile dataForTarget = entry.getValue();
-            for (OITable table : dataForTarget.getOiDataList()) {
-                dataTree.addNode(targetTreeNode, table);
+            final OIFitsFile dataForTarget = oiFitsPerTarget.get(target);
+            if (dataForTarget != null) {
+                for (OITable table : dataForTarget.getOiDataList()) {
+                    dataTree.addNode(targetTreeNode, table);
+                }
             }
         }
         // fire node structure changed :
@@ -371,8 +381,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 updateOIFitsCollection(event.getOIFitsCollection());
                 break;
             case ACTIVE_PLOT_CHANGED:
-                updateOIFitsCollection(event.getActivePlot());                                              
-                break;            
+                updateOIFitsCollection(event.getActivePlot());
+                break;
             default:
         }
         logger.debug("onProcess {} - done", event);
