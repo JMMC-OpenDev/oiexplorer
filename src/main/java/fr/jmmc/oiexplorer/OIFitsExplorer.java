@@ -14,6 +14,7 @@ import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.network.interop.SampCapability;
 import fr.jmmc.jmcs.network.interop.SampMessageHandler;
 import fr.jmmc.jmcs.gui.util.ResourceImage;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
@@ -22,6 +23,7 @@ import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
+import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -47,8 +49,7 @@ public final class OIFitsExplorer extends App {
     /** main Panel */
     private MainPanel mainPanel;
     /* Minimal size of main component */
-    private static final Dimension INITIAL_DIMENSION = new java.awt.Dimension(1200, 700);  
-   
+    private static final Dimension INITIAL_DIMENSION = new java.awt.Dimension(1200, 700);
 
     /**
      * Main entry point : use swing setup and then launch the application
@@ -220,7 +221,7 @@ public final class OIFitsExplorer extends App {
 
         StatusBar.show("application started.");
         App.setFrame(frame);
-                              
+
         App.getFrame().setPreferredSize(INITIAL_DIMENSION);
         App.getFrame().pack();
 
@@ -251,9 +252,7 @@ public final class OIFitsExplorer extends App {
         new OIFitsExplorerExportPDFAction();
 
         // Edit menu :
-
         // Interop menu :
-
     }
 
     /**
@@ -266,19 +265,37 @@ public final class OIFitsExplorer extends App {
         new SampMessageHandler(SampCapability.LOAD_FITS_TABLE) {
             @Override
             protected void processMessage(final String senderId, final Message message) throws SampException {
-                // bring this application to front and load data
-                SwingUtils.invokeLaterEDT(new Runnable() {
-                    @Override
-                    public void run() {
-                        App.showFrameToFront();
-                        try {
-                            final String url = (String) message.getParam("url");
-                            OIFitsCollectionManager.getInstance().loadOIFitsFile(url, null);
-                        } catch (IOException ex) {
-                            MessagePane.showErrorMessage("Could not load file from samp message : " + message, ex);
+                final String url = (String) message.getParam("url");
+
+                if (!StringUtils.isEmpty(url)) {
+                    // bring this application to front and load data
+                    SwingUtils.invokeLaterEDT(new Runnable() {
+                        @Override
+                        public void run() {
+                            App.showFrameToFront();
+
+                            final OIFitsChecker checker = new OIFitsChecker();
+
+                            try {
+                                final long startTime = System.nanoTime();
+
+                                OIFitsCollectionManager.getInstance().loadOIFitsFile(url, checker);
+
+                                logger.info("LoadSampOIFitsAction: duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
+
+                            } catch (IOException ioe) {
+                                MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
+                                StatusBar.show(ioe.getMessage());
+                            } finally {
+                                // display validation messages anyway:
+                                final String checkReport = checker.getCheckReport();
+                                logger.info("validation results:\n{}", checkReport);
+
+                                MessagePane.showMessage(checkReport);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         };
     }
