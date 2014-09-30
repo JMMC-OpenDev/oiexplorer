@@ -145,7 +145,8 @@
         <release version="0.1">
             <prerelease version="0.1.5 beta 1">
                 <pubDate>Tue, 30 Sep 2014 16:00:00 GMT</pubDate>
-                <change type="FEATURE">Improved log scale handling: dynamic tick label placement</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/484">Improved log scale handling: dynamic tick label placement</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/479">Added sort OIFits files and targets by their name</change>
                 <change type="BUGFIX">Improved mousewheel zoom over sub plots</change>
             </prerelease>
             <prerelease version="0.1.4">
