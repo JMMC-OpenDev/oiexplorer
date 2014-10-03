@@ -8,13 +8,17 @@ import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
-import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.data.MimeType;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
-import java.io.IOException;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +63,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
             if (!file.exists() || !file.isFile()) {
                 MessagePane.showErrorMessage("Could not load the file : " + file.getAbsolutePath());
                 files = null;
-            }
-
-            if (file != null) {
+            } else {
                 // update current directory for oidata:
                 SessionSettingsPreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
 
@@ -74,25 +76,50 @@ public final class LoadOIFitsAction extends RegisteredAction {
 
         // If a file was defined (No cancel in the dialog)
         if (files != null) {
+
+            // Create progress panel:
+            final JProgressBar progressBar = new JProgressBar();
+            final JPanel progressPanel = createLoadOIFitsProgressPanel(progressBar);
+
+            final OIFitsExplorer xp = OIFitsExplorer.getInstance();
+            xp.addOverlay(progressPanel);
+
             final OIFitsChecker checker = new OIFitsChecker();
 
-            try {
-                final long startTime = System.nanoTime();
+            OIFitsCollectionManager.getInstance().loadOIFitsFiles(files, checker,
+                    new LoadOIFitsListener() {
 
-                OIFitsCollectionManager.getInstance().loadOIFitsFiles(files, checker);
+                        @Override
+                        public void propertyChange(final PropertyChangeEvent pce) {
+                            if ("progress".equals(pce.getPropertyName())) {
+                                progressBar.setValue((Integer) pce.getNewValue());
+                            }
+                        }
 
-                logger.info("LoadOIFitsAction: duration = {} ms.", 1e-6d * (System.nanoTime() - startTime));
+                        @Override
+                        public void done(final boolean cancelled) {
+                            xp.removeOverlay(progressPanel);
 
-            } catch (IOException ioe) {
-                MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
-                StatusBar.show(ioe.getMessage());
-            } finally {
-                // display validation messages anyway:
-                final String checkReport = checker.getCheckReport();
-                logger.info("validation results:\n{}", checkReport);
+                            // display validation messages anyway:
+                            final String checkReport = checker.getCheckReport();
+                            logger.info("validation results:\n{}", checkReport);
 
-                MessagePane.showMessage(checkReport);
-            }
+                            if (!cancelled) {
+                                MessagePane.showMessage(checkReport);
+                            }
+                        }
+                    });
         }
+    }
+
+    public static JPanel createLoadOIFitsProgressPanel(final JProgressBar progressBar) {
+        return OIFitsExplorer.createProgressPanel("Loading OIFits:", progressBar,
+                new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        OIFitsCollectionManager.cancelTaskLoadOIFits();
+                    }
+                });
     }
 }

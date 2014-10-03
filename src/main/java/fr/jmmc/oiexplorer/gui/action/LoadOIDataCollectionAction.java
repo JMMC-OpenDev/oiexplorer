@@ -10,11 +10,16 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.data.MimeType;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,16 +91,45 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {
-
-            final OIFitsChecker checker = new OIFitsChecker();
-
             final String fileLocation = file.getAbsolutePath();
 
             StatusBar.show("loading OIFits Explorer Collection: " + fileLocation);
 
+            // Create progress panel:
+            final JProgressBar progressBar = new JProgressBar();
+            final JPanel progressPanel = LoadOIFitsAction.createLoadOIFitsProgressPanel(progressBar);
+
+            final OIFitsExplorer xp = OIFitsExplorer.getInstance();
+            xp.addOverlay(progressPanel);
+
             Exception e = null;
             try {
-                ocm.loadOIFitsCollection(file, checker);
+                final OIFitsChecker checker = new OIFitsChecker();
+
+                ocm.loadOIFitsCollection(file, checker,
+                        new LoadOIFitsListener() {
+
+                            @Override
+                            public void propertyChange(final PropertyChangeEvent pce) {
+                                if ("progress".equals(pce.getPropertyName())) {
+                                    progressBar.setValue((Integer) pce.getNewValue());
+                                }
+                            }
+
+                            @Override
+                            public void done(final boolean cancelled) {
+                                xp.removeOverlay(progressPanel);
+
+                                // log validation messages anyway:
+                                final String checkReport = checker.getCheckReport();
+                                logger.info("validation results:\n{}", checkReport);
+
+                                // TODO: use a preference to show or hide the validation report:
+                                if (false && !cancelled) {
+                                    MessagePane.showMessage(checkReport);
+                                }
+                            }
+                        });
 
             } catch (IllegalStateException ise) {
                 e = ise;
@@ -103,17 +137,10 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                 e = ioe;
             } finally {
                 if (e != null) {
+                    xp.removeOverlay(progressPanel);
+
                     StatusBar.show("Could not load OIFits Explorer Collection: " + fileLocation);
                     MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);
-                }
-
-                // log validation messages anyway:
-                final String checkReport = checker.getCheckReport();
-                logger.info("validation results:\n{}", checkReport);
-
-                // TODO: use a preference to show or hide the validation report:
-                if (false) {
-                    MessagePane.showMessage(checkReport);
                 }
             }
         }

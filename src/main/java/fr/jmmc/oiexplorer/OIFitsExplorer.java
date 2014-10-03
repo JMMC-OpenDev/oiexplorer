@@ -3,6 +3,8 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer;
 
+import com.jidesoft.swing.DefaultOverlayable;
+import com.jidesoft.swing.Overlayable;
 import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
@@ -25,12 +27,20 @@ import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.EtchedBorder;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.client.SampException;
 import org.slf4j.Logger;
@@ -50,6 +60,8 @@ public final class OIFitsExplorer extends App {
     private MainPanel mainPanel;
     /* Minimal size of main component */
     private static final Dimension INITIAL_DIMENSION = new java.awt.Dimension(1200, 700);
+
+    private DefaultOverlayable overlayable = null;
 
     /**
      * Main entry point : use swing setup and then launch the application
@@ -236,7 +248,10 @@ public final class OIFitsExplorer extends App {
         this.mainPanel = new MainPanel();
         this.mainPanel.setName("mainPanel"); // Fest
 
-        container.add(this.mainPanel, BorderLayout.CENTER);
+//        container.add(this.mainPanel, BorderLayout.CENTER);
+        overlayable = new DefaultOverlayable(mainPanel);
+
+        container.add(overlayable, BorderLayout.CENTER);
     }
 
     /**
@@ -307,4 +322,55 @@ public final class OIFitsExplorer extends App {
     public MainPanel getMainPanel() {
         return mainPanel;
     }
+
+    /**
+     * Remove the given panel from the main panel's overlay
+     * @param panel panel to remove from the main panel's overlay
+     */
+    public void removeOverlay(final JPanel panel) {
+        // force repaint the parent panel (ie main panel):
+        panel.setVisible(false);
+        overlayable.removeOverlayComponent(panel);
+//        overlayable.repaint();
+    }
+
+    /**
+     * Add the given panel to the main panel's overlay
+     * @param panel panel to add to the main panel's overlay
+     */
+    public void addOverlay(final JPanel panel) {
+        overlayable.addOverlayComponent(panel, Overlayable.SOUTH_WEST);
+    }
+
+    /**
+     * Create a generic progress panel (typically shown in overlay)
+     * @param message message to display
+     * @param progressBar progress bar to use
+     * @param cancelListener optional cancel action listener
+     * @return new panel
+     */
+    public static JPanel createProgressPanel(final String message, final JProgressBar progressBar, final ActionListener cancelListener) {
+        final JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        containerPanel.setBackground(new Color(0, 0, 0, 0)); // transparent
+
+        final JPanel progressPanel = new JPanel();
+        progressPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+        progressPanel.add(new JLabel(message));
+
+        progressBar.setStringPainted(true);
+        progressPanel.add(progressBar);
+
+        if (cancelListener != null) {
+            final JButton cancelBtn = new JButton("Cancel");
+            cancelBtn.addActionListener(cancelListener);
+            progressPanel.add(cancelBtn);
+        }
+
+        containerPanel.add(progressPanel);
+
+        return containerPanel;
+    }
+
 }

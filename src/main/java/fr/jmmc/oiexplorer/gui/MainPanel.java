@@ -6,6 +6,7 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.oiexplorer.core.gui.PlotView;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
+import com.jidesoft.swing.OverlayableUtils;
 import com.jidesoft.swing.TabEditingValidator;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
@@ -14,8 +15,6 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
-import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.PLOT_LIST_CHANGED;
-import fr.jmmc.oiexplorer.core.model.event.GenericEvent;
 import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * Main container of OIFits Explorer App
  * @author mella
  */
-public final class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
+public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -63,6 +62,12 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // Finish init
         postInit();
+    }
+
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+        super.repaint(tm, x, y, width, height);
+        OverlayableUtils.repaintOverlayable(this);
     }
 
     /**
@@ -192,7 +197,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
                 addPanel(p, plotId);
             }
         }
-    } 
+    }
 
     private String getSelectedPlotId() {
         PlotView currentPlotView = getCurrentPanel();
@@ -266,7 +271,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         String id;
 
         // find subset id:
-        for (int count = 1;;count++) {
+        for (int count = 1;; count++) {
             id = "SUBSET_" + count;
             if (!ocm.hasSubsetDefinition(id)) {
                 break;
@@ -277,13 +282,13 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         subset.setId(id);
         subset.setName(id);
         subset.copyValues(ocm.getCurrentSubsetDefinitionRef());
-        
+
         if (!ocm.addSubsetDefinition(subset)) {
             throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
         }
 
         // find plotDef id:
-        for (int count = 1;;count++) {
+        for (int count = 1;; count++) {
             id = "PLOT_DEF_" + count;
             if (!ocm.hasPlotDefinition(id)) {
                 break;
@@ -294,13 +299,13 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         plotDef.setId(id);
         plotDef.setName(id);
         plotDef.copyValues(ocm.getCurrentPlotDefinitionRef());
-        
+
         if (!ocm.addPlotDefinition(plotDef)) {
             throw new IllegalStateException("unable to addPlotDefinition : " + plotDef);
         }
 
         // find plot id:
-        for (int count = 1;;count++) {
+        for (int count = 1;; count++) {
             id = "VIEW_" + count;
             if (!ocm.hasPlot(id)) {
                 break;
