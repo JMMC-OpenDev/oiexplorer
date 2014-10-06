@@ -6,7 +6,6 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.oiexplorer.core.gui.PlotView;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
-import com.jidesoft.swing.OverlayableUtils;
 import com.jidesoft.swing.TabEditingValidator;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
@@ -62,12 +61,6 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
 
         // Finish init
         postInit();
-    }
-
-    @Override
-    public void repaint(long tm, int x, int y, int width, int height) {
-        super.repaint(tm, x, y, width, height);
-        OverlayableUtils.repaintOverlayable(this);
     }
 
     /**

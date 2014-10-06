@@ -10,7 +10,6 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.data.MimeType;
-import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
@@ -99,8 +98,7 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
             final JProgressBar progressBar = new JProgressBar();
             final JPanel progressPanel = LoadOIFitsAction.createLoadOIFitsProgressPanel(progressBar);
 
-            final OIFitsExplorer xp = OIFitsExplorer.getInstance();
-            xp.addOverlay(progressPanel);
+            StatusBar.addCustomPanel(progressPanel);
 
             Exception e = null;
             try {
@@ -118,7 +116,7 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
 
                             @Override
                             public void done(final boolean cancelled) {
-                                xp.removeOverlay(progressPanel);
+                                StatusBar.removeCustomPanel(progressPanel);
 
                                 // log validation messages anyway:
                                 final String checkReport = checker.getCheckReport();
@@ -137,7 +135,7 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                 e = ioe;
             } finally {
                 if (e != null) {
-                    xp.removeOverlay(progressPanel);
+                    StatusBar.removeCustomPanel(progressPanel);
 
                     StatusBar.show("Could not load OIFits Explorer Collection: " + fileLocation);
                     MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);

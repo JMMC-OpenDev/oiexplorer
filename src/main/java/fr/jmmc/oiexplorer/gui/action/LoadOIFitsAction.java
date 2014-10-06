@@ -9,6 +9,7 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.data.MimeType;
+import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -54,7 +55,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
 
-        File files[] = null;
+        File[] files;
 
         // If the action was automatically triggered from App launch
         if (evt.getSource() == ActionRegistrar.getInstance()) {
@@ -81,8 +82,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
             final JProgressBar progressBar = new JProgressBar();
             final JPanel progressPanel = createLoadOIFitsProgressPanel(progressBar);
 
-            final OIFitsExplorer xp = OIFitsExplorer.getInstance();
-            xp.addOverlay(progressPanel);
+            StatusBar.addCustomPanel(progressPanel);
 
             final OIFitsChecker checker = new OIFitsChecker();
 
@@ -98,7 +98,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
 
                         @Override
                         public void done(final boolean cancelled) {
-                            xp.removeOverlay(progressPanel);
+                            StatusBar.removeCustomPanel(progressPanel);
 
                             // display validation messages anyway:
                             final String checkReport = checker.getCheckReport();
@@ -112,8 +112,8 @@ public final class LoadOIFitsAction extends RegisteredAction {
         }
     }
 
-    public static JPanel createLoadOIFitsProgressPanel(final JProgressBar progressBar) {
-        return OIFitsExplorer.createProgressPanel("Loading OIFits:", progressBar,
+    static JPanel createLoadOIFitsProgressPanel(final JProgressBar progressBar) {
+        return OIFitsExplorer.createProgressPanel("loading OIFits files ...", progressBar,
                 new ActionListener() {
 
                     @Override
