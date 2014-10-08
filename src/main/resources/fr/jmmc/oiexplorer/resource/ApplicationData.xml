@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.1.4"/>
+    <program name="OIFitsExplorer" version="0.2.0 beta 1"/>
     <compilation date="06/10/2014" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
@@ -116,7 +116,7 @@
         <menu label="File">
             <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewAction" action="newCollection" accelerator="N" />
             <menu/> <!-- menu separator -->
-            <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="A"
+            <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="F"
                   icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add an OIFits file"/>
 
             <menu/> <!-- menu separator -->
@@ -142,16 +142,18 @@
     </menubar>
 
     <releasenotes>
-        <release version="0.1">
-            <prerelease version="0.1.5 beta 1">
-                <pubDate>Mon, 06 Oct 2014 16:00:00 GMT</pubDate>
+        <release version="0.2">
+            <pubDate>Mon, 06 Oct 2014 16:00:00 GMT</pubDate>
+            <prerelease version="0.2.0 beta 1">
                 <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/434">Improved loading OIFits files in background with cancellation support</change>
                 <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/484">Improved log scale handling: dynamic tick label placement</change>
                 <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/479">Added sort OIFits files and targets by their name</change>
                 <change type="BUGFIX">Improved mousewheel zoom over sub plots</change>
             </prerelease>
+        </release>
+        <release version="0.1">
+            <pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>
             <prerelease version="0.1.4">
-                <pubDate>Fri, 06 Sep 2013 16:00:00 GMT</pubDate>
                 <change type="FEATURE">Modified plot presets to use computed hour angles instead of MJD as x-axis</change>
                 <change type="FEATURE">Added hour angle estimation from MJD (using array coordinates and target RA)</change>
                 <change type="BUGFIX">Hide plot's legend in case of too many legend items (100)</change>
