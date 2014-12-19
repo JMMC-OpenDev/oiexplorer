@@ -17,16 +17,22 @@ import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
 import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
 import fr.jmmc.oiexplorer.core.model.util.TargetUIDComparator;
+import fr.jmmc.oitools.model.OIData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +57,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private String subsetId = OIFitsCollectionManager.CURRENT_SUBSET_DEFINITION;
     /** Swing data tree */
     private GenericJTree<Object> dataTree;
+    /** temporary buffer */
+    private final StringBuilder tmpBuf = new StringBuilder(64);
 
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
@@ -88,14 +96,20 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             @Override
             protected String convertUserObjectToString(final Object userObject) {
                 if (userObject instanceof TargetUID) {
+                    // target name
+                    // TODO: add all aliases
                     return ((TargetUID) userObject).getTarget();
                 }
                 if (userObject instanceof OITable) {
-                    return ((OITable) userObject).toString();
+                    return getDisplayLabel((OITable) userObject, tmpBuf);
                 }
                 return toString(userObject);
             }
         };
+
+        ToolTipManager.sharedInstance().registerComponent(dataTree);
+
+        dataTree.setCellRenderer(new TooltipTreeCellRenderer());
 
         // Define root node once:
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
@@ -386,5 +400,77 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             default:
         }
         logger.debug("onProcess {} - done", event);
+    }
+
+    /**
+     * Return the label displayed in the data tree
+     * @param table OITable to display
+     * @param sb temporary buffer
+     * @return label
+     */
+    private static String getDisplayLabel(final OITable table, final StringBuilder sb) {
+        if (table instanceof OIData) {
+            final OIData oiData = (OIData) table;
+            sb.setLength(0);
+            sb.append(table.getExtName());
+            sb.append('#');
+            sb.append(table.getExtNb());
+            final String dateObs = oiData.getDateObs();
+            if (!StringUtils.isEmpty(dateObs)) {
+                sb.append(' ').append(dateObs);
+            }
+            sb.append(' ').append(oiData.getInsName());
+            return sb.toString();
+        }
+        return table.toString();
+    }
+
+    private String getTreeTooltipText(final Object value, final StringBuilder sb) {
+        sb.setLength(0);
+        if (value instanceof TargetUID) {
+            final TargetUID targetUID = (TargetUID) value;
+            sb.append(targetUID.getTarget());
+//            sb.append(" TODO (add aliases, coordinates ...)");
+            return sb.toString();
+        }
+        if (value instanceof OIData) {
+            final OIData oiData = (OIData) value;
+            sb.append("<html>");
+            sb.append("<b>Table:</b> ").append(oiData.getExtName()).append('#').append(oiData.getExtNb());
+            sb.append("<br><b>OIFits:</b> ").append(oiData.getOIFitsFile().getName());
+            sb.append("<br><b>DATE-OBS:</b> ").append(oiData.getDateObs());
+            sb.append("<br><b>ARRNAME:</b> ").append(oiData.getArrName());
+            sb.append("<br><b>INSNAME:</b> ").append(oiData.getInsName());
+            sb.append("<br><b>NB_MEASUREMENTS:</b> ").append(oiData.getNbMeasurements());
+
+            sb.append("<br><b>Configurations:</b> ");
+            for (short[] staConf : oiData.getDistinctStaConf()) {
+                sb.append(oiData.getStaNames(staConf)); // cached
+            }
+            sb.append("</html>");
+            return sb.toString();
+        }
+        return null;
+    }
+
+    private class TooltipTreeCellRenderer extends DefaultTreeCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                                                      boolean sel, boolean expanded, boolean leaf, int row,
+                                                      boolean hasFocus) {
+
+            if (value != null) {
+                final Object userObject;
+                if (value instanceof DefaultMutableTreeNode) {
+                    userObject = ((DefaultMutableTreeNode) value).getUserObject();
+                    setToolTipText(getTreeTooltipText(userObject, tmpBuf));
+                }
+            }
+            return super.getTreeCellRendererComponent(tree, value, sel,
+                    expanded, leaf, row, hasFocus);
+        }
     }
 }
