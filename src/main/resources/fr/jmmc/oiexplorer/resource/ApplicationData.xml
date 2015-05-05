@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.0 beta 1"/>
-    <compilation date="06/10/2014" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.0 beta 2"/>
+    <compilation date="05/05/2015" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -143,7 +143,10 @@
 
     <releasenotes>
         <release version="0.2">
-            <pubDate>Mon, 06 Oct 2014 16:00:00 GMT</pubDate>
+            <pubDate>Tue, 05 May 2015 16:00:00 GMT</pubDate>
+            <prerelease version="0.2.0 beta 2">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/676">Fixed compatibility issue with JDK8 HashMap (OITableSerieKey.compareTo)</change>
+            </prerelease>
             <prerelease version="0.2.0 beta 1">
                 <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/434">Improved loading OIFits files in background with cancellation support</change>
                 <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/484">Improved log scale handling: dynamic tick label placement</change>
