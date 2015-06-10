@@ -35,6 +35,6 @@ public final class OIFitsExplorerExportAction extends ExportDocumentAction {
      */
     @Override
     protected DocumentExportable getSelectedComponent() {
-        return OIFitsExplorer.getInstance().getMainPanel().getCurrentPDFView();
+        return OIFitsExplorer.getInstance().getMainPanel().getCurrentExportableView();
     }
 }

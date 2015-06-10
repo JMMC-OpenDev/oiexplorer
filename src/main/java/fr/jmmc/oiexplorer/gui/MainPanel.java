@@ -428,7 +428,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      *
      * @return any component or null
      */
-    public Component getCurrentView() {
+    private Component getCurrentView() {
         return tabbedPane.getSelectedComponent();
     }
 
@@ -437,7 +437,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      *
      * @return a DocumentExportable instance or null
      */
-    public DocumentExportable getCurrentPDFView() {
+    public DocumentExportable getCurrentExportableView() {
         final Component com = getCurrentView();
         if (com instanceof PlotView) {
             return ((PlotView) com).getPlotPanel();
@@ -560,7 +560,10 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             logger.debug("removeCurrentView(): {}", index);
 
             // list will be refresh by fired event inside removePlot
-            ocm.removePlot(getSelectedPlotId());
+            final String plotId = getSelectedPlotId();
+            if (plotId != null) {
+                ocm.removePlot(plotId);
+            }
         }
     }
 
