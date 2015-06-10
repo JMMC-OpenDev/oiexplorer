@@ -3,13 +3,13 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui.action;
 
+import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
-import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
@@ -126,6 +126,9 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                                 if (false && !cancelled) {
                                     MessagePane.showMessage(checkReport);
                                 }
+
+                                // Fire the Ready event to any listener:
+                                ocm.fireReady(this, null);
                             }
                         });
 

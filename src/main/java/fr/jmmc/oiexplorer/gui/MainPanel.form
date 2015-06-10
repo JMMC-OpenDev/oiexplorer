@@ -80,13 +80,10 @@
             </Container>
           </SubComponents>
         </Container>
-        <Container class="com.jidesoft.swing.JideTabbedPane" name="tabbedPane">
-          <Properties>
-            <Property name="boldActiveTab" type="boolean" value="true"/>
-            <Property name="showCloseButton" type="boolean" value="true"/>
-            <Property name="showCloseButtonOnSelectedTab" type="boolean" value="true"/>
-            <Property name="showCloseButtonOnTab" type="boolean" value="true"/>
-          </Properties>
+        <Container class="javax.swing.JTabbedPane" name="tabbedPane">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="createTabbedPane()"/>
+          </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
               <JSplitPaneConstraints position="right"/>

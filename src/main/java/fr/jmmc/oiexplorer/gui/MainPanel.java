@@ -1,15 +1,27 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
- ******************************************************************************/
+ *****************************************************************************
+ */
 package fr.jmmc.oiexplorer.gui;
 
-import fr.jmmc.oiexplorer.core.gui.PlotView;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import com.jidesoft.swing.TabEditingValidator;
+import fr.jmmc.jmcs.Bootstrapper;
+import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.oiexplorer.core.export.DocumentExportable;
+import fr.jmmc.oiexplorer.core.export.DocumentMode;
+import fr.jmmc.oiexplorer.core.export.DocumentOptions;
+import fr.jmmc.oiexplorer.core.export.DocumentSize;
+import fr.jmmc.oiexplorer.core.export.Orientation;
+import fr.jmmc.oiexplorer.core.gui.GlobalView;
+import fr.jmmc.oiexplorer.core.gui.PlotChartPanel;
+import fr.jmmc.oiexplorer.core.gui.PlotView;
+import fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
@@ -19,10 +31,11 @@ import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
-import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportPDFAction;
+import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -31,26 +44,40 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
+import org.jfree.ui.Drawable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Main container of OIFits Explorer App
+ *
  * @author mella
  */
-public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
+public class MainPanel extends javax.swing.JPanel implements DocumentExportable, OIFitsCollectionManagerEventListener {
 
-    /** default serial UID for Serializable interface */
+    /**
+     * default serial UID for Serializable interface
+     */
     private static final long serialVersionUID = 1;
+
+    // if multi page activated the export file will containt global view + each plot on a page/image
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
     /* members */
-    /** OIFitsCollectionManager singleton reference */
+    /**
+     * OIFitsCollectionManager singleton reference
+     */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
-    /** Add a new plot tab action */
+    /**
+     * Add a new plot tab action
+     */
     private NewPlotTabAction newPlotTabAction;
 
-    /** Creates new form MainPanel */
+    private GlobalView gv = null;
+
+    /**
+     * Creates new form MainPanel
+     */
     public MainPanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
         ocm.bindCollectionChangedEvent(this);
@@ -64,9 +91,8 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     }
 
     /**
-     * Free any ressource or reference to this instance :
-     * remove this instance from OIFitsCollectionManager event notifiers
-     * dispose also child components
+     * Free any ressource or reference to this instance : remove this instance from OIFitsCollectionManager event
+     * notifiers dispose also child components
      */
     @Override
     public void dispose() {
@@ -91,75 +117,241 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     }
 
     /**
+     * Export the component as a document using the given action:
+     * the component should check if there is something to export ?
+     * @param action export action to perform the export action
+     */
+    @Override
+    public void performAction(final ExportDocumentAction action) {
+        logger.info("MainPanel.performAction");
+
+        action.process(this);
+    }
+
+    /**
+     * Return the default file name
+     * @param fileExtension  document's file extension
+     * @return default file name
+     */
+    @Override
+    public String getDefaultFileName(final String fileExtension) {
+        return "AllPlots." + fileExtension;
+    }
+
+    /** Array of drawables  */
+    private static class DocumentPage {
+
+        /* members */
+        final Drawable[] drawables;
+
+        DocumentPage(final Drawable[] drawables) {
+            this.drawables = drawables;
+        }
+
+        Drawable[] getDrawables() {
+            return drawables;
+        }
+
+    }
+
+    /** prepared page content */
+    private List<DocumentPage> pages = null;
+
+    /**
+     * Prepare the page layout before doing the export:
+     * Performs layout and modifies the given options
+     * @param options document options used to prepare the document
+     */
+    @Override
+    public void prepareExport(final DocumentOptions options) {
+
+        // allocate pages:
+        this.pages = new ArrayList<DocumentPage>();
+
+        int numberOfPages = 0;
+
+        final int tabCount = tabbedPane.getTabCount();
+
+        if (DocumentMode.MULTI_PAGE == options.getMode()) {
+
+            for (int i = 0; i < tabCount; i++) {
+                final Component com = tabbedPane.getComponentAt(i);
+                if (com instanceof PlotView) {
+                    final PlotView plotView = (PlotView) com;
+
+                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+
+                    if (plotChartPanel.canExportPlotFile()) {
+                        numberOfPages++;
+
+                        // warning: use pageIndex = 1 (unused) but may change in future !
+                        this.pages.add(
+                                new DocumentPage(plotChartPanel.preparePage(1))
+                        );
+                    }
+                } else if (com instanceof GlobalView) {
+                    final GlobalView globalView = (GlobalView) com;
+                    numberOfPages++;
+
+                    // warning: use pageIndex = 1 (unused) but may change in future !
+                    this.pages.add(
+                            new DocumentPage(globalView.preparePage(1))
+                    );
+                }
+            }
+        } else if (DocumentMode.DEFAULT == options.getMode()) {
+            for (int i = 0; i < tabCount; i++) {
+                final Component com = tabbedPane.getComponentAt(i);
+                if (com instanceof PlotView) {
+                    final PlotView plotView = (PlotView) com;
+
+                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+
+                    if (plotChartPanel.canExportPlotFile()) {
+                        numberOfPages++;
+
+                        // warning: use pageIndex = 1 (unused) but may change in future !
+                        this.pages.add(
+                                new DocumentPage(plotChartPanel.preparePage(1))
+                        );
+                    }
+                }
+            }
+        } else if (DocumentMode.SINGLE_PAGE == options.getMode()) {
+            numberOfPages = 1;
+
+            final List<Drawable> chartList = new ArrayList<Drawable>(tabCount);
+
+            for (int i = 0; i < tabCount; i++) {
+                final Component com = tabbedPane.getComponentAt(i);
+                if (com instanceof PlotView) {
+                    final PlotView plotView = (PlotView) com;
+
+                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+
+                    if (plotChartPanel.canExportPlotFile()) {
+                        chartList.add(plotChartPanel.getChart());
+                    }
+                }
+            }
+
+            // put all charts in one page:
+            this.pages.add(
+                    new DocumentPage(chartList.toArray(new Drawable[chartList.size()]))
+            );
+
+        } else {
+            logger.info("unsupported DocumentMode: {}", options.getMode());
+        }
+
+        options.setDocumentSize(DocumentSize.NORMAL)
+                .setOrientation(Orientation.Landscape)
+                .setNumberOfPages(numberOfPages);
+    }
+
+    /**
+     * Return the page to export given its page index
+     * @param pageIndex page index (1..n)
+     * @return Drawable array to export on this page
+     */
+    @Override
+    public Drawable[] preparePage(final int pageIndex) {
+        final DocumentPage currentPage = pages.get(pageIndex - 1);
+        return currentPage.getDrawables();
+    }
+
+    /**
+     * Callback indicating the document is done to reset the component's state
+     */
+    @Override
+    public void postExport() {
+        // page cleanup:
+        pages = null;
+    }
+
+    /**
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
 
         registerActions();
 
-        // Link removeCurrentView to the tabpane close button
-        this.tabbedPane.setCloseAction(new AbstractAction() {
-            /** default serial UID for Serializable interface */
-            private static final long serialVersionUID = 1;
+        this.gv = new GlobalView();
+        this.tabbedPane.add(gv, "GLOBAL_VIEW");
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeCurrentView();
-            }
-        });
+        if (this.tabbedPane instanceof JideTabbedPane) {
+            final JideTabbedPane jideTabbedPane = (JideTabbedPane) this.tabbedPane;
 
-        tabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
-        tabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
-        tabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
-        tabbedPane.setTabEditingAllowed(true);
+            // Link removeCurrentView to the tabpane close button
+            jideTabbedPane.setCloseAction(new AbstractAction() {
+                /**
+                 * default serial UID for Serializable interface
+                 */
+                private static final long serialVersionUID = 1;
 
-        // TODO : setTabEditingValidator(...)       
-        tabbedPane.setTabEditingValidator(new TabEditingValidator() {
-            @Override
-            public boolean shouldStartEdit(int tabIndex, MouseEvent event) {
-                return true;
-            }
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    removeCurrentView();
+                }
+            });
 
-            @Override
-            public boolean isValid(int tabIndex, String tabText) {
-                return true;
-            }
+            jideTabbedPane.setBoldActiveTab(true);
+            jideTabbedPane.setShowCloseButton(true);
+            jideTabbedPane.setShowCloseButtonOnSelectedTab(true);
+            jideTabbedPane.setShowCloseButtonOnTab(true);
 
-            @Override
-            public boolean alertIfInvalid(int tabIndex, String tabText) {
-                setActivePlotName(tabText);
-                return true;
-            }
-        });
+            jideTabbedPane.setTabShape(JideTabbedPane.SHAPE_ROUNDED_VSNET);
+            jideTabbedPane.setTabResizeMode(JideTabbedPane.RESIZE_MODE_NONE);
+            jideTabbedPane.setColorTheme(JideTabbedPane.COLOR_THEME_VSNET);
+            jideTabbedPane.setTabEditingAllowed(true);
 
-        final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
-        tabbedPane.setTabLeadingComponent(plusButton);
+            jideTabbedPane.setTabEditingValidator(new TabEditingValidator() {
+                @Override
+                public boolean shouldStartEdit(int tabIndex, MouseEvent event) {
+                    return true;
+                }
 
-        tabbedPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateActivePlot();
-            }
-        });
+                @Override
+                public boolean isValid(int tabIndex, String tabText) {
+                    return true;
+                }
+
+                @Override
+                public boolean alertIfInvalid(int tabIndex, String tabText) {
+                    setActivePlotName(tabText);
+                    return true;
+                }
+            });
+
+            final JideButtonUIResource plusButton = new JideButtonUIResource(newPlotTabAction);
+            jideTabbedPane.setTabLeadingComponent(plusButton);
+
+            jideTabbedPane.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    updateActivePlot();
+                }
+            });
+        }
     }
 
     /**
      * Create the main actions and/or present in the toolbar
      */
     private void registerActions() {
-
         newPlotTabAction = new NewPlotTabAction(NewPlotTabAction.class.getName(), "newPlotTabAction");
         newPlotTabAction.putValue(Action.NAME, " + ");
         newPlotTabAction.putValue(Action.SHORT_DESCRIPTION, "add a new plot view ...");
 
         // Build toolBar
-        toolBar.add(OIFitsExplorerExportPDFAction.getInstance());
+        toolBar.add(OIFitsExplorerExportAction.getInstance(MimeType.PDF));
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIFitsAction.className, LoadOIFitsAction.actionName));
     }
 
     /**
      * Synchronize tab and Views of OIFitsCollectionManager
-     * @see #onProcess(fr.jmmc.oiexplorer.core.model.event.GenericEvent) 
-     * 
+     * @see #onProcess(fr.jmmc.oiexplorer.core.model.event.GenericEvent)
+     *
      * @param plotList plot list
      */
     private void updateTabContent(final List<Plot> plotList) {
@@ -193,7 +385,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     }
 
     private String getSelectedPlotId() {
-        PlotView currentPlotView = getCurrentPanel();
+        PlotView currentPlotView = getCurrentPlotView();
         if (currentPlotView == null) {
             // TODO disable dataTreePanel ?
             return null;
@@ -213,21 +405,52 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
      * @param name futur name of active plot
      */
     private void setActivePlotName(String name) {
-        final String plotId = getCurrentPanel().getPlotId();
-        ocm.getPlotRef(plotId).setName(name);
-        ocm.firePlotChanged(this, plotId, null);
+        PlotView currentPlotView = getCurrentPlotView();
+        if (currentPlotView != null) {
+            final String plotId = currentPlotView.getPlotId();
+            ocm.getPlotRef(plotId).setName(name);
+            ocm.firePlotChanged(this, plotId, null);
+        }
     }
 
     /**
-     * Return the current plot panel
-     * @return main panel
+     * Return the current plot view
+     *
+     * @return the current plot view or null if not a PlotView instance
      */
-    public PlotView getCurrentPanel() {
-        return (PlotView) tabbedPane.getSelectedComponent();
+    public PlotView getCurrentPlotView() {
+        final Component com = getCurrentView();
+        return (com instanceof PlotView) ? (PlotView) com : null;
+    }
+
+    /**
+     * Return the current view
+     *
+     * @return any component or null
+     */
+    public Component getCurrentView() {
+        return tabbedPane.getSelectedComponent();
+    }
+
+    /**
+     * Return the current view as a DocumentExportable
+     *
+     * @return a DocumentExportable instance or null
+     */
+    public DocumentExportable getCurrentPDFView() {
+        final Component com = getCurrentView();
+        if (com instanceof PlotView) {
+            return ((PlotView) com).getPlotPanel();
+        }
+        if (com instanceof GlobalView) {
+            return (DocumentExportable) com;
+        }
+        return null;
     }
 
     /**
      * Add the given panel or one new if null given.
+     *
      * @param panel Panel to add (PlotView instance)
      * @param panelName name of panel to be added
      */
@@ -252,12 +475,20 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         panelToAdd.setOpaque(false);
 
         tabbedPane.add(name, panelToAdd);
+
+        if (panelToAdd instanceof PlotView) {
+            final PlotView plotView = (PlotView) panelToAdd;
+
+            final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+            this.gv.addChart(plotChartPanel.getChart());
+        }
+
         logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
     }
 
-    /** 
-     * Create a new plot (plotDef,subset copied from current).
-     * The created objects are added to the manager and 
+    /**
+     * Create a new plot (plotDef,subset copied from current). The created objects are added to the manager and
+     *
      * @return plotId of created Plot
      */
     private String getNewPlot() {
@@ -339,13 +570,17 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
      */
     private void removeView(final int index) {
         // Note: views should be freed by GC soon
-        // EventNotifier can remove them automatically from its listeners (weak reference) 
+        // EventNotifier can remove them automatically from its listeners (weak reference)
         // BUT not immediately so such phantom views can still process useless events !
 
         // CONCLUSION: it is better to do it explicitely even if EventNotifier could do it but asynchronously:
         final Component com = tabbedPane.getComponentAt(index);
         if (com instanceof PlotView) {
             final PlotView plotView = (PlotView) com;
+
+            final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+            this.gv.removeChart(plotChartPanel.getChart());
+
             // free resources (unregister event notifiers):
             plotView.dispose();
         }
@@ -373,11 +608,9 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         return -1;
     }
 
-    /** 
-     * This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -390,7 +623,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         dataSplitTopPanel = new javax.swing.JPanel();
         toolBar = new javax.swing.JToolBar();
         oifitsFileListPanel1 = new fr.jmmc.oiexplorer.gui.OIFitsFileListPanel();
-        tabbedPane = new com.jidesoft.swing.JideTabbedPane();
+        tabbedPane = createTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -416,11 +649,6 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
 
         mainSplitPane.setLeftComponent(dataSplitPane);
-
-        tabbedPane.setBoldActiveTab(true);
-        tabbedPane.setShowCloseButton(true);
-        tabbedPane.setShowCloseButtonOnSelectedTab(true);
-        tabbedPane.setShowCloseButtonOnTab(true);
         mainSplitPane.setRightComponent(tabbedPane);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -437,11 +665,11 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
     private javax.swing.JSplitPane mainSplitPane;
     private fr.jmmc.oiexplorer.gui.OIFitsFileListPanel oifitsFileListPanel1;
-    private com.jidesoft.swing.JideTabbedPane tabbedPane;
+    private javax.swing.JTabbedPane tabbedPane;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 
-    /** 
+    /**
      * This action open prepare plot objects and open one new tab.
      */
     private class NewPlotTabAction extends RegisteredAction {
@@ -468,7 +696,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     }
 
     /*
-     * OIFitsCollectionManagerEventListener implementation 
+     * OIFitsCollectionManagerEventListener implementation
      */
     /**
      * Return the optional subject id i.e. related object id that this listener accepts
@@ -500,5 +728,12 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
             default:
         }
         logger.debug("onProcess {} - done", event);
+    }
+
+    static JTabbedPane createTabbedPane() {
+        if (Bootstrapper.isHeadless()) {
+            return new JTabbedPane();
+        }
+        return new JideTabbedPane();
     }
 }
