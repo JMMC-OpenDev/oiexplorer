@@ -7,10 +7,8 @@ import com.mortennobel.imagescaling.AdvancedResizeOp;
 import com.mortennobel.imagescaling.ResampleOp;
 import fest.common.JmcsFestSwingJUnitTestCase;
 import fr.jmmc.jmcs.Bootstrapper;
-import fr.jmmc.jmcs.gui.component.MessagePane;
 import static java.awt.event.KeyEvent.*;
 import java.awt.image.BufferedImage;
-import org.apache.commons.lang.SystemUtils;
 import org.fest.swing.annotation.GUITest;
 import static org.fest.swing.core.KeyPressInfo.*;
 import static org.fest.swing.core.matcher.DialogMatcher.*;
@@ -28,9 +26,8 @@ import org.junit.Test;
  */
 public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
-    /** absolute path to test folder to load OIFits collection */
-    private final static String USER_HOME = SystemUtils.USER_HOME;
-    private final static String TEST_FOLDER = USER_HOME + "/dev/oiexplorer/src/test/resources/";
+    /** absolute path to test folder to load test resources */
+    private final static String TEST_FOLDER = getProjectFolderPath() + "src/test/resources/";
 
     /**
      * Initialize system properties & static variables and finally starts the application
@@ -39,15 +36,6 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
     public static void intializeAndStartApplication() {
 
         // invoke Bootstrapper method to initialize logback now:
-        Bootstrapper.getState();
-
-        // Test JDK 1.6
-        if (!SystemUtils.IS_JAVA_1_6) {
-            MessagePane.showErrorMessage("Please use a JVM 1.6 (Sun) before running tests (fonts and LAF may be wrong) !");
-            Bootstrapper.stopApp(1);
-        }
-
-        // Initialize logs first:
         Bootstrapper.getState();
 
         // define robot delays :
