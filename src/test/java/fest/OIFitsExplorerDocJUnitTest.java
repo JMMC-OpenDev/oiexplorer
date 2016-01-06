@@ -26,9 +26,6 @@ import org.junit.Test;
  */
 public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase {
 
-    /** absolute path to test folder to load test resources */
-    private final static String TEST_FOLDER = getProjectFolderPath() + "src/test/resources/";
-
     /**
      * Initialize system properties & static variables and finally starts the application
      */
