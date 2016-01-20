@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.0 beta 2"/>
-    <compilation date="09/06/2014" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.0 beta 3"/>
+    <compilation date="20/01/2016" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -154,15 +154,18 @@
 
     <releasenotes>
         <release version="0.2">
+            <prerelease version="0.2.0 beta 3">
+                <change type="FEATURE">Improved both plot and its editor to support up to 10 y axes (combined plots)</change>
+            </prerelease>
             <prerelease version="0.2.0 beta 2">
                 <change type="FEATURE">Improved action 'Export plot' to support several formats (PDF, PNG, JPG)</change>
                 <change type="FEATURE">Added action 'Export all plots' to export plots in a single document</change>
                 <change type="FEATURE">Added a global view that displays all plots in the same view</change>
-                <change type="FEATURE">Added command line interface (CLI) support to load an OIFitsExplorer collection [-open file] 
-                     and export plots into PDF [-pdf file] or image formats [-png or -jpg arguments]</change>
-                <change type="FEATURE">Added command line argument [-mode multi|single] to define the page mode: 
-                     single means all plots on a single page; multi means all plots in a single page and one plot per page; default mode means one plot per page</change>
-                <change type="FEATURE">Added command line argument [-dims width,height] to define fixed dimensions for images</change> 
+                <change type="FEATURE">Added command line interface (CLI) support to load an OIFitsExplorer collection [-open file]
+                    and export plots into PDF [-pdf file] or image formats [-png or -jpg arguments]</change>
+                <change type="FEATURE">Added command line argument [-mode multi|single] to define the page mode:
+                    single means all plots on a single page; multi means all plots in a single page and one plot per page; default mode means one plot per page</change>
+                <change type="FEATURE">Added command line argument [-dims width,height] to define fixed dimensions for images</change>
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/676">Fixed compatibility issue with JDK8 HashMap (OITableSerieKey.compareTo)</change>
             </prerelease>
             <prerelease version="0.2.0 beta 1">
