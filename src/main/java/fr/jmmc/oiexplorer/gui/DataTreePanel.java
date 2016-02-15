@@ -299,17 +299,19 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         // update subset definition (copy):
         final SubsetDefinition subsetCopy = getSubsetDefinition();
-        subsetCopy.setTarget(target);
-        final List<TableUID> tables = subsetCopy.getTables();
-        tables.clear();
+        if (subsetCopy != null) {
+            subsetCopy.setTarget(target);
+            final List<TableUID> tables = subsetCopy.getTables();
+            tables.clear();
 
-        final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
-        if (dataFile != null) {
-            tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+            final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
+            if (dataFile != null) {
+                tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+            }
+
+            // fire subset changed event:
+            ocm.updateSubsetDefinition(this, subsetCopy);
         }
-
-        // fire subset changed event:
-        ocm.updateSubsetDefinition(this, subsetCopy);
     }
 
     /** 
