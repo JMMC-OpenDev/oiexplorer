@@ -72,7 +72,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * Add a new plot tab action
      */
     private NewPlotTabAction newPlotTabAction;
-
+    /** global view */
     private GlobalView gv = null;
 
     /**
@@ -82,6 +82,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         // always bind at the beginning of the constructor (to maintain correct ordering):
         ocm.bindCollectionChangedEvent(this);
         ocm.bindPlotListChangedEvent(this);
+        ocm.getActivePlotChangedEventNotifier().register(this);
 
         // Build GUI
         initComponents();
@@ -189,59 +190,65 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
                                 new DocumentPage(plotChartPanel.preparePage(1))
                         );
                     }
-                } else if (com instanceof GlobalView) {
-                    final GlobalView globalView = (GlobalView) com;
-                    numberOfPages++;
-
-                    // warning: use pageIndex = 1 (unused) but may change in future !
-                    this.pages.add(
-                            new DocumentPage(globalView.preparePage(1))
-                    );
-                }
-            }
-        } else if (DocumentMode.DEFAULT == options.getMode()) {
-            for (int i = 0; i < tabCount; i++) {
-                final Component com = tabbedPane.getComponentAt(i);
-                if (com instanceof PlotView) {
-                    final PlotView plotView = (PlotView) com;
-
-                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
-
-                    if (plotChartPanel.canExportPlotFile()) {
+                } else {
+                    if (com instanceof GlobalView) {
+                        final GlobalView globalView = (GlobalView) com;
                         numberOfPages++;
 
                         // warning: use pageIndex = 1 (unused) but may change in future !
                         this.pages.add(
-                                new DocumentPage(plotChartPanel.preparePage(1))
+                                new DocumentPage(globalView.preparePage(1))
                         );
                     }
                 }
             }
-        } else if (DocumentMode.SINGLE_PAGE == options.getMode()) {
-            numberOfPages = 1;
+        } else {
+            if (DocumentMode.DEFAULT == options.getMode()) {
+                for (int i = 0; i < tabCount; i++) {
+                    final Component com = tabbedPane.getComponentAt(i);
+                    if (com instanceof PlotView) {
+                        final PlotView plotView = (PlotView) com;
 
-            final List<Drawable> chartList = new ArrayList<Drawable>(tabCount);
+                        final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
 
-            for (int i = 0; i < tabCount; i++) {
-                final Component com = tabbedPane.getComponentAt(i);
-                if (com instanceof PlotView) {
-                    final PlotView plotView = (PlotView) com;
+                        if (plotChartPanel.canExportPlotFile()) {
+                            numberOfPages++;
 
-                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
-
-                    if (plotChartPanel.canExportPlotFile()) {
-                        chartList.add(plotChartPanel.getChart());
+                            // warning: use pageIndex = 1 (unused) but may change in future !
+                            this.pages.add(
+                                    new DocumentPage(plotChartPanel.preparePage(1))
+                            );
+                        }
                     }
                 }
+            } else {
+                if (DocumentMode.SINGLE_PAGE == options.getMode()) {
+                    numberOfPages = 1;
+
+                    final List<Drawable> chartList = new ArrayList<Drawable>(tabCount);
+
+                    for (int i = 0; i < tabCount; i++) {
+                        final Component com = tabbedPane.getComponentAt(i);
+                        if (com instanceof PlotView) {
+                            final PlotView plotView = (PlotView) com;
+
+                            final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+
+                            if (plotChartPanel.canExportPlotFile()) {
+                                chartList.add(plotChartPanel.getChart());
+                            }
+                        }
+                    }
+
+                    // put all charts in one page:
+                    this.pages.add(
+                            new DocumentPage(chartList.toArray(new Drawable[chartList.size()]))
+                    );
+
+                } else {
+                    logger.info("unsupported DocumentMode: {}", options.getMode());
+                }
             }
-
-            // put all charts in one page:
-            this.pages.add(
-                    new DocumentPage(chartList.toArray(new Drawable[chartList.size()]))
-            );
-
-        } else {
-            logger.info("unsupported DocumentMode: {}", options.getMode());
         }
 
         options.setDocumentSize(DocumentSize.NORMAL)
@@ -277,7 +284,6 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         registerActions();
 
         this.gv = new GlobalView();
-        this.tabbedPane.add(gv, "GLOBAL_VIEW");
 
         if (this.tabbedPane instanceof JideTabbedPane) {
             final JideTabbedPane jideTabbedPane = (JideTabbedPane) this.tabbedPane;
@@ -379,7 +385,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             // check where tab is already present:
             if (findPlotView(tabbedPane, plotId) == -1) {
                 final PlotView p = new PlotView(plotId);
-                addPanel(p, plotId);
+                addView(p, plotId);
             }
         }
     }
@@ -391,6 +397,15 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             return null;
         }
         return currentPlotView.getPlotId();
+    }
+    
+    private void setSelectedPlotId(final String plotId) {
+        logger.debug("setSelectedPlotId: {}", plotId);
+        
+        final int idx = findPlotView(tabbedPane, plotId);
+        if (idx != -1) {
+            this.tabbedPane.setSelectedIndex(idx);
+        }
     }
 
     private void updateActivePlot() {
@@ -454,13 +469,12 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * @param panel Panel to add (PlotView instance)
      * @param panelName name of panel to be added
      */
-    private void addPanel(final JPanel panel, final String panelName) {
+    private void addView(final JPanel panel, final String panelName) {
         JPanel panelToAdd = panel;
 
         if (panelToAdd == null) {
             // note: as a plot is added, then updateTabContent() is called by event notifier:
-            getNewPlot();
-
+            createNewPlot();
             return;
         }
 
@@ -484,14 +498,14 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         }
 
         logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
+
+        updateOverviewTab();
     }
 
     /**
-     * Create a new plot (plotDef,subset copied from current). The created objects are added to the manager and
-     *
-     * @return plotId of created Plot
+     * Create a new plot (plotDef,subset copied from current). The created objects are added to the manager
      */
-    private String getNewPlot() {
+    private void createNewPlot() {
         String id;
 
         // find subset id:
@@ -547,8 +561,9 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         if (!ocm.addPlot(plot)) {
             throw new IllegalStateException("unable to addPlot : " + plot);
         }
-
-        return id;
+        
+        // change selected plot:
+        ocm.fireActivePlotChanged(null, id, null);
     }
 
     /**
@@ -589,6 +604,16 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         }
 
         tabbedPane.removeTabAt(index);
+
+        updateOverviewTab();
+    }
+
+    private void updateOverviewTab() {
+        if (gv.getChartCount() < 2) {
+            this.tabbedPane.remove(gv);
+        } else {
+            this.tabbedPane.add(gv, "Overview", 0);
+        }
     }
 
     /**
@@ -683,7 +708,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            addPanel(null, null);
+            addView(null, null);
         }
     }
 
@@ -727,6 +752,9 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             case PLOT_LIST_CHANGED:
                 // Update tabpane content
                 updateTabContent(event.getPlotList());
+                break;
+            case ACTIVE_PLOT_CHANGED:
+                setSelectedPlotId(event.getActivePlot().getId());
                 break;
             default:
         }
