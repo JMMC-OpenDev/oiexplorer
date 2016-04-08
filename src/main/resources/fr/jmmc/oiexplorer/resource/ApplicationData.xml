@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.0 beta 3"/>
-    <compilation date="20/01/2016" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2"/>
+    <compilation date="08/04/2016" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -154,6 +154,10 @@
 
     <releasenotes>
         <release version="0.2">
+            <prerelease version="0.2.0 beta 4">
+                <change type="CHANGE">Fixed typical data ranges for VIS [-0.1, 1.1] and ANGLE [-200, 200]</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/569">Added OI_SPECTRUM (OIFits 2) or OI_FLUX (GRAVITY) support</change>
+            </prerelease>
             <prerelease version="0.2.0 beta 3">
                 <change type="FEATURE">Improved both plot and its editor to support up to 10 y axes (combined plots)</change>
             </prerelease>
