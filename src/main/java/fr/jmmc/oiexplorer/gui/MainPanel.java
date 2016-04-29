@@ -108,8 +108,8 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             dataTreePanel.dispose();
         }
 
-        for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
-            final Component com = tabbedPane.getComponentAt(i);
+        for (int i = 0, tabCount = tabbedPaneTop.getTabCount(); i < tabCount; i++) {
+            final Component com = tabbedPaneTop.getComponentAt(i);
             if (com instanceof PlotView) {
                 final PlotView plotView = (PlotView) com;
                 plotView.dispose();
@@ -171,12 +171,12 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
 
         int numberOfPages = 0;
 
-        final int tabCount = tabbedPane.getTabCount();
+        final int tabCount = tabbedPaneTop.getTabCount();
 
         if (DocumentMode.MULTI_PAGE == options.getMode()) {
 
             for (int i = 0; i < tabCount; i++) {
-                final Component com = tabbedPane.getComponentAt(i);
+                final Component com = tabbedPaneTop.getComponentAt(i);
                 if (com instanceof PlotView) {
                     final PlotView plotView = (PlotView) com;
 
@@ -205,7 +205,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         } else {
             if (DocumentMode.DEFAULT == options.getMode()) {
                 for (int i = 0; i < tabCount; i++) {
-                    final Component com = tabbedPane.getComponentAt(i);
+                    final Component com = tabbedPaneTop.getComponentAt(i);
                     if (com instanceof PlotView) {
                         final PlotView plotView = (PlotView) com;
 
@@ -228,7 +228,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
                     final List<Drawable> chartList = new ArrayList<Drawable>(tabCount);
 
                     for (int i = 0; i < tabCount; i++) {
-                        final Component com = tabbedPane.getComponentAt(i);
+                        final Component com = tabbedPaneTop.getComponentAt(i);
                         if (com instanceof PlotView) {
                             final PlotView plotView = (PlotView) com;
 
@@ -285,8 +285,8 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
 
         this.gv = new GlobalView();
 
-        if (this.tabbedPane instanceof JideTabbedPane) {
-            final JideTabbedPane jideTabbedPane = (JideTabbedPane) this.tabbedPane;
+        if (this.tabbedPaneTop instanceof JideTabbedPane) {
+            final JideTabbedPane jideTabbedPane = (JideTabbedPane) this.tabbedPaneTop;
 
             // Link removeCurrentView to the tabpane close button
             jideTabbedPane.setCloseAction(new AbstractAction() {
@@ -364,8 +364,8 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         logger.debug("updateTabContent - plots : {}", plotList);
 
         // remove dead plot views:
-        for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
-            final Component com = tabbedPane.getComponentAt(i);
+        for (int i = 0, tabCount = tabbedPaneTop.getTabCount(); i < tabCount; i++) {
+            final Component com = tabbedPaneTop.getComponentAt(i);
             if (com instanceof PlotView) {
                 final PlotView plotView = (PlotView) com;
 
@@ -383,7 +383,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final String plotId = plot.getId();
 
             // check where tab is already present:
-            if (findPlotView(tabbedPane, plotId) == -1) {
+            if (findPlotView(tabbedPaneTop, plotId) == -1) {
                 final PlotView p = new PlotView(plotId);
                 addView(p, plotId);
             }
@@ -402,9 +402,9 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
     private void setSelectedPlotId(final String plotId) {
         logger.debug("setSelectedPlotId: {}", plotId);
         
-        final int idx = findPlotView(tabbedPane, plotId);
+        final int idx = findPlotView(tabbedPaneTop, plotId);
         if (idx != -1) {
-            this.tabbedPane.setSelectedIndex(idx);
+            this.tabbedPaneTop.setSelectedIndex(idx);
         }
     }
 
@@ -444,7 +444,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * @return any component or null
      */
     private Component getCurrentView() {
-        return tabbedPane.getSelectedComponent();
+        return tabbedPaneTop.getSelectedComponent();
     }
 
     /**
@@ -488,7 +488,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         // To correctly match deeper background color of inner tab panes
         panelToAdd.setOpaque(false);
 
-        tabbedPane.add(name, panelToAdd);
+        tabbedPaneTop.add(name, panelToAdd);
 
         if (panelToAdd instanceof PlotView) {
             final PlotView plotView = (PlotView) panelToAdd;
@@ -570,7 +570,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * Remove the current view
      */
     private void removeCurrentView() {
-        final int index = tabbedPane.getSelectedIndex();
+        final int index = tabbedPaneTop.getSelectedIndex();
         if (index != -1) {
             logger.debug("removeCurrentView(): {}", index);
 
@@ -592,7 +592,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         // BUT not immediately so such phantom views can still process useless events !
 
         // CONCLUSION: it is better to do it explicitely even if EventNotifier could do it but asynchronously:
-        final Component com = tabbedPane.getComponentAt(index);
+        final Component com = tabbedPaneTop.getComponentAt(index);
         if (com instanceof PlotView) {
             final PlotView plotView = (PlotView) com;
 
@@ -603,16 +603,16 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             plotView.dispose();
         }
 
-        tabbedPane.removeTabAt(index);
+        tabbedPaneTop.removeTabAt(index);
 
         updateOverviewTab();
     }
 
     private void updateOverviewTab() {
         if (gv.getChartCount() < 2) {
-            this.tabbedPane.remove(gv);
+            this.tabbedPaneTop.remove(gv);
         } else {
-            this.tabbedPane.add(gv, "Overview", 0);
+            this.tabbedPaneTop.add(gv, "Overview", 0);
         }
     }
 
@@ -647,18 +647,19 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
 
         mainSplitPane = new javax.swing.JSplitPane();
         dataSplitPane = new javax.swing.JSplitPane();
-        dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
         dataSplitTopPanel = new javax.swing.JPanel();
         toolBar = new javax.swing.JToolBar();
-        oifitsFileListPanel1 = new fr.jmmc.oiexplorer.gui.OIFitsFileListPanel();
-        tabbedPane = createTabbedPane();
+        jTabbedPaneBrowser = new javax.swing.JTabbedPane();
+        granuleTreePanel = new fr.jmmc.oiexplorer.gui.GranuleTreePanel();
+        oifitsFileListPanel = new fr.jmmc.oiexplorer.gui.OIFitsFileListPanel();
+        dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
+        tabbedPaneTop = createTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
 
         dataSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         dataSplitPane.setResizeWeight(0.3);
         dataSplitPane.setMinimumSize(new java.awt.Dimension(150, 58));
-        dataSplitPane.setRightComponent(dataTreePanel);
 
         dataSplitTopPanel.setLayout(new java.awt.GridBagLayout());
 
@@ -666,18 +667,24 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         dataSplitTopPanel.add(toolBar, gridBagConstraints);
+
+        jTabbedPaneBrowser.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
+        jTabbedPaneBrowser.addTab("Granules", granuleTreePanel);
+        jTabbedPaneBrowser.addTab("Files", oifitsFileListPanel);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
-        dataSplitTopPanel.add(oifitsFileListPanel1, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        dataSplitTopPanel.add(jTabbedPaneBrowser, gridBagConstraints);
 
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
+        dataSplitPane.setRightComponent(dataTreePanel);
 
         mainSplitPane.setLeftComponent(dataSplitPane);
-        mainSplitPane.setRightComponent(tabbedPane);
+        mainSplitPane.setRightComponent(tabbedPaneTop);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -691,9 +698,11 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
     private javax.swing.JSplitPane dataSplitPane;
     private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
+    private fr.jmmc.oiexplorer.gui.GranuleTreePanel granuleTreePanel;
+    private javax.swing.JTabbedPane jTabbedPaneBrowser;
     private javax.swing.JSplitPane mainSplitPane;
-    private fr.jmmc.oiexplorer.gui.OIFitsFileListPanel oifitsFileListPanel1;
-    private javax.swing.JTabbedPane tabbedPane;
+    private fr.jmmc.oiexplorer.gui.OIFitsFileListPanel oifitsFileListPanel;
+    private javax.swing.JTabbedPane tabbedPaneTop;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 
