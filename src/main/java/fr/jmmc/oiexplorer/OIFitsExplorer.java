@@ -24,6 +24,7 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
+import fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction;
@@ -298,6 +299,8 @@ public final class OIFitsExplorer extends App {
         // File menu :
         new NewAction();
         new LoadOIFitsAction();
+        new LoadOIFitsFromCollectionAction();
+
         new LoadOIDataCollectionAction();
         new SaveOIDataCollectionAction();
         // addExportListener actions:
