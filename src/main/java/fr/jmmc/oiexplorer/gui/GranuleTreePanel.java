@@ -59,6 +59,10 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(GranuleTreePanel.class);
 
+    /* constants */
+    /** Show root of granule tree */
+    private static final boolean SHOW_DATATREE_ROOTVISIBLE = false;
+
     /* members */
     /** OIFitsCollectionManager singleton */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
@@ -126,6 +130,8 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
         dataTree.setCellRenderer(new TooltipTreeCellRenderer());
 
+        dataTree.setRootVisible(SHOW_DATATREE_ROOTVISIBLE);
+
         // Define root node once:
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.setUserObject("Granules");
@@ -189,6 +195,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     private void generateTree(final OIFitsCollection oiFitsCollection) {
 
         final boolean showFile = this.jRadioButtonFile.isSelected();
+        final boolean showOITable = this.jRadioButtonOITable.isSelected();
 
         final TableColumnModel tcm = jTableCols.getColumnModel();
         final TableModel tm = jTableCols.getModel();
@@ -288,12 +295,16 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                             prev = fileName;
                             current = dataTree.addNode(parent, fileName);
                         }
-                        dataTree.addNode(current, table);
+                        if (showOITable) {
+                            dataTree.addNode(current, table);
+                        }
                     }
                 } else {
-                    // for now per OIData:
+                    if (showOITable) {
+                        // for now per OIData:
                     for (OITable table : dataForGranule.getOiDataList()) {
                         dataTree.addNode(parent, table);
+                        }
                     }
                 }
             }
@@ -314,16 +325,55 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jPanelHeader = new javax.swing.JPanel();
-        jScrollPaneTable = new javax.swing.JScrollPane();
-        jTableCols = new javax.swing.JTable();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jRadioButtonFile = new javax.swing.JRadioButton();
+        jRadioButtonOITable = new javax.swing.JRadioButton();
         jScrollPane = new javax.swing.JScrollPane();
         genericTreePanel = new javax.swing.JPanel();
+        jPanelTable = new javax.swing.JPanel();
+        jScrollPaneTable = new javax.swing.JScrollPane();
+        jTableCols = new javax.swing.JTable();
 
         setLayout(new java.awt.GridBagLayout());
 
-        jPanelHeader.setLayout(new java.awt.BorderLayout());
+        jRadioButtonFile.setText("Files");
+        jRadioButtonFile.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jRadioButtonFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonFileActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(jRadioButtonFile, gridBagConstraints);
+
+        jRadioButtonOITable.setText("Tables");
+        jRadioButtonOITable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonOITableActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        add(jRadioButtonOITable, gridBagConstraints);
+
+        genericTreePanel.setLayout(new java.awt.BorderLayout());
+        jScrollPane.setViewportView(genericTreePanel);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(jScrollPane, gridBagConstraints);
+
+        jPanelTable.setLayout(new java.awt.BorderLayout());
 
         jTableCols.setAutoCreateRowSorter(true);
         jTableCols.setModel(new javax.swing.table.DefaultTableModel(
@@ -348,33 +398,15 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         jTableCols.setShowVerticalLines(false);
         jScrollPaneTable.setViewportView(jTableCols);
 
-        jPanelHeader.add(jScrollPaneTable, java.awt.BorderLayout.CENTER);
-
-        jRadioButtonFile.setText("File");
-        jRadioButtonFile.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jRadioButtonFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonFileActionPerformed(evt);
-            }
-        });
-        jPanelHeader.add(jRadioButtonFile, java.awt.BorderLayout.EAST);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.1;
-        add(jPanelHeader, gridBagConstraints);
-
-        genericTreePanel.setLayout(new java.awt.BorderLayout());
-        jScrollPane.setViewportView(genericTreePanel);
+        jPanelTable.add(jScrollPaneTable, java.awt.BorderLayout.CENTER);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(jScrollPane, gridBagConstraints);
+        add(jPanelTable, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jRadioButtonFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonFileActionPerformed
@@ -382,12 +414,19 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         updateOIFitsCollection();
     }//GEN-LAST:event_jRadioButtonFileActionPerformed
 
+    private void jRadioButtonOITableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonOITableActionPerformed
+        logger.info("jRadioButtonOITableActionPerformed");
+        updateOIFitsCollection();
+    }//GEN-LAST:event_jRadioButtonOITableActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel genericTreePanel;
-    private javax.swing.JPanel jPanelHeader;
+    private javax.swing.JPanel jPanelTable;
     private javax.swing.JRadioButton jRadioButtonFile;
+    private javax.swing.JRadioButton jRadioButtonOITable;
     private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JScrollPane jScrollPaneTable;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTableCols;
     // End of variables declaration//GEN-END:variables
 
