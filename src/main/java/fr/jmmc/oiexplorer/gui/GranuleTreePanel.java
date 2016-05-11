@@ -26,8 +26,10 @@ import fr.jmmc.oitools.model.Target;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.ChangeEvent;
@@ -122,6 +124,10 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 if (userObject instanceof OITable) {
                     return getDisplayLabel((OITable) userObject, tmpBuf);
                 }
+                if (userObject instanceof StatisticatedObject) {
+                    // use converter of mainObject
+                    return convertUserObjectToString(((StatisticatedObject) userObject).getMainObject());
+                }
                 return toString(userObject);
             }
         };
@@ -171,6 +177,9 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 updateOIFitsCollection();
             }
         });
+
+        // fire node structure changed :
+        dataTree.fireNodeChanged(rootNode);
     }
 
     /**
@@ -225,6 +234,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         final GranuleComparator comparator = (selectedFields.isEmpty()) ? GranuleComparator.DEFAULT
                 : new GranuleComparator(selectedFields);
 
+        // Reset root content of datatree:
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.removeAllChildren();
 
@@ -271,7 +281,16 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                     }
                 }
 
-                pathNodes[level] = dataTree.addNode(pathNodes[level - 1], value);
+                // insert original granule value if we are on the deepest level (no file and no table)
+                // or use a proxy object enriched by material that need to be used by tooltip (and probably more in the future)
+                if (level < fieldsLen || showFile || showOITable) {
+                    pathNodes[level] = dataTree.addNode(pathNodes[level - 1], value);
+                } else {
+                    StatisticatedObject sobject = new StatisticatedObject(value);
+                    pathNodes[level] = dataTree.addNode(pathNodes[level - 1], sobject);
+                    // reference on table will be appent below
+                    // we could add more information comming from
+                }
             }
 
             // Leaf:
@@ -293,25 +312,48 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
                         if (!fileName.equals(prev)) {
                             prev = fileName;
-                            current = dataTree.addNode(parent, fileName);
+                            if (showOITable) {
+                                current = dataTree.addNode(parent, fileName);
+                            } else {
+                                StatisticatedObject sobject = new StatisticatedObject(fileName);
+                                current = dataTree.addNode(parent, sobject);
+                            }
                         }
                         if (showOITable) {
                             dataTree.addNode(current, table);
+                        } else {
+                            // TODO add reference on table + other stat info into userObject of current
+                            StatisticatedObject sobject = (StatisticatedObject) current.getUserObject();
+                            sobject.addOITable(table);
                         }
                     }
                 } else {
                     if (showOITable) {
                         // for now per OIData:
-                    for (OITable table : dataForGranule.getOiDataList()) {
-                        dataTree.addNode(parent, table);
+                        for (OITable table : dataForGranule.getOiDataList()) {
+                            dataTree.addNode(parent, table);
+                        }
+                    } else {
+                        // TODO add reference on table + other stat info into userObject of parent
+                        StatisticatedObject sobject = (StatisticatedObject) parent.getUserObject();
+                        for (OITable table : dataForGranule.getOiDataList()) {
+                            sobject.addOITable(table);
                         }
                     }
                 }
             }
         }
 
+        jLabelStats.setText(granules.size() + " granules, " + oiFitsCollection.getOIFitsFiles().size() + " oifits");        
+
         // fire node structure changed :
         dataTree.fireNodeChanged(rootNode);
+
+        if (jToggleButtonExpandTree.isSelected()) {
+            dataTree.expandAll(true);
+        } else if (jToggleButtonCollapseTree.isSelected()) {
+            dataTree.expandAll(false);
+        }
     }
 
     /** 
@@ -333,6 +375,9 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         jPanelTable = new javax.swing.JPanel();
         jScrollPaneTable = new javax.swing.JScrollPane();
         jTableCols = new javax.swing.JTable();
+        jLabelStats = new javax.swing.JLabel();
+        jToggleButtonExpandTree = new javax.swing.JToggleButton();
+        jToggleButtonCollapseTree = new javax.swing.JToggleButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -344,7 +389,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(jRadioButtonFile, gridBagConstraints);
@@ -356,7 +401,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         add(jRadioButtonOITable, gridBagConstraints);
@@ -367,13 +412,17 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(jScrollPane, gridBagConstraints);
 
+        jPanelTable.setPreferredSize(new java.awt.Dimension(452, 12));
         jPanelTable.setLayout(new java.awt.BorderLayout());
+
+        jScrollPaneTable.setPreferredSize(null);
 
         jTableCols.setAutoCreateRowSorter(true);
         jTableCols.setModel(new javax.swing.table.DefaultTableModel(
@@ -394,6 +443,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         });
         jTableCols.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTableCols.setAutoscrolls(false);
+        jTableCols.setMaximumSize(new java.awt.Dimension(225, 18));
         jTableCols.setRowSelectionAllowed(false);
         jTableCols.setShowVerticalLines(false);
         jScrollPaneTable.setViewportView(jTableCols);
@@ -403,10 +453,43 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         add(jPanelTable, gridBagConstraints);
+
+        jLabelStats.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(jLabelStats, gridBagConstraints);
+
+        jToggleButtonExpandTree.setText("Expand");
+        jToggleButtonExpandTree.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonExpandTreeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        add(jToggleButtonExpandTree, gridBagConstraints);
+
+        jToggleButtonCollapseTree.setText("Collapse");
+        jToggleButtonCollapseTree.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonCollapseTreeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(jToggleButtonCollapseTree, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jRadioButtonFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonFileActionPerformed
@@ -419,8 +502,23 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         updateOIFitsCollection();
     }//GEN-LAST:event_jRadioButtonOITableActionPerformed
 
+    private void jToggleButtonExpandTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonExpandTreeActionPerformed
+        if (jToggleButtonExpandTree.isSelected()) {
+            dataTree.expandAll(true);
+            jToggleButtonCollapseTree.setSelected(false);
+        }
+    }//GEN-LAST:event_jToggleButtonExpandTreeActionPerformed
+
+    private void jToggleButtonCollapseTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonCollapseTreeActionPerformed
+        if(jToggleButtonCollapseTree.isSelected()){
+            dataTree.expandAll(false);
+            jToggleButtonExpandTree.setSelected(false);
+        }
+    }//GEN-LAST:event_jToggleButtonCollapseTreeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel genericTreePanel;
+    private javax.swing.JLabel jLabelStats;
     private javax.swing.JPanel jPanelTable;
     private javax.swing.JRadioButton jRadioButtonFile;
     private javax.swing.JRadioButton jRadioButtonOITable;
@@ -428,6 +526,8 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     private javax.swing.JScrollPane jScrollPaneTable;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTableCols;
+    private javax.swing.JToggleButton jToggleButtonCollapseTree;
+    private javax.swing.JToggleButton jToggleButtonExpandTree;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -484,11 +584,36 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         return table.toString();
     }
 
-    private String getTreeTooltipText(final Object value, final StringBuilder sb) {
-        sb.setLength(0);
-        if (value instanceof Target) {
+    /**
+     * return the String for a given object comming from the tree.
+     * @param value
+     * @param sb
+     * @param completeMode true avoid reset of stringbuilder and html markup generation, else generate a full html fragment
+     * @return the tooltip content
+     * @todo find a better name fo completeMode parameter.
+    */
+    private String getTreeTooltipText(final Object value, final StringBuilder sb, final boolean completeMode) {
+        if (!completeMode) {
+            sb.setLength(0);
+        }
+
+        if (value instanceof StatisticatedObject) {
+            final StatisticatedObject statisticatedObject = (StatisticatedObject) value;
+            final Object mainObject = statisticatedObject.getMainObject();         
+            // TODO display statistics....
+            // by now, just append orinal tooltip
+            final String mainObjectToolTip = getTreeTooltipText(mainObject, new StringBuilder(), true);
+            if (mainObjectToolTip != null) {
+                sb.append(mainObjectToolTip);
+            }
+            sb.append("<hr>cool it will provide info for ").append(mainObject);
+            for (OITable oitable : statisticatedObject.getOITables()) {
+                sb.append("<br><br>").append(oitable).append("<br>");
+                getTreeTooltipText(oitable, sb, true);
+            }
+        }
+        else if (value instanceof Target) {
             final Target t = (Target) value;
-            sb.append("<html>");
             sb.append("<b>name:</b> ").append(t.getTarget());
 
             final List<String> aliases = TargetManager.getInstance().getSortedUniqueAliases(t);
@@ -523,12 +648,9 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             if (t.getSpecTyp() != null && !t.getSpecTyp().isEmpty()) {
                 sb.append("<br><b>Spectral types</b>: ").append(t.getSpecTyp());
             }
-            sb.append("</html>");
-            return sb.toString();
         }
-        if (value instanceof InstrumentMode) {
+        else if (value instanceof InstrumentMode) {
             final InstrumentMode i = (InstrumentMode) value;
-            sb.append("<html>");
             sb.append("<b>name:</b> ").append(i.getInsName());
 
             final List<String> aliases = InstrumentModeManager.getInstance().getSortedUniqueAliases(i);
@@ -549,10 +671,8 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             sb.append("<br><b>Lambda min:</b> ").append(i.getLambdaMin());
             sb.append("<br><b>Lambda max:</b> ").append(i.getLambdaMax());
             sb.append("<br><b>Resolution:</b> ").append(i.getResPower());
-            sb.append("</html>");
-            return sb.toString();
         }
-        if (value instanceof OIData) {
+        else if (value instanceof OIData) {
             final OIData o = (OIData) value;
             sb.append("<html>");
             sb.append("<b>Table:</b> ").append(o.getExtName()).append('#').append(o.getExtNb());
@@ -566,10 +686,37 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             for (short[] staConf : o.getDistinctStaConf()) {
                 sb.append(o.getStaNames(staConf)); // cached
             }
-            sb.append("</html>");
-            return sb.toString();
         }
-        return null;
+        if (sb.length() == 0) {
+            return null;
+        } else if (!completeMode) {
+            sb.insert(0, "<html>");
+            sb.append("</html>");
+        }
+        return sb.toString();
+    }
+
+    private class StatisticatedObject {
+
+        private Object mainObject;
+        private final Set<OITable> oiTables = new LinkedHashSet<OITable>();
+        private final OITable[] emptyOIDataList = new OITable[]{};
+
+        public StatisticatedObject(Object mainObject) {
+            this.mainObject = mainObject;
+        }
+
+        public Object getMainObject() {
+            return this.mainObject;
+        }
+
+        public OITable[] getOITables() {
+            return this.oiTables.toArray(emptyOIDataList);
+        }
+
+        public void addOITable(OITable table){
+            this.oiTables.add(table);
+        }
     }
 
     private class TooltipTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -578,14 +725,14 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean sel, boolean expanded, boolean leaf, int row,
-                                                      boolean hasFocus) {
+                boolean sel, boolean expanded, boolean leaf, int row,
+                boolean hasFocus) {
 
             if (value != null) {
                 final Object userObject;
                 if (value instanceof DefaultMutableTreeNode) {
                     userObject = ((DefaultMutableTreeNode) value).getUserObject();
-                    setToolTipText(getTreeTooltipText(userObject, tmpBuf));
+                    setToolTipText(getTreeTooltipText(userObject, tmpBuf, false));
                 }
             }
             return super.getTreeCellRendererComponent(tree, value, sel,
