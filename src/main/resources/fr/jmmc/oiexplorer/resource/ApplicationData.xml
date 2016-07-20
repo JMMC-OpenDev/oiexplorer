@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.1 beta 1"/>
-    <compilation date="23/06/2016" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.1 beta 2"/>
+    <compilation date="20/07/2016" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -157,6 +157,9 @@
     <releasenotes>
         <release version="0.2.1">
             <pubDate>Thu, 23 Jun 2016 10:00:00 GMT</pubDate>
+            <prerelease version="0.2.1 beta 2">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/778">Fixed a trivial bug when removing a plot view</change>
+            </prerelease>
             <prerelease version="0.2.1 beta 1">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/770">Fixed null pointer exception when displaying tooltip on the granule tree panel</change>
             </prerelease>
