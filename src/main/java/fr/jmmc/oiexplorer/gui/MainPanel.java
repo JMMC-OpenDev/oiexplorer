@@ -371,9 +371,10 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
 
                 if (!Identifiable.hasIdentifiable(plotView.getPlotId(), plotList)) {
                     removeView(i);
-
-                    tabCount--;
-                    i--;
+                    
+                    // restart loop (global view may be added/removed):
+                    i = 0;
+                    tabCount = tabbedPaneTop.getTabCount();
                 }
             }
         }
