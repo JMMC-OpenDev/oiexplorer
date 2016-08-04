@@ -24,6 +24,13 @@
     <jnlp>http://apps.jmmc.fr/~swmgr/OifitsExplorer/OifitsExplorer.jnlp</jnlp>
     <sampdescription>Explore your interferometric observation data files (OIFits)</sampdescription>
 
+    <distribution>
+        <application_data_file>ApplicationRelease.xml</application_data_file>
+        <public_url>http://apps.jmmc.fr/~swmgr/OIFitsExplorer/</public_url>
+        <beta_url>http://apps.jmmc.fr/~betaswmgr/OIFitsExplorer/</beta_url>
+        <alpha_url>http://apps.jmmc.fr/~bourgesl/OIFitsExplorer/</alpha_url>
+    </distribution>
+
     <dependences>
 
         <!-- JMMC -->
