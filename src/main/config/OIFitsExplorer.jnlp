@@ -8,6 +8,10 @@
         <description kind="tooltip">OIFits Explorer</description>
         <icon href="@GENERATED@/OIFitsExplorer.jpg"/>
         <offline-allowed/>
+        <association mime-type="application/x-oifits-explorer+xml" extensions="oixp">
+            <icon href="@GENERATED@/OIFitsExplorer.jpg"/>
+            <description>OIFits Explorer files</description>
+        </association>
         <shortcut>
             <desktop/>
         </shortcut>
