@@ -264,15 +264,20 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             for (level = 1; level <= fieldsLen; level++) {
                 field = fields.get(level - 1);
                 value = granule.getField(field);
+                
+                if (value == null) {
+                    logger.warn("null field value for granule: {}", granule);
+                    value = "UNDEFINED";
+                }
 
                 DefaultMutableTreeNode prevNode = pathNodes[level];
                 if (prevNode != null) {
                     // compare ?
                     other = prevNode.getUserObject();
 
-// note: equals uses custom implementation in Target / InstrumentMode / Integer (all members are equals)
+                    // note: equals uses custom implementation in Target / InstrumentMode / Integer (all members are equals)
                     // equals method must be called on other to support proxy object (value.equals(other) may be different)
-                    if (other.equals(value)) {
+                    if (other == null || other.equals(value)) {
                         continue;
                     } else {
                         // different:
@@ -288,7 +293,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 if (level < fieldsLen || showFile || showOITable) {
                     pathNodes[level] = dataTree.addNode(pathNodes[level - 1], value);
                 } else {
-                    StatisticatedObject sobject = new StatisticatedObject(value);
+                    final StatisticatedObject sobject = new StatisticatedObject(value);
                     pathNodes[level] = dataTree.addNode(pathNodes[level - 1], sobject);                    
                     // reference on table will be appent below
                     // we could add more information comming from current granule
