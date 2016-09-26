@@ -513,13 +513,21 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             }
         }
 
-        final SubsetDefinition subset = new SubsetDefinition();
-        subset.setId(id);
-        subset.setName(id);
-        subset.copyValues(ocm.getCurrentSubsetDefinitionRef());
+        final SubsetDefinition subset;
 
-        if (!ocm.addSubsetDefinition(subset)) {
-            throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
+        // Keep same SubsetDefinition:
+        if (false) {
+            // dead code left as a reminder how to create properly a new subset (clone):
+            subset = new SubsetDefinition();
+            subset.setId(id);
+            subset.setName(id);
+            subset.copyValues(ocm.getCurrentSubsetDefinitionRef());
+
+            if (!ocm.addSubsetDefinition(subset)) {
+                throw new IllegalStateException("unable to addSubsetDefinition : " + subset);
+            }
+        } else {
+            subset = ocm.getCurrentSubsetDefinitionRef();
         }
 
         // find plotDef id:
