@@ -19,6 +19,7 @@ import fr.jmmc.oiexplorer.core.model.util.OITableByFileComparator;
 import fr.jmmc.oitools.model.Granule;
 import fr.jmmc.oitools.model.Granule.GranuleField;
 import fr.jmmc.oitools.model.InstrumentMode;
+import fr.jmmc.oitools.model.NightId;
 import fr.jmmc.oitools.model.OIData;
 import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
@@ -100,7 +101,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
      */
     private void postInit() {
 
-        // dataTree contains Target/InstrumentMode/Integer or OITable objects:
+        // dataTree contains Target / InstrumentMode / NightId or OITable objects:
         dataTree = new GenericJTree<Object>(null) {
             /** default serial UID for Serializable interface */
             private static final long serialVersionUID = 1;
@@ -115,11 +116,12 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                     // instrument name
                     return ((InstrumentMode) userObject).getInsName();
                 }
-                if (userObject instanceof Integer) {
+                if (userObject instanceof NightId) {
                     // nightId
-                    final Integer nightId = (Integer) userObject;
+                    final NightId nightId = (NightId) userObject;
                     // convert as date:
-                    return MJDConverter.mjdToString(nightId);
+                    tmpBuf.setLength(0);
+                    return MJDConverter.mjdToString(nightId.getNightId(), tmpBuf).toString();
                 }
                 if (userObject instanceof OITable) {
                     return getDisplayLabel((OITable) userObject, tmpBuf);
@@ -272,7 +274,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                     // compare ?
                     other = prevNode.getUserObject();
 
-                    // note: equals uses custom implementation in Target / InstrumentMode / Integer (all members are equals)
+                    // note: equals uses custom implementation in Target / InstrumentMode / NightId (all members are equals)
                     // equals method must be called on other to support proxy object (value.equals(other) may be different)
                     if (other == null || other.equals(value)) {
                         continue;
@@ -709,7 +711,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         private final Set<OITable> oiTables = new LinkedHashSet<OITable>();
         private final Set<Granule> granules = new LinkedHashSet<Granule>();
 
-        public StatisticatedObject(Object mainObject) {
+        public StatisticatedObject(final Object mainObject) {
             this.mainObject = mainObject;
         }
 
