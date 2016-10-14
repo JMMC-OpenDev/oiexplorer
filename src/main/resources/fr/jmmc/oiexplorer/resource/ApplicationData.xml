@@ -170,6 +170,7 @@
             <prerelease version="0.2.1 beta 3">
                 <change type="FEATURE">Updated crosshair handling to show information about the data point</change>
                 <change type="FEATURE">Updated color attribution in plots (sorted baseline or configurations)</change>
+                <change type="FEATURE">Added the color scale for the effective wavelength in the plot legend</change>
             </prerelease>
             <prerelease version="0.2.1 beta 2">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/778">Fixed a trivial bug when removing a plot view</change>
