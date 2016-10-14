@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.1 beta 2"/>
-    <compilation date="20/07/2016" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.1 beta 3"/>
+    <compilation date="14/10/2016" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -162,8 +162,15 @@
     </menubar>
 
     <releasenotes>
+
+        <!-- fixed consistency in the color mapping (among many tables) between series and legend !! -->
+
         <release version="0.2.1">
-            <pubDate>Thu, 23 Jun 2016 10:00:00 GMT</pubDate>
+            <pubDate>Fri, 14 Oct 2016 17:00:00 GMT</pubDate>
+            <prerelease version="0.2.1 beta 3">
+                <change type="FEATURE">Updated crosshair handling to show information about the data point</change>
+                <change type="FEATURE">Updated color attribution in plots (sorted baseline or configurations)</change>
+            </prerelease>
             <prerelease version="0.2.1 beta 2">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/778">Fixed a trivial bug when removing a plot view</change>
             </prerelease>
