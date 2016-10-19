@@ -491,7 +491,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final PlotView plotView = (PlotView) panelToAdd;
 
             final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
-            this.gv.addChart(plotChartPanel.getChart());
+            this.gv.addChart(plotChartPanel.getChart(), plotChartPanel.getCrosshairOverlay());
         }
 
         logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
