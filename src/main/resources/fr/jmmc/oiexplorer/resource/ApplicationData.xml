@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.1 beta 3"/>
-    <compilation date="19/10/2016" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.1 beta 4"/>
+    <compilation date="15/11/2016" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -166,7 +166,10 @@
         <!-- fixed consistency in the color mapping (among many tables) between series and legend !! -->
 
         <release version="0.2.1">
-            <pubDate>Fri, 19 Oct 2016 17:00:00 GMT</pubDate>
+            <pubDate>TUe, 15 Nov 2016 14:00:00 GMT</pubDate>
+            <prerelease version="0.2.1 beta 4">
+                <change type="FEATURE">Fixed the wavelength color mapping when the OI_WAVELENGTH table contains unordered wavelengths (MIRC)</change>
+            </prerelease>
             <prerelease version="0.2.1 beta 3">
                 <change type="FEATURE">Updated crosshairs handling on all plots (synchronization)</change>
                 <change type="FEATURE">Updated crosshair handling to show information about the data point</change>
