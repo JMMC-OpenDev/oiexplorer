@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.1 beta 4"/>
-    <compilation date="15/11/2016" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.1 beta 5"/>
+    <compilation date="21/11/2016" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -166,7 +166,11 @@
         <!-- fixed consistency in the color mapping (among many tables) between series and legend !! -->
 
         <release version="0.2.1">
-            <pubDate>TUe, 15 Nov 2016 14:00:00 GMT</pubDate>
+            <pubDate>Mon, 21 Nov 2016 15:00:00 GMT</pubDate>
+            <prerelease version="0.2.1 beta 5">
+                <change type="FEATURE">Improved the pointing accuracy for crosshairs with logarithmic axes</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/809">Fixed null pointer exception when clicking a data point on flux data (crosshairs)</change>
+            </prerelease>
             <prerelease version="0.2.1 beta 4">
                 <change type="FEATURE">Fixed the wavelength color mapping when the OI_WAVELENGTH table contains unordered wavelengths (MIRC)</change>
             </prerelease>
