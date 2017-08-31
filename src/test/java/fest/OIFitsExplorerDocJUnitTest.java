@@ -7,6 +7,8 @@ import com.mortennobel.imagescaling.AdvancedResizeOp;
 import com.mortennobel.imagescaling.ResampleOp;
 import fest.common.JmcsFestSwingJUnitTestCase;
 import fr.jmmc.jmcs.Bootstrapper;
+import fr.jmmc.jmcs.data.preference.CommonPreferences;
+import fr.jmmc.jmcs.data.preference.PreferencesException;
 import static java.awt.event.KeyEvent.*;
 import java.awt.image.BufferedImage;
 import org.fest.swing.annotation.GUITest;
@@ -17,23 +19,52 @@ import org.fest.swing.fixture.DialogFixture;
 import org.fest.swing.fixture.JTextComponentFixture;
 import org.fest.swing.util.Platform;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 /**
  * This simple tests takes screenshots to complete the OIFitsExplorer documentation
  * 
  * @author bourgesl
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase {
+
+    private final static String FAKE_EMAIL = "FAKE_EMAIL";
+    private static String CURRENT_EMAIL = "";
+
+    private static void defineEmailPref(final String email) {
+        try {
+            final CommonPreferences prefs = CommonPreferences.getInstance();
+
+            CURRENT_EMAIL = prefs.getPreference(CommonPreferences.FEEDBACK_REPORT_USER_EMAIL);
+
+            prefs.setPreference(CommonPreferences.FEEDBACK_REPORT_USER_EMAIL, email);
+        } catch (PreferencesException pe) {
+            logger.error("setPreference failed", pe);
+        }
+    }
 
     /**
      * Initialize system properties & static variables and finally starts the application
      */
     @BeforeClass
     public static void intializeAndStartApplication() {
+        // Hack to reset LAF & ui scale:
+        CommonPreferences.getInstance().resetToDefaultPreferences();
 
         // invoke Bootstrapper method to initialize logback now:
         Bootstrapper.getState();
+
+        // reset Preferences:
+//        Preferences.getInstance().resetToDefaultPreferences();
+        try {
+            CommonPreferences.getInstance().setPreference(CommonPreferences.SHOW_STARTUP_SPLASHSCREEN, false);
+        } catch (PreferencesException pe) {
+            logger.error("setPreference failed", pe);
+        }
+        defineEmailPref(FAKE_EMAIL);
 
         // define robot delays :
         defineRobotDelayBetweenEvents(SHORT_DELAY);
@@ -55,7 +86,7 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
      */
     @Test
     @GUITest
-    public void shouldShowPlot() {
+    public void m01_shouldShowPlot() {
 
         // Capture UV Coverage plot :
         final BufferedImage image = GetScreenshot();
@@ -77,69 +108,11 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
     }
 
     /**
-     * Test Preferences
-     */
-    /*  
-     @Test
-     @GUITest
-     public void shouldOpenPreferences() {
-     window.menuItemWithPath("Edit", "Preferences...").click();
-
-     final Frame prefFrame = robot().finder().find(FrameMatcher.withTitle("Preferences"));
-
-     if (prefFrame != null) {
-     final FrameFixture frame = new FrameFixture(robot(), prefFrame);
-
-     frame.requireVisible();
-     frame.moveToFront();
-
-     saveScreenshot(frame, "OIFitsExplorer-prefs.png");
-
-     // close frame :
-     frame.close();
-     }
-     }
-     */
-    /**
-     * Test Interop menu : Start SearchCal and LITpro manually before this test
-     */
-    /*    
-     @Test
-     @GUITest
-     public void showInteropMenu() {
-     window.menuItemWithPath("Interop").click();
-     captureMainForm("OIFitsExplorer-interop-menu.png");
-
-     window.menuItemWithPath("Interop", "Show Hub Status").click();
-
-     final Frame hubFrame = robot().finder().find(FrameMatcher.withTitle("SAMP Status"));
-
-     if (hubFrame != null) {
-     final FrameFixture frame = new FrameFixture(robot(), hubFrame);
-
-     frame.requireVisible();
-     frame.moveToFront();
-
-     frame.list(new GenericTypeMatcher<JList>(JList.class) {
-     @Override
-     protected boolean isMatching(JList component) {
-     return "org.astrogrid.samp.gui.ClientListCellRenderer".equals(component.getCellRenderer().getClass().getName());
-     }
-     }).selectItem("OIFitsExplorer");
-
-     saveScreenshot(frame, "OIFitsExplorer-interop-hubStatus.png");
-
-     // close frame :
-     frame.close();
-     }
-     }
-     */
-    /**
      * Test Feedback report
      */
     @Test
     @GUITest
-    public void shouldOpenFeedbackReport() {
+    public void m02_shouldOpenFeedbackReport() {
 
         // hack to solve focus trouble in menu items :
         window.menuItemWithPath("Help").focus();
@@ -151,20 +124,21 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
         dialog.requireVisible();
         dialog.moveToFront();
 
-        final String myEmail = "laurent.bourges@obs.ujf-grenoble.fr";
-
-        final JTextComponentFixture emailField = dialog.textBox(JTextComponentMatcher.withText(myEmail));
+        final JTextComponentFixture emailField = dialog.textBox(JTextComponentMatcher.withText(FAKE_EMAIL));
 
         // hide my email address :
         emailField.setText("type your email address here");
 
-        saveScreenshot(dialog, "OIFitsExplorer-FeebackReport.png");
+        saveScreenshot(dialog, "Aspro2-FeebackReport.png");
 
         // restore my preferences :
-        emailField.setText(myEmail);
+        emailField.setText(FAKE_EMAIL);
 
         // close dialog :
         dialog.close();
+
+        // reset email preference:
+        defineEmailPref(CURRENT_EMAIL);
     }
 
     /**
@@ -172,7 +146,7 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
      */
     @Test
     @GUITest
-    public void shouldExit() {
+    public void m03_shouldExit() {
         logger.info("shouldExit test");
 
         window.close();
