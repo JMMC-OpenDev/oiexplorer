@@ -439,7 +439,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             final OIData oiData = (OIData) value;
             sb.append("<html>");
             sb.append("<b>Table:</b> ").append(oiData.getExtName()).append('#').append(oiData.getExtNb());
-            sb.append("<br><b>OIFits:</b> ").append(oiData.getOIFitsFile().getName());
+            sb.append("<br><b>OIFits:</b> ").append(oiData.getOIFitsFile().getFileName());
             sb.append("<br><b>DATE-OBS:</b> ").append(oiData.getDateObs());
             sb.append("<br><b>ARRNAME:</b> ").append(oiData.getArrName());
             sb.append("<br><b>INSNAME:</b> ").append(oiData.getInsName());
@@ -461,8 +461,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean sel, boolean expanded, boolean leaf, int row,
-                                                      boolean hasFocus) {
+                boolean sel, boolean expanded, boolean leaf, int row,
+                boolean hasFocus) {
 
             if (value != null) {
                 final Object userObject;

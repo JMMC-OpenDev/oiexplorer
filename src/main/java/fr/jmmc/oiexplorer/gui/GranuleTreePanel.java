@@ -685,7 +685,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             final OIData o = (OIData) value;
             sb.append("<html>");
             sb.append("<b>Table:</b> ").append(o.getExtName()).append('#').append(o.getExtNb());
-            sb.append("<br><b>OIFits:</b> ").append(o.getOIFitsFile().getName());
+            sb.append("<br><b>OIFits:</b> ").append(o.getOIFitsFile().getFileName());
             sb.append("<br><b>DATE-OBS:</b> ").append(o.getDateObs());
             sb.append("<br><b>ARRNAME:</b> ").append(o.getArrName());
             sb.append("<br><b>INSNAME:</b> ").append(o.getInsName());
@@ -750,8 +750,8 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean sel, boolean expanded, boolean leaf, int row,
-                                                      boolean hasFocus) {
+                boolean sel, boolean expanded, boolean leaf, int row,
+                boolean hasFocus) {
 
             if (value != null) {
                 final Object userObject;
