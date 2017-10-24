@@ -12,9 +12,9 @@
             <icon href="@GENERATED@/OIFitsExplorer.jpg"/>
             <description>OIFits Explorer files</description>
         </association>
-        <shortcut online="true" install="false">
+        <shortcut online="true" install="true">
             <desktop/>
-            <menu submenu="JMMC"/>
+            <menu/>
         </shortcut>
     </information>
     <security>
