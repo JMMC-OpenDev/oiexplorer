@@ -12,9 +12,8 @@
             <icon href="@GENERATED@/OIFitsExplorer.jpg"/>
             <description>OIFits Explorer files</description>
         </association>
-        <shortcut online="true" install="true">
+        <shortcut>
             <desktop/>
-            <menu/>
         </shortcut>
     </information>
     <security>
