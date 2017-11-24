@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<jnlp spec="1.0+" codebase="@GENERATED@" href="OIFitsExplorer.jnlp">
+<jnlp spec="6.0+" codebase="@GENERATED@" href="OIFitsExplorer.jnlp">
     <information>
         <title>OIFits Explorer</title>
         <vendor>JMMC (Jean-Marie MARIOTTI Center)</vendor>
@@ -12,20 +12,21 @@
             <icon href="@GENERATED@/OIFitsExplorer.jpg"/>
             <description>OIFits Explorer files</description>
         </association>
-        <shortcut>
+        <shortcut online="true" install="true">
             <desktop/>
         </shortcut>
     </information>
     <security>
         <all-permissions/>
     </security>
+    <update check="background" policy="always"/>
     <resources>
         <j2se version="1.6+" initial-heap-size="256m" max-heap-size="1024m"/>
 
-        <!-- MANUALLY EDITED - Should be generated with maven ASAP ! -->
+        <!-- MANUALLY EDITED -->
 
         <!-- Application module first (main class) -->
-        <jar href="jar/oiexplorer-TRUNK.jar"/>
+        <jar href="jar/oiexplorer-TRUNK.jar" main="true"/>
 
 
         <!-- doc module -->
