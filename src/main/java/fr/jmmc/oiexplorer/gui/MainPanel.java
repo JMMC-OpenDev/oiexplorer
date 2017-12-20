@@ -45,7 +45,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
-import org.jfree.ui.Drawable;
+import org.jfree.chart.ui.Drawable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
