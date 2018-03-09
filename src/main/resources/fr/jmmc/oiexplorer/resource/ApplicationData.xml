@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.2"/>
-    <compilation date="06/03/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.3 beta 1"/>
+    <compilation date="09/03/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -162,8 +162,14 @@
     </menubar>
 
     <releasenotes>
-
-        <!-- fixed consistency in the color mapping (among many tables) between series and legend !! -->
+        <release version="0.2.3">
+            <pubDate>Tue, 06 Mar 2018 16:00:00 GMT</pubDate>
+            <prerelease version="0.2.3 beta 1">
+                <change type="FEATURE">improved cross hairs on plots to always select matching data points at (row, channel)</change>
+                <change type="FEATURE">Truncate the keyword DATE-OBS if it contains extra characters (display only)</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/904">Always cleanup default file names to avoid special characters</change>
+            </prerelease>            
+        </release>
         <release version="0.2.2">
             <pubDate>Tue, 06 Mar 2018 16:00:00 GMT</pubDate>
             <prerelease version="0.2.2 beta 2">
