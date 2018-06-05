@@ -618,7 +618,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             if (mainObjectToolTip != null) {
                 sb.append(mainObjectToolTip);
             }
-            sb.append("<hr>This node gater following material from ").append(statisticatedObject.getGranules().size()).append(" granule(s)");
+            sb.append("<hr>This node gathers following material from ").append(statisticatedObject.getGranules().size()).append(" granule(s)");
             for (OITable oitable : statisticatedObject.getOITables()) {
                 sb.append("<br><br>").append(oitable).append("<br>");
                 getTreeTooltipText(oitable, sb, true);
