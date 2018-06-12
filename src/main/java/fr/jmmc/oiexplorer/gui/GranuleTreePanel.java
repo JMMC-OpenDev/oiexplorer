@@ -693,7 +693,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
             sb.append("<br><b>Configurations:</b> ");
             for (short[] staConf : o.getDistinctStaConf()) {
-                sb.append(o.getStaNames(staConf)); // cached
+                sb.append(o.getStaNames(staConf)).append(' '); // cached
             }
         }
         if (sb.length() == 0) {
