@@ -21,7 +21,6 @@ import fr.jmmc.oitools.model.Granule.GranuleField;
 import fr.jmmc.oitools.model.InstrumentMode;
 import fr.jmmc.oitools.model.NightId;
 import fr.jmmc.oitools.model.OIData;
-import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
 import fr.jmmc.oitools.model.Target;
 import java.awt.Component;
@@ -238,13 +237,10 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.removeAllChildren();
 
-        final Map<Granule, OIFitsFile> oiFitsPerGranule = oiFitsCollection.getOiFitsPerGranule();
-
-        final List<Granule> granules = new ArrayList<Granule>(oiFitsPerGranule.size());
-        granules.addAll(oiFitsPerGranule.keySet());
-        Collections.sort(granules, comparator);
-
+        final List<Granule> granules = oiFitsCollection.getSortedGranules(comparator);
         logger.debug("granules sorted: {}", granules);
+
+        final Map<Granule, Set<OIData>> oiDataPerGranule = oiFitsCollection.getOiDataPerGranule();
 
         // Add nodes and their data tables:
         final List<GranuleField> fields = comparator.getSortDirectives();
@@ -307,11 +303,11 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             }
 
             // Leaf:
-            final OIFitsFile dataForGranule = oiFitsPerGranule.get(granule);
-            if (dataForGranule != null) {
+            final Set<OIData> oiDatas = oiDataPerGranule.get(granule);
+            if (oiDatas != null) {
                 if (showFile) {
                     // insert node per OIFits File:
-                    final List<OIData> sortedByFile = new ArrayList<OIData>(dataForGranule.getOiDataList());
+                    final List<OIData> sortedByFile = new ArrayList<OIData>(oiDatas);
                     Collections.sort(sortedByFile, OITableByFileComparator.INSTANCE);
 
                     DefaultMutableTreeNode current = parent;
@@ -342,20 +338,20 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                     }
                 } else if (showOITable) {
                     // for now per OIData:
-                    for (OITable table : dataForGranule.getOiDataList()) {
+                    for (OITable table : oiDatas) {
                         dataTree.addNode(parent, table);
                     }
                 } else {
                     // add reference on table + other stat info into userObject of parent
                     StatisticatedObject sobject = (StatisticatedObject) parent.getUserObject();
-                    for (OITable table : dataForGranule.getOiDataList()) {
+                    for (OITable table : oiDatas) {
                         sobject.addOITable(table);
                     }
                 }
             }
         }
 
-        jLabelStats.setText(granules.size() + " granules, " + oiFitsCollection.getOIFitsFiles().size() + " oifits");
+        jLabelStats.setText(granules.size() + " granules, " + oiFitsCollection.size() + " oifits");
 
         // fire node structure changed :
         dataTree.fireNodeChanged(rootNode);
@@ -705,7 +701,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         return sb.toString();
     }
 
-    private class StatisticatedObject {
+    private static class StatisticatedObject {
 
         private final Object mainObject;
         private final Set<OITable> oiTables = new LinkedHashSet<OITable>();
