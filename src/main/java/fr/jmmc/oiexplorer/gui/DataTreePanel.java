@@ -3,10 +3,10 @@
  ******************************************************************************/
 package fr.jmmc.oiexplorer.gui;
 
+import fr.jmmc.jmal.ALX;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
@@ -14,17 +14,22 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetFilter;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
-import fr.jmmc.oiexplorer.core.model.oi.TargetUID;
-import fr.jmmc.oiexplorer.core.model.util.TargetUIDComparator;
+import fr.jmmc.oitools.model.Granule;
+import fr.jmmc.oitools.model.InstrumentMode;
+import fr.jmmc.oitools.model.InstrumentModeManager;
 import fr.jmmc.oitools.model.OIData;
-import fr.jmmc.oitools.model.OIFitsFile;
+import fr.jmmc.oitools.model.OIFitsCollection;
 import fr.jmmc.oitools.model.OITable;
+import fr.jmmc.oitools.model.Target;
+import fr.jmmc.oitools.model.TargetManager;
+import fr.jmmc.oitools.util.GranuleComparator;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
@@ -49,6 +54,13 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private static final long serialVersionUID = 1;
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(DataTreePanel.class);
+    /** singleton instance */
+    public static final GranuleComparator CMP_TARGET_INSMODE = new GranuleComparator(
+            Arrays.asList(
+                    Granule.GranuleField.TARGET,
+                    Granule.GranuleField.INS_MODE
+            )
+    );
 
     /* members */
     /** OIFitsCollectionManager singleton */
@@ -57,8 +69,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private String subsetId = OIFitsCollectionManager.CURRENT_SUBSET_DEFINITION;
     /** Swing data tree */
     private GenericJTree<Object> dataTree;
-    /** temporary buffer */
-    private final StringBuilder tmpBuf = new StringBuilder(64);
 
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
@@ -88,32 +98,16 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      */
     private void postInit() {
 
-        // dataTree contains TargetUID or OITable objects:
-        dataTree = new GenericJTree<Object>(null) {
-            /** default serial UID for Serializable interface */
-            private static final long serialVersionUID = 1;
-
-            @Override
-            protected String convertUserObjectToString(final Object userObject) {
-                if (userObject instanceof TargetUID) {
-                    // target name
-                    // TODO: add all aliases
-                    return ((TargetUID) userObject).getTarget();
-                }
-                if (userObject instanceof OITable) {
-                    return getDisplayLabel((OITable) userObject, tmpBuf);
-                }
-                return toString(userObject);
-            }
-        };
-
-        ToolTipManager.sharedInstance().registerComponent(dataTree);
-
-        dataTree.setCellRenderer(new TooltipTreeCellRenderer());
+        // dataTree contains TargetUID, InsModeUID or OITable objects:
+        dataTree = createTree();
 
         // Define root node once:
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.setUserObject("Targets");
+
+        ToolTipManager.sharedInstance().registerComponent(dataTree);
+
+        dataTree.setCellRenderer(new TooltipTreeCellRenderer());
 
         // tree selection listener :
         dataTree.addTreeSelectionListener(this);
@@ -134,44 +128,56 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         // ALWAYS select a target
         // TODO: the selection should be in sync with subset modification (load, external updates)
         if (oiFitsCollection.isEmpty()) {
-            processTargetSelection(null);
+            processSelection(null, null, null);
         } else {
             boolean found = false;
 
             // Restore subset selection:
             final SubsetDefinition subsetRef = getSubsetDefinitionRef();
 
-            if (subsetRef != null && subsetRef.getTarget() != null) {
-                final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(subsetRef.getTarget());
+            if (subsetRef != null) {
+                final SubsetFilter filter = subsetRef.getFilter();
 
-                if (targetTreeNode != null) {
-                    DefaultMutableTreeNode tableTreeNode = null;
+                if (filter.getTargetUID() != null) {
+                    final Target target = TargetManager.getInstance().getGlobalByUID(filter.getTargetUID());
+                    final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(target);
 
-                    if (!subsetRef.getTables().isEmpty()) {
-                        // TODO: support multi selection:
-                        final TableUID tableUID = subsetRef.getTables().get(0);
-                        final String filePath = tableUID.getFile().getFile();
-                        final Integer extNb = tableUID.getExtNb();
+                    if (targetTreeNode != null) {
+                        DefaultMutableTreeNode insModeTreeNode = null;
+                        DefaultMutableTreeNode tableTreeNode = null;
+                        found = true;
 
-                        for (int i = 0, size = targetTreeNode.getChildCount(); i < size; i++) {
-                            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) targetTreeNode.getChildAt(i);
-                            final OITable oiTable = (OITable) node.getUserObject();
+                        if (filter.getInsModeUID() != null) {
+                            final InstrumentMode insMode = InstrumentModeManager.getInstance().getGlobalByUID(filter.getInsModeUID());
+                            insModeTreeNode = dataTree.findTreeNode(targetTreeNode, insMode);
 
-                            if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
-                                if (extNb != null && extNb.intValue() == oiTable.getExtNb()) {
-                                    tableTreeNode = node;
-                                    break;
+                            if (!filter.getTables().isEmpty()) {
+                                // TODO: support multi selection:
+                                final TableUID tableUID = filter.getTables().get(0);
+                                final String filePath = tableUID.getFile().getFile();
+                                final Integer extNb = tableUID.getExtNb();
+
+                                for (int i = 0, size = insModeTreeNode.getChildCount(); i < size; i++) {
+                                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) insModeTreeNode.getChildAt(i);
+                                    final OITable oiTable = (OITable) node.getUserObject();
+
+                                    if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
+                                        if (extNb != null && extNb.intValue() == oiTable.getExtNb()) {
+                                            tableTreeNode = node;
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
 
-                    }
-                    found = true;
-
-                    if (tableTreeNode != null) {
-                        dataTree.selectPath(new TreePath(tableTreeNode.getPath()));
-                    } else {
-                        dataTree.selectPath(new TreePath(targetTreeNode.getPath()));
+                        if (tableTreeNode != null) {
+                            dataTree.selectPath(new TreePath(tableTreeNode.getPath()));
+                        } else if (insModeTreeNode != null) {
+                            dataTree.selectPath(new TreePath(insModeTreeNode.getPath()));
+                        } else {
+                            dataTree.selectPath(new TreePath(targetTreeNode.getPath()));
+                        }
                     }
                 }
             }
@@ -203,24 +209,73 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
         rootNode.removeAllChildren();
 
-        final Map<TargetUID, OIFitsFile> oiFitsPerTarget = oiFitsCollection.getOiFitsPerTarget();
+        // Sort granule by criteria (target / insMode / night):
+        final GranuleComparator comparator = CMP_TARGET_INSMODE;
 
-        // Sort target by their name:
-        final List<TargetUID> targetUIDs = new ArrayList<TargetUID>(oiFitsPerTarget.size());
-        targetUIDs.addAll(oiFitsPerTarget.keySet());
-        Collections.sort(targetUIDs, TargetUIDComparator.INSTANCE);
+        final List<Granule> granules = oiFitsCollection.getSortedGranules(comparator);
+        logger.debug("granules sorted: {}", granules);
 
-        // Add targets and their data tables:
-        for (TargetUID target : targetUIDs) {
-            final DefaultMutableTreeNode targetTreeNode = dataTree.addNode(rootNode, target);
+        final Map<Granule, Set<OIData>> oiDataPerGranule = oiFitsCollection.getOiDataPerGranule();
 
-            final OIFitsFile dataForTarget = oiFitsPerTarget.get(target);
-            if (dataForTarget != null) {
-                for (OITable table : dataForTarget.getOiDataList()) {
-                    dataTree.addNode(targetTreeNode, table);
+        // Add nodes and their data tables:
+        final List<Granule.GranuleField> fields = comparator.getSortDirectives();
+        final int fieldsLen = fields.size();
+
+        final DefaultMutableTreeNode[] pathNodes = new DefaultMutableTreeNode[fieldsLen + 1];
+        int level;
+        Granule.GranuleField field;
+        Object value, other;
+
+        pathNodes[0] = rootNode;
+
+        for (Granule granule : granules) {
+
+            // loop on fields:
+            for (level = 1; level <= fieldsLen; level++) {
+                field = fields.get(level - 1);
+                value = granule.getField(field);
+
+                if (value == null) {
+                    logger.warn("null field value for granule: {}", granule);
+                    value = "UNDEFINED";
+                }
+
+                DefaultMutableTreeNode prevNode = pathNodes[level];
+                if (prevNode != null) {
+                    // compare ?
+                    other = prevNode.getUserObject();
+
+                    // note: equals uses custom implementation in Target / InstrumentMode / NightId (all members are equals)
+                    // equals method must be called on other to support proxy object (value.equals(other) may be different)
+                    if (other == null || other.equals(value)) {
+                        continue;
+                    } else {
+                        // different:
+                        for (int i = level + 1; i <= fieldsLen; i++) {
+                            // clear previous nodes:
+                            pathNodes[i] = null;
+                        }
+                    }
+                }
+
+                pathNodes[level] = dataTree.addNode(pathNodes[level - 1], value);
+            }
+
+            final DefaultMutableTreeNode parent = pathNodes[level - 1];
+
+            // Leaf:
+            final Set<OIData> oiDatas = oiDataPerGranule.get(granule);
+            if (oiDatas != null) {
+                // for now per OIData:
+                for (OITable table : oiDatas) {
+                    // Avoid Table duplicates :
+                    if (GenericJTree.findTreeNode(parent, table) == null) {
+                        dataTree.addNode(parent, table);
+                    }
                 }
             }
         }
+
         // fire node structure changed :
         dataTree.fireNodeChanged(rootNode);
     }
@@ -251,19 +306,34 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     /* retrieve the node that was selected */
                     final Object userObject = currentNode.getUserObject();
 
-                    if (userObject instanceof TargetUID) {
-                        final TargetUID target = (TargetUID) userObject;
-
-                        processTargetSelection(target);
-                    } else if (userObject instanceof OITable) {
-                        final OITable oiTable = (OITable) userObject;
+                    if (userObject instanceof Target) {
+                        final Target target = (Target) userObject;
+                        processSelection(target.getTarget(), null, null);
+                    } else if (userObject instanceof InstrumentMode) {
+                        final InstrumentMode insMode = (InstrumentMode) userObject;
 
                         final DefaultMutableTreeNode parentNode = dataTree.getParentNode(currentNode);
 
-                        if (parentNode != null && parentNode.getUserObject() instanceof TargetUID) {
-                            final TargetUID parentTarget = (TargetUID) parentNode.getUserObject();
+                        if (parentNode != null && parentNode.getUserObject() instanceof Target) {
+                            final Target target = (Target) parentNode.getUserObject();
 
-                            processTableSelection(parentTarget, oiTable);
+                            processSelection(target.getTarget(), insMode.getInsName(), null);
+                        }
+                    } else if (userObject instanceof OITable) {
+                        final OITable oiTable = (OITable) userObject;
+
+                        DefaultMutableTreeNode parentNode = dataTree.getParentNode(currentNode);
+
+                        if (parentNode != null && parentNode.getUserObject() instanceof InstrumentMode) {
+                            final InstrumentMode insMode = (InstrumentMode) parentNode.getUserObject();
+
+                            parentNode = dataTree.getParentNode(parentNode);
+
+                            if (parentNode != null && parentNode.getUserObject() instanceof Target) {
+                                final Target target = (Target) parentNode.getUserObject();
+
+                                processSelection(target.getTarget(), insMode.getInsName(), oiTable);
+                            }
                         }
                     }
                 }
@@ -272,41 +342,29 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     }
 
     /**
-     * Update the UI when a target is selected in the data tree
-     * @param target selected target
-     */
-    private void processTargetSelection(final TargetUID target) {
-        logger.debug("processTargetSelection: {}", target);
-
-        // update subset definition (copy):
-        final SubsetDefinition subsetCopy = getSubsetDefinition();
-        if (subsetCopy != null) {
-            subsetCopy.setTarget(target);
-            subsetCopy.getTables().clear(); // means all
-
-            // fire subset changed event:
-            ocm.updateSubsetDefinition(this, subsetCopy);
-        }
-    }
-
-    /**
-     * Update the UI when a OITable is selected in the data tree
-     * @param target selected target
+     * Update the SubsetDeinition depending on the data tree selection
+     * @param targetUID selected target UID
+     * @param insModeUID selected InstrumentMode UID
      * @param oiTable selected table
      */
-    private void processTableSelection(final TargetUID target, final OITable oiTable) {
-        logger.debug("processTableSelection: {}", oiTable);
+    private void processSelection(final String targetUID, final String insModeUID, final OITable oiTable) {
+        logger.debug("processSelection: {}", targetUID, insModeUID, oiTable);
 
         // update subset definition (copy):
         final SubsetDefinition subsetCopy = getSubsetDefinition();
         if (subsetCopy != null) {
-            subsetCopy.setTarget(target);
-            final List<TableUID> tables = subsetCopy.getTables();
+            final SubsetFilter filter = subsetCopy.getFilter();
+            filter.setTargetUID(targetUID);
+            filter.setInsModeUID(insModeUID);
+
+            final List<TableUID> tables = filter.getTables();
             tables.clear();
 
-            final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
-            if (dataFile != null) {
-                tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+            if (oiTable != null) {
+                final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
+                if (dataFile != null) {
+                    tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+                }
             }
 
             // fire subset changed event:
@@ -404,65 +462,65 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         logger.debug("onProcess {} - done", event);
     }
 
-    /**
-     * Return the label displayed in the data tree
-     * @param table OITable to display
-     * @param sb temporary buffer
-     * @return label
-     */
-    private static String getDisplayLabel(final OITable table, final StringBuilder sb) {
-        if (table instanceof OIData) {
-            final OIData oiData = (OIData) table;
-            sb.setLength(0);
-            sb.append(table.getExtName());
-            sb.append('#');
-            sb.append(table.getExtNb());
-            final String dateObs = oiData.getDateObs();
-            if (!StringUtils.isEmpty(dateObs)) {
-                sb.append(' ').append(dateObs);
+    // TODO: share code with GranuleTreePanel ?
+    private GenericJTree<Object> createTree() {
+        return new GenericJTree<Object>(null) {
+            /** default serial UID for Serializable interface */
+            private static final long serialVersionUID = 1;
+
+            /** temporary buffer */
+            private final StringBuilder tmpBuf = new StringBuilder(64);
+
+            @Override
+            protected String convertUserObjectToString(final Object userObject) {
+                if (userObject instanceof Target) {
+                    return ((Target) userObject).getTarget(); // global UID
+                }
+                if (userObject instanceof InstrumentMode) {
+                    return ((InstrumentMode) userObject).getInsName(); // global UID
+                }
+                if (userObject instanceof OITable) {
+                    return getDisplayLabel((OITable) userObject, tmpBuf);
+                }
+                return toString(userObject);
             }
-            sb.append(' ').append(oiData.getInsName());
-            return sb.toString();
-        }
-        return table.toString();
+
+            /**
+             * Return the label displayed in the data tree
+             * @param table OITable to display
+             * @param sb temporary buffer
+             * @return label
+             */
+            private String getDisplayLabel(final OITable table, final StringBuilder sb) {
+                if (table instanceof OIData) {
+                    final OIData oiData = (OIData) table;
+                    sb.setLength(0);
+                    sb.append(table.getExtName());
+                    sb.append('#');
+                    sb.append(table.getExtNb());
+                    final String dateObs = oiData.getDateObs();
+                    if (!StringUtils.isEmpty(dateObs)) {
+                        sb.append(' ').append(dateObs);
+                    }
+                    sb.append(' ').append(oiData.getInsName());
+                    return sb.toString();
+                }
+                return table.toString();
+            }
+        };
     }
 
-    private String getTreeTooltipText(final Object value, final StringBuilder sb) {
-        sb.setLength(0);
-        if (value instanceof TargetUID) {
-            final TargetUID targetUID = (TargetUID) value;
-            sb.append(targetUID.getTarget());
-//            sb.append(" TODO (add aliases, coordinates ...)");
-            return sb.toString();
-        }
-        if (value instanceof OIData) {
-            final OIData oiData = (OIData) value;
-            sb.append("<html>");
-            sb.append("<b>Table:</b> ").append(oiData.getExtName()).append('#').append(oiData.getExtNb());
-            sb.append("<br><b>OIFits:</b> ").append(oiData.getOIFitsFile().getFileName());
-            sb.append("<br><b>DATE-OBS:</b> ").append(oiData.getDateObs());
-            sb.append("<br><b>ARRNAME:</b> ").append(oiData.getArrName());
-            sb.append("<br><b>INSNAME:</b> ").append(oiData.getInsName());
-            sb.append("<br><b>NB_MEASUREMENTS:</b> ").append(oiData.getNbMeasurements());
-
-            sb.append("<br><b>Configurations:</b> ");
-            for (short[] staConf : oiData.getDistinctStaConf()) {
-                sb.append(oiData.getStaNames(staConf)); // cached
-            }
-            sb.append("</html>");
-            return sb.toString();
-        }
-        return null;
-    }
-
-    private class TooltipTreeCellRenderer extends DefaultTreeCellRenderer {
+    private final static class TooltipTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private static final long serialVersionUID = 1L;
 
+        /** temporary buffer */
+        private final StringBuilder tmpBuf = new StringBuilder(64);
+
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
-                boolean sel, boolean expanded, boolean leaf, int row,
-                boolean hasFocus) {
+                                                      boolean sel, boolean expanded, boolean leaf, int row,
+                                                      boolean hasFocus) {
 
             if (value != null) {
                 final Object userObject;
@@ -473,6 +531,90 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             }
             return super.getTreeCellRendererComponent(tree, value, sel,
                     expanded, leaf, row, hasFocus);
+        }
+
+        private String getTreeTooltipText(final Object value, final StringBuilder sb) {
+            sb.setLength(0);
+
+            if (value instanceof Target) {
+                final Target t = (Target) value;
+                sb.append("<b>name:</b> ").append(t.getTarget());
+
+                final List<String> aliases = TargetManager.getInstance().getSortedUniqueAliases(t);
+                if (aliases != null) {
+                    sb.append("<hr>");
+                    sb.append("<b>Aliases:</b><br>");
+                    for (int j = 0, end = aliases.size(); j < end; j++) {
+                        if (j != 0) {
+                            sb.append("<br>");
+                        }
+                        sb.append("- ").append(aliases.get(j));
+                    }
+                    sb.append("<hr>");
+                } else {
+                    sb.append("<br>");
+                }
+                sb.append("<b>Coords:</b> ");
+                ALX.toHMS(sb, t.getRaEp0());
+                sb.append(' ');
+                ALX.toDMS(sb, t.getDecEp0());
+
+                // TODO: check units
+                if (!Double.isNaN(t.getPmRa()) && !Double.isNaN(t.getPmDec())) {
+                    // convert deg/year in mas/year :
+                    sb.append("<br><b>Proper motion</b> (mas/yr): ").append(t.getPmRa() * ALX.DEG_IN_MILLI_ARCSEC)
+                            .append(' ').append(t.getPmDec() * ALX.DEG_IN_MILLI_ARCSEC);
+                }
+                if (!Double.isNaN(t.getParallax()) && !Double.isNaN(t.getParaErr())) {
+                    sb.append("<br><b>Parallax</b> (mas): ").append(t.getParallax() * ALX.DEG_IN_MILLI_ARCSEC)
+                            .append(" [").append(t.getParaErr() * ALX.DEG_IN_MILLI_ARCSEC).append(']');
+                }
+                if (t.getSpecTyp() != null && !t.getSpecTyp().isEmpty()) {
+                    sb.append("<br><b>Spectral types</b>: ").append(t.getSpecTyp());
+                }
+            } else if (value instanceof InstrumentMode) {
+                final InstrumentMode i = (InstrumentMode) value;
+                sb.append("<b>name:</b> ").append(i.getInsName());
+
+                final List<String> aliases = InstrumentModeManager.getInstance().getSortedUniqueAliases(i);
+                if (aliases != null) {
+                    sb.append("<hr>");
+                    sb.append("<b>Aliases:</b><br>");
+                    for (int j = 0, end = aliases.size(); j < end; j++) {
+                        if (j != 0) {
+                            sb.append("<br>");
+                        }
+                        sb.append("- ").append(aliases.get(j));
+                    }
+                    sb.append("<hr>");
+                } else {
+                    sb.append("<br>");
+                }
+                sb.append("<b>Nb channels:</b> ").append(i.getNbChannels());
+                sb.append("<br><b>Lambda min:</b> ").append(i.getLambdaMin());
+                sb.append("<br><b>Lambda max:</b> ").append(i.getLambdaMax());
+                sb.append("<br><b>Resolution:</b> ").append(i.getResPower());
+            } else if (value instanceof OIData) {
+                final OIData oiData = (OIData) value;
+                sb.append("<b>Table:</b> ").append(oiData.getExtName()).append('#').append(oiData.getExtNb());
+                sb.append("<br><b>OIFits:</b> ").append(oiData.getOIFitsFile().getFileName());
+                sb.append("<br><b>DATE-OBS:</b> ").append(oiData.getDateObs());
+                sb.append("<br><b>ARRNAME:</b> ").append(oiData.getArrName());
+                sb.append("<br><b>INSNAME:</b> ").append(oiData.getInsName());
+                sb.append("<br><b>NB_MEASUREMENTS:</b> ").append(oiData.getNbMeasurements());
+
+                sb.append("<br><b>Configurations:</b> ");
+                for (short[] staConf : oiData.getDistinctStaConf()) {
+                    sb.append(oiData.getStaNames(staConf)).append(' '); // cached
+                }
+            }
+            if (sb.length() == 0) {
+                return null;
+            } else {
+                sb.insert(0, "<html>");
+                sb.append("</html>");
+            }
+            return sb.toString();
         }
     }
 }

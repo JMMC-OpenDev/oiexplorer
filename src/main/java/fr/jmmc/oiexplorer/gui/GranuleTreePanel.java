@@ -7,7 +7,6 @@ import fr.jmmc.jmal.ALX;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oitools.model.InstrumentModeManager;
-import fr.jmmc.oiexplorer.core.model.OIFitsCollection;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
@@ -21,6 +20,7 @@ import fr.jmmc.oitools.model.Granule.GranuleField;
 import fr.jmmc.oitools.model.InstrumentMode;
 import fr.jmmc.oitools.model.NightId;
 import fr.jmmc.oitools.model.OIData;
+import fr.jmmc.oitools.model.OIFitsCollection;
 import fr.jmmc.oitools.model.OITable;
 import fr.jmmc.oitools.model.Target;
 import java.awt.Component;
@@ -746,8 +746,8 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
-                boolean sel, boolean expanded, boolean leaf, int row,
-                boolean hasFocus) {
+                                                      boolean sel, boolean expanded, boolean leaf, int row,
+                                                      boolean hasFocus) {
 
             if (value != null) {
                 final Object userObject;
