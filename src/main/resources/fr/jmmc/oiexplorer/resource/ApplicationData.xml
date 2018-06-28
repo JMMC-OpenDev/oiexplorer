@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.3 beta 1"/>
-    <compilation date="09/03/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.4 beta 1"/>
+    <compilation date="28/06/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -162,19 +162,25 @@
     </menubar>
 
     <releasenotes>
+        <release version="0.2.4">
+            <pubDate>Thu, 28 Jun 2018 16:00:00 GMT</pubDate>
+            <prerelease version="0.2.4 beta 1">
+                <change type="FEATURE">Improved data selection to use global Target and Instrument modes (matching)</change>
+            </prerelease>
+        </release>
         <release version="0.2.3">
-            <pubDate>Tue, 06 Mar 2018 16:00:00 GMT</pubDate>
+            <pubDate>Fri, 09 Mar 2018 16:00:00 GMT</pubDate>
             <prerelease version="0.2.3 beta 1">
-                <change type="FEATURE">improved cross hairs on plots to always select matching data points at (row, channel)</change>
+                <change type="FEATURE">Improved cross hairs on plots to always select matching data points at (row, channel)</change>
                 <change type="FEATURE">Truncate the keyword DATE-OBS if it contains extra characters (display only)</change>
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/904">Always cleanup default file names to avoid special characters</change>
-            </prerelease>            
+            </prerelease>
         </release>
         <release version="0.2.2">
             <pubDate>Tue, 06 Mar 2018 16:00:00 GMT</pubDate>
             <prerelease version="0.2.2 beta 2">
                 <change type="FEATURE">Improved Java support (9 + mac OS X) but Java 7 minimum is now required</change>
-            </prerelease>            
+            </prerelease>
             <prerelease version="0.2.2 beta 1">
                 <change type="FEATURE">Upgraded OITools 2 providing OIFits 2 support</change>
             </prerelease>
