@@ -22,6 +22,7 @@ import fr.jmmc.oiexplorer.core.export.DocumentOptions;
 import fr.jmmc.oiexplorer.core.export.ImageOptions;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
+import fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction;
@@ -303,6 +304,9 @@ public final class OIFitsExplorer extends App {
 
         new LoadOIDataCollectionAction();
         new SaveOIDataCollectionAction();
+        
+        new ExportOIFitsAction();
+        
         // addExportListener actions:
         new OIFitsExplorerExportAction(MimeType.PDF);
         new OIFitsExplorerExportAction(MimeType.PNG);

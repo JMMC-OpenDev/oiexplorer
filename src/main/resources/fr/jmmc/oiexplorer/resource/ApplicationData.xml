@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.4 beta 1"/>
-    <compilation date="28/06/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.4 beta 2"/>
+    <compilation date="05/07/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -135,6 +135,9 @@
                   accelerator="S" description="save the current OIFits Collection settings"/>
 
             <menu/> <!-- menu separator -->
+            <menu label="Export to OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction" action="exportOIFits"
+                  description="Export your current selection to an OIFits file"/>
+            <menu/> <!-- menu separator -->
             <menu label="Export plot to PDF" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction" action="exportPDF" accelerator="P"
                   icon="fr/jmmc/oiexplorer/core/resource/image/icon_pdf.gif" description="Export the current plot to a PDF document"/>
             <menu label="Export plot to PNG" classpath="fr.jmmc.oiexplorer.core.gui.action.ExportDocumentAction" action="exportPNG"
@@ -163,7 +166,10 @@
 
     <releasenotes>
         <release version="0.2.4">
-            <pubDate>Thu, 28 Jun 2018 16:00:00 GMT</pubDate>
+            <pubDate>Thu, 05 Jul 2018 22:00:00 GMT</pubDate>
+            <prerelease version="0.2.4 beta 2">
+                <change type="FEATURE">Added File action 'Export to OIFits file' to export the current selection (subset) as an OIFits file (using OITools Merger)</change>
+            </prerelease>
             <prerelease version="0.2.4 beta 1">
                 <change type="FEATURE">Improved data selection to use global Target and Instrument modes (matching)</change>
             </prerelease>
