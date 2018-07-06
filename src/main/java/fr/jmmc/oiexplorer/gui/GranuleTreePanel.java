@@ -320,16 +320,28 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
                         if (!fileName.equals(prev)) {
                             prev = fileName;
+                            // Avoid File duplicates :
                             if (showOITable) {
-                                current = dataTree.addNode(parent, fileName);
+                                current = GenericJTree.findTreeNode(parent, fileName);
+                                if (current == null) {
+                                    current = dataTree.addNode(parent, fileName);
+                                }
                             } else {
                                 StatisticatedObject sobject = new StatisticatedObject(fileName);
-                                current = dataTree.addNode(parent, sobject);
+                                current = GenericJTree.findTreeNode(parent, sobject);
+                                if (current == null) {
+                                    current = dataTree.addNode(parent, sobject);
+                                } else {
+                                    sobject = (StatisticatedObject) current.getUserObject();
+                                }
                                 sobject.addGranule(granule);
                             }
                         }
                         if (showOITable) {
-                            dataTree.addNode(current, table);
+                            // Avoid Table duplicates :
+                            if (GenericJTree.findTreeNode(parent, table) == null) {
+                                dataTree.addNode(current, table);
+                            }
                         } else {
                             //add reference on table + other stat info into userObject of current
                             StatisticatedObject sobject = (StatisticatedObject) current.getUserObject();
@@ -339,7 +351,10 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 } else if (showOITable) {
                     // for now per OIData:
                     for (OITable table : oiDatas) {
-                        dataTree.addNode(parent, table);
+                        // Avoid Table duplicates :
+                        if (GenericJTree.findTreeNode(parent, table) == null) {
+                            dataTree.addNode(parent, table);
+                        }
                     }
                 } else {
                     // add reference on table + other stat info into userObject of parent
