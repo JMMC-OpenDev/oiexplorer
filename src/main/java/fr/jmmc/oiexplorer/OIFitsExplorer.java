@@ -30,6 +30,7 @@ import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
+import fr.jmmc.oitools.model.DataModel;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -135,6 +136,9 @@ public final class OIFitsExplorer extends App {
 
         // Initialize the parallel job executor:
         ParallelJobExecutor.getInstance();
+
+        // Enable OI columns for OIFits datamodel
+        DataModel.setOiModelColumnsSupport(true);
     }
 
     /**
