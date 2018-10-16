@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.5 beta 1"/>
-    <compilation date="27/09/2018" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.5 beta 2"/>
+    <compilation date="16/10/2018" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -164,7 +164,10 @@
 
     <releasenotes>
         <release version="0.2.5">
-            <pubDate>Tue, 27 Sep 2018 17:00:00 GMT</pubDate>
+            <pubDate>Tue, 16 Oct 2018 12:00:00 GMT</pubDate>
+            <prerelease version="0.2.5 beta 2">
+                <change type="FEATURE">Added 'Send OIFits' action in the Interop menu to share selected OIFits data with OImaging and other VO tools</change>
+            </prerelease>
             <prerelease version="0.2.5 beta 1">
                 <change type="FEATURE">Enable Image-OI support.</change>
             </prerelease>
