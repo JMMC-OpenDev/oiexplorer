@@ -30,6 +30,7 @@ import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
+import fr.jmmc.oiexplorer.interop.SendOIFitsAction;
 import fr.jmmc.oitools.model.DataModel;
 import fr.jmmc.oitools.model.OIFitsChecker;
 import java.awt.BorderLayout;
@@ -322,6 +323,8 @@ public final class OIFitsExplorer extends App {
 
         // Edit menu :
         // Interop menu :
+        // Send OIFits (SAMP) :
+        new SendOIFitsAction();
     }
 
     /**
