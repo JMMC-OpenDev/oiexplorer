@@ -342,7 +342,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     }
 
     /**
-     * Update the SubsetDeinition depending on the data tree selection
+     * Update the SubsetDefinition depending on the data tree selection
      * @param targetUID selected target UID
      * @param insModeUID selected InstrumentMode UID
      * @param oiTable selected table

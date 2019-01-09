@@ -61,20 +61,18 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      */
     private static final long serialVersionUID = 1;
 
-    // if multi page activated the export file will containt global view + each plot on a page/image
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
+    
     /* members */
-    /**
-     * OIFitsCollectionManager singleton reference
-     */
+    /** OIFitsCollectionManager singleton reference */
     private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
-    /**
-     * Add a new plot tab action
-     */
-    private NewPlotTabAction newPlotTabAction;
+    /** new plot tab action */
+    private NewPlotTabAction newPlotTabAction = null;
     /** global view */
-    private GlobalView gv = null;
+    private GlobalView globalView = null;
+    /** prepared page content */
+    private List<DocumentPage> pages = null;
 
     /**
      * Creates new form MainPanel
@@ -155,9 +153,6 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         }
 
     }
-
-    /** prepared page content */
-    private List<DocumentPage> pages = null;
 
     /**
      * Prepare the page layout before doing the export:
@@ -275,10 +270,9 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
-
         registerActions();
 
-        this.gv = new GlobalView();
+        this.globalView = new GlobalView();
 
         if (this.tabbedPaneTop instanceof JideTabbedPane) {
             final JideTabbedPane jideTabbedPane = (JideTabbedPane) this.tabbedPaneTop;
@@ -491,7 +485,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final PlotView plotView = (PlotView) panelToAdd;
 
             final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
-            this.gv.addChart(plotChartPanel.getChart(), plotChartPanel.getCrosshairOverlay());
+            this.globalView.addChart(plotChartPanel.getChart(), plotChartPanel.getCrosshairOverlay());
         }
 
         logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
@@ -602,7 +596,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final PlotView plotView = (PlotView) com;
 
             final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
-            this.gv.removeChart(plotChartPanel.getChart());
+            this.globalView.removeChart(plotChartPanel.getChart());
 
             // free resources (unregister event notifiers):
             plotView.dispose();
@@ -614,10 +608,10 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
     }
 
     private void updateOverviewTab() {
-        if (gv.getChartCount() < 2) {
-            this.tabbedPaneTop.remove(gv);
+        if (globalView.getChartCount() <= 1) {
+            this.tabbedPaneTop.remove(globalView);
         } else {
-            this.tabbedPaneTop.add(gv, "Overview", 0);
+            this.tabbedPaneTop.add(globalView, "Overview", 0);
         }
     }
 
