@@ -63,8 +63,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     );
 
     /* members */
-    /** OIFitsCollectionManager singleton */
-    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    /** OIFitsCollectionManager singleton reference */
+    private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** subset identifier */
     private String subsetId = OIFitsCollectionManager.CURRENT_SUBSET_DEFINITION;
     /** Swing data tree */
@@ -139,7 +139,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 final SubsetFilter filter = subsetRef.getFilter();
 
                 if (filter.getTargetUID() != null) {
-                    final Target target = TargetManager.getInstance().getGlobalByUID(filter.getTargetUID());
+                    final Target target = oiFitsCollection.getTargetManager().getGlobalByUID(filter.getTargetUID());
                     final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(target);
 
                     if (targetTreeNode != null) {
@@ -148,8 +148,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         found = true;
 
                         if (filter.getInsModeUID() != null) {
-                            final InstrumentMode insMode = InstrumentModeManager.getInstance().getGlobalByUID(filter.getInsModeUID());
-                            insModeTreeNode = dataTree.findTreeNode(targetTreeNode, insMode);
+                            final InstrumentMode insMode = oiFitsCollection.getInstrumentModeManager().getGlobalByUID(filter.getInsModeUID());
+                            insModeTreeNode = GenericJTree.findTreeNode(targetTreeNode, insMode);
 
                             if (!filter.getTables().isEmpty()) {
                                 // TODO: support multi selection:
@@ -462,6 +462,14 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         logger.debug("onProcess {} - done", event);
     }
 
+    private static InstrumentModeManager getInstrumentModeManager() {
+        return ocm.getOIFitsCollection().getInstrumentModeManager();
+    }
+
+    private static TargetManager getTargetManager() {
+        return ocm.getOIFitsCollection().getTargetManager();
+    }
+
     // TODO: share code with GranuleTreePanel ?
     private GenericJTree<Object> createTree() {
         return new GenericJTree<Object>(null) {
@@ -540,7 +548,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 final Target t = (Target) value;
                 sb.append("<b>name:</b> ").append(t.getTarget());
 
-                final List<String> aliases = TargetManager.getInstance().getSortedUniqueAliases(t);
+                final List<String> aliases = getTargetManager().getSortedUniqueAliases(t);
                 if (aliases != null) {
                     sb.append("<hr>");
                     sb.append("<b>Aliases:</b><br>");
@@ -576,7 +584,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 final InstrumentMode i = (InstrumentMode) value;
                 sb.append("<b>name:</b> ").append(i.getInsName());
 
-                final List<String> aliases = InstrumentModeManager.getInstance().getSortedUniqueAliases(i);
+                final List<String> aliases = getInstrumentModeManager().getSortedUniqueAliases(i);
                 if (aliases != null) {
                     sb.append("<hr>");
                     sb.append("<b>Aliases:</b><br>");

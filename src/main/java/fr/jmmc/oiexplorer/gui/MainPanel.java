@@ -66,7 +66,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
     
     /* members */
     /** OIFitsCollectionManager singleton reference */
-    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** new plot tab action */
     private NewPlotTabAction newPlotTabAction = null;
     /** global view */

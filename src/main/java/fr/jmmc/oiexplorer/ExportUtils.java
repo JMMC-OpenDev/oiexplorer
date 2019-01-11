@@ -51,7 +51,7 @@ public final class ExportUtils {
         final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
         final OIFitsCollectionManagerEventListener readyEventListener
-                = new ExportWhenReadyListener(file, options);
+                                                   = new ExportWhenReadyListener(file, options);
 
         // Register READY event listener:
         ocm.getReadyEventNotifier().register(readyEventListener);
@@ -73,7 +73,8 @@ public final class ExportUtils {
 
     private static class ExportWhenReadyListener implements OIFitsCollectionManagerEventListener {
 
-        private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+        /** OIFitsCollectionManager singleton reference */
+        private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
         private final File file;
         private final DocumentOptions options;
 

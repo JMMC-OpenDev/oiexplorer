@@ -66,8 +66,8 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     private static final boolean SHOW_DATATREE_ROOTVISIBLE = false;
 
     /* members */
-    /** OIFitsCollectionManager singleton */
-    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    /** OIFitsCollectionManager singleton reference */
+    private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** Swing data tree */
     private GenericJTree<Object> dataTree;
     /** temporary buffer */
@@ -584,6 +584,14 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         logger.debug("onProcess {} - done", event);
     }
 
+    private static InstrumentModeManager getInstrumentModeManager() {
+        return ocm.getOIFitsCollection().getInstrumentModeManager();
+    }
+
+    private static TargetManager getTargetManager() {
+        return ocm.getOIFitsCollection().getTargetManager();
+    }
+
     /**
      * Return the label displayed in the data tree
      * @param table OITable to display
@@ -638,7 +646,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             final Target t = (Target) value;
             sb.append("<b>name:</b> ").append(t.getTarget());
 
-            final List<String> aliases = TargetManager.getInstance().getSortedUniqueAliases(t);
+            final List<String> aliases = getTargetManager().getSortedUniqueAliases(t);
             if (aliases != null) {
                 sb.append("<hr>");
                 sb.append("<b>Aliases:</b><br>");
@@ -674,7 +682,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
             final InstrumentMode i = (InstrumentMode) value;
             sb.append("<b>name:</b> ").append(i.getInsName());
 
-            final List<String> aliases = InstrumentModeManager.getInstance().getSortedUniqueAliases(i);
+            final List<String> aliases = getInstrumentModeManager().getSortedUniqueAliases(i);
             if (aliases != null) {
                 sb.append("<hr>");
                 sb.append("<b>Aliases:</b><br>");

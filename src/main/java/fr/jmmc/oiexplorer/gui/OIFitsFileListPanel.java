@@ -39,8 +39,8 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(OIFitsFileListPanel.class);
     /* members */
-    /** OIFitsCollectionManager singleton */
-    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+    /** OIFitsCollectionManager singleton reference */
+    private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
     /** subset identifier */
     private String subsetId = null;
 
