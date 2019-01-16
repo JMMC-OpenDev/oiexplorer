@@ -10,6 +10,9 @@
 # | [-mode]                   export mode [multi|single] page    |
 # | [-dims]                   export image dimensions [width,height] [SHELL]    |
 #
+# java -cp ./target/oiexplorer-TRUNK-jar-with-dependencies.jar fr.jmmc.oiexplorer.OIFitsExplorer -png test.png -mode=single -dims 1200,800 -open test.oixp 
+#
+#
 
 function genOIXP(){
   OIFITS="${1}"

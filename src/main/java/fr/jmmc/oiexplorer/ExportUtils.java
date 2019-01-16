@@ -12,6 +12,7 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
+import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
@@ -115,7 +116,30 @@ public final class ExportUtils {
         }
 
         private void doExport() {
-            // TODO: verifier que des données ont été chargées ...
+            boolean noData = false;
+            // check that OIFitsCollection (no data) and subsets (bad filter criteria) are not empty      
+            if (ocm.getOIFitsCollection().isEmpty()) {
+                noData = true;
+                logger.error("No loaded data");
+            } else {
+                noData = true;
+                for (String subsetId : ocm.getSubsetDefinitionIds()) {
+                    final SubsetDefinition subsetDefinition = ocm.getSubsetDefinitionRef(subsetId);
+                    if (subsetDefinition != null) {
+                        if (subsetDefinition.getOIFitsSubset() != null) {
+                            noData = false;
+                        } else {
+                            logger.warn("Subset[{}] has no data with filter {}", subsetId, subsetDefinition.getFilter());
+                        }
+                    }
+                }
+                if (noData) {
+                    logger.error("All Subsets have no data");
+                }
+            }
+            if (noData) {
+                Bootstrapper.stopApp(1);
+            }
 
             final DocumentExportable exportable = OIFitsExplorer.getInstance().getMainPanel();
 
