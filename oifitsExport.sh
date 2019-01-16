@@ -31,7 +31,7 @@ function genOIXP(){
 function genPNG(){
   OIXP="${1}"
   PNG="${OIXP/.oixp/.png}"
-  java -Djmcs.ui.scale=1.0 -cp ./target/oiexplorer-TRUNK-jar-with-dependencies.jar fr.jmmc.oiexplorer.OIFitsExplorer -png $PNG -mode=single -dims 1200,800 -open $OIXP
+  java -cp ./target/oiexplorer-TRUNK-jar-with-dependencies.jar fr.jmmc.oiexplorer.OIFitsExplorer -png $PNG -mode=single -dims 1200,800 -open $OIXP
 }
 
 OIFITS="${1}"

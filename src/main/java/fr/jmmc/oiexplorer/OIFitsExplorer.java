@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.App;
 import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
+import fr.jmmc.jmcs.data.preference.CommonPreferences;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
@@ -404,18 +405,22 @@ public final class OIFitsExplorer extends App {
         final String dims = argValues.get(ARG_DIMS);
 
         try {
-            boolean doLoad = false;
+            boolean doExportLater = false;
 
             if (pdfFile != null) {
-                doLoad = initializeExport(pdfFile, MimeType.PDF, mode, dims);
+                doExportLater = initializeExport(pdfFile, MimeType.PDF, mode, dims);
             }
             if (pngFile != null) {
-                doLoad = initializeExport(pngFile, MimeType.PNG, mode, dims);
+                doExportLater = initializeExport(pngFile, MimeType.PNG, mode, dims);
             }
             if (jpgFile != null) {
-                doLoad = initializeExport(jpgFile, MimeType.JPG, mode, dims);
+                doExportLater = initializeExport(jpgFile, MimeType.JPG, mode, dims);
             }
-            if (doLoad) {
+            if (doExportLater) {
+                // Force UI scale to 1.0 for exported plots:
+                // Note: it must be called early (before creating any Plot view):
+                CommonPreferences.getInstance().setSystemUiScale(1.0f);
+                
                 ExportUtils.loadDataAndWaitUntilExportDone();
             }
 
