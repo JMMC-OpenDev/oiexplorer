@@ -421,6 +421,8 @@ public final class OIFitsExplorer extends App {
                 // Note: it must be called early (before creating any Plot view):
                 CommonPreferences.getInstance().setSystemUiScale(1.0f);
                 
+                getMainPanel().prepareShellAction();
+                
                 ExportUtils.loadDataAndWaitUntilExportDone();
             }
 

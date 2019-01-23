@@ -63,7 +63,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
 
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
-    
+
     /* members */
     /** OIFitsCollectionManager singleton reference */
     private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
@@ -114,6 +114,17 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
                 plotView.dispose();
             }
         }
+    }
+
+    /**
+     * Disable event processing for GUI components that may interfere with shell actions (export...)
+     */
+    public void prepareShellAction() {
+        // Hack to unbind DataTreePanel when exporting plots (to avoid changing initial subset selection):
+        this.dataTreePanel.dispose();
+        // read-only but useless event processing:
+        this.granuleTreePanel.dispose();
+        this.oifitsFileListPanel.dispose();
     }
 
     /**
