@@ -25,7 +25,7 @@ function genOIXP(){
   cp export_templates/$OIXP_TMPL $OIXP
 
   # update fields
-  xmlstarlet ed -L -u "//file/name" -v "$(basename $OIFITS)" -u "//file/file" -v "$OIFITS" -u "//filter/targetUID" -v "$TargetUID" -u "//filter/insModeUID" -v "$InsModeUID" -u "//filter/nightId" -v "$NightId" $OIXP
+  xmlstarlet ed -L -u "//file/name" -v "$(basename $OIFITS)" -u "//file/file" -v "$OIFITS" -u "//filter/targetUID" -v "$TargetUID" -u "//filter/insModeUID" -v "$InsModeUID" -u "//filter/nightID" -v "$NightId" $OIXP
 }
 
 #

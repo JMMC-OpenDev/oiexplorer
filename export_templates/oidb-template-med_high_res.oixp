@@ -12,7 +12,7 @@
         <filter>
             <targetUID>[[targetUID]]</targetUID>
             <insModeUID>[[insModeUID]]</insModeUID>
-            <nightId>[[nightId]]</nightId>
+            <nightID>[[nightID]]</nightID>
         </filter>
     </subsetDefinition>
     <plotDefinition>
