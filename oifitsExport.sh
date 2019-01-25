@@ -12,6 +12,8 @@
 #
 # java -cp ./target/oiexplorer-TRUNK-jar-with-dependencies.jar fr.jmmc.oiexplorer.OIFitsExplorer -png test.png -mode=single -dims 1200,800 -open test.oixp 
 #
+# Extra flags: -Dtarget.matcher.name=true -Dinsmode.matcher.name=true -Dfix.bad.uid=true
+#
 #
 
 function genOIXP(){
