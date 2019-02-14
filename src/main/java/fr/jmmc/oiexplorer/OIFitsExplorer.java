@@ -8,6 +8,7 @@ import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.data.app.ApplicationDescription;
 import fr.jmmc.jmcs.data.preference.CommonPreferences;
+import fr.jmmc.jmcs.gui.PreferencesView;
 import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
@@ -23,6 +24,7 @@ import fr.jmmc.oiexplorer.core.export.DocumentOptions;
 import fr.jmmc.oiexplorer.core.export.ImageOptions;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
+import fr.jmmc.oiexplorer.gui.PreferencePanel;
 import fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
@@ -44,6 +46,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -152,7 +155,28 @@ public final class OIFitsExplorer extends App {
     protected void setupGui() throws RuntimeException {
         logger.debug("OifitsExplorerGui.setupGui() handler : enter");
         prepareFrame();
+
+        if (!Bootstrapper.isHeadless()) {
+            createPreferencesView();
+        }
+
         logger.debug("OifitsExplorerGui.setupGui() handler : exit");
+    }
+
+    /**
+     * Create the Preferences view
+     * @return Preferences view
+     */
+    public static PreferencesView createPreferencesView() {
+        // Retrieve application preferences and attach them to their view
+        // (This instance must be instanciated after dependencies)
+        final LinkedHashMap<String, JPanel> panels = new LinkedHashMap<String, JPanel>(2);
+        panels.put("General settings", new PreferencePanel());
+
+        final PreferencesView preferencesView = new PreferencesView(App.getFrame(), Preferences.getInstance(), panels);
+        preferencesView.init();
+
+        return preferencesView;
     }
 
     /**
@@ -310,9 +334,9 @@ public final class OIFitsExplorer extends App {
 
         new LoadOIDataCollectionAction();
         new SaveOIDataCollectionAction();
-        
+
         new ExportOIFitsAction();
-        
+
         // addExportListener actions:
         new OIFitsExplorerExportAction(MimeType.PDF);
         new OIFitsExplorerExportAction(MimeType.PNG);
@@ -420,9 +444,9 @@ public final class OIFitsExplorer extends App {
                 // Force UI scale to 1.0 for exported plots:
                 // Note: it must be called early (before creating any Plot view):
                 CommonPreferences.getInstance().setSystemUiScale(1.0f);
-                
+
                 getMainPanel().prepareShellAction();
-                
+
                 ExportUtils.loadDataAndWaitUntilExportDone();
             }
 
@@ -434,7 +458,7 @@ public final class OIFitsExplorer extends App {
     }
 
     private static boolean initializeExport(final String filePath, final MimeType mimeType,
-            final String mode, final String dims) throws IOException {
+                                            final String mode, final String dims) throws IOException {
 
         if (filePath != null) {
             final DocumentOptions options = DocumentOptions.createInstance(mimeType).setMode(mode);
