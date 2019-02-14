@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.5 beta 3"/>
-    <compilation date="21/01/2019" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.5 beta 4"/>
+    <compilation date="14/02/2019" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -165,6 +165,9 @@
     <releasenotes>
         <release version="0.2.5">
             <pubDate>Mon, 21 Jan 2019 12:00:00 GMT</pubDate>
+            <prerelease version="0.2.5 beta 4">
+                <change type="BUGFIX">Enhanced Draw Line support: use step line for plots having x-axis = EFF_WAVE (spectrum like)</change>
+            </prerelease>
             <prerelease version="0.2.5 beta 3">
                 <change type="BUGFIX">Fixed (random) bug while refreshing selected data points (cross hairs)</change>
             </prerelease>
