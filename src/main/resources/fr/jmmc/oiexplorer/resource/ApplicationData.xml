@@ -166,7 +166,7 @@
         <release version="0.2.5">
             <pubDate>Tue, 05 Mar 2019 12:00:00 GMT</pubDate>
             <prerelease version="0.2.5 beta 4">
-                <change type="BUGFIX">Enhanced Draw Line support: use step line for plots having x-axis = EFF_WAVE (spectrum like)</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/796">Enhanced Draw Line support: use step line for plots having x-axis = EFF_WAVE (spectrum like)</change>
             </prerelease>
             <prerelease version="0.2.5 beta 3">
                 <change type="BUGFIX">Fixed (random) bug while refreshing selected data points (cross hairs)</change>
