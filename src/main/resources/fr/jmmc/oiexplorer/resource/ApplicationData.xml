@@ -166,10 +166,10 @@
         <release version="0.2.5">
             <pubDate>Tue, 16 Apr 2019 14:00:00 GMT</pubDate>
             <prerelease version="0.2.5 beta 5">
-                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/990">Fixed Instrument matcher to specifically distinguish between GRAVITY polarizations</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/990">Fixed Instrument matcher to specifically distinguish between GRAVITY polarizations</change>
             </prerelease>
             <prerelease version="0.2.5 beta 4">
-                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/796">Enhanced Draw Line support: use step line for plots having x-axis = EFF_WAVE (spectrum like)</change>
+                <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/796">Enhanced Draw Line support: use step line for plots having x-axis = EFF_WAVE (spectrum like)</change>
             </prerelease>
             <prerelease version="0.2.5 beta 3">
                 <change type="BUGFIX">Fixed (random) bug while refreshing selected data points (cross hairs)</change>
