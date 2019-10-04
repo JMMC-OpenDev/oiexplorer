@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.5 beta 6"/>
-    <compilation date="20/09/2019" compiler="JDK 1.6.0_24"/>
+    <program name="OIFitsExplorer" version="0.2.5 beta 7"/>
+    <compilation date="04/10/2019" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -164,7 +164,10 @@
 
     <releasenotes>
         <release version="0.2.5">
-            <pubDate>Fri, 20 Sep 2019 17:00:00 GMT</pubDate>
+            <pubDate>Fri, 04 Oct 2019 11:00:00 GMT</pubDate>
+            <prerelease version="0.2.5 beta 7">
+                <change type="FEATURE">Improved plot editor to quickly switch between viewports (Auto, Default, Fixed modes)</change>
+            </prerelease>
             <prerelease version="0.2.5 beta 6">
                 <change type="FEATURE" url="http://trac.jmmc.fr/jmmc-sw/ticket/896">Improved plot editor to get the plot ranges and better handle fixed ranges</change>
                 <change type="FEATURE">Improved plot editor to preserve recent values in a popup menu for the min/max fields (range mode)</change>
