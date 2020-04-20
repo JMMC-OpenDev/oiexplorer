@@ -89,26 +89,26 @@ public final class LoadOIFitsAction extends RegisteredAction {
             OIFitsCollectionManager.getInstance().loadOIFitsFiles(files, checker,
                     new LoadOIFitsListener() {
 
-                        @Override
-                        public void propertyChange(final PropertyChangeEvent pce) {
-                            if ("progress".equals(pce.getPropertyName())) {
-                                progressBar.setValue((Integer) pce.getNewValue());
-                            }
-                        }
+                @Override
+                public void propertyChange(final PropertyChangeEvent pce) {
+                    if ("progress".equals(pce.getPropertyName())) {
+                        progressBar.setValue((Integer) pce.getNewValue());
+                    }
+                }
 
-                        @Override
-                        public void done(final boolean cancelled) {
-                            StatusBar.removeCustomPanel(progressPanel);
+                @Override
+                public void done(final boolean cancelled) {
+                    StatusBar.removeCustomPanel(progressPanel);
 
-                            // display validation messages anyway:
-                            final String checkReport = checker.getCheckReport();
-                            logger.info("validation results:\n{}", checkReport);
+                    // display validation messages anyway:
+                    final String checkReport = checker.getCheckReport();
+                    logger.info("validation results:\n{}", checkReport);
 
-                            if (!cancelled) {
-                                MessagePane.showMessage(checkReport);
-                            }
-                        }
-                    });
+                    if (!cancelled) {
+                        MessagePane.showMessage(checkReport);
+                    }
+                }
+            });
         }
     }
 
@@ -116,10 +116,10 @@ public final class LoadOIFitsAction extends RegisteredAction {
         return OIFitsExplorer.createProgressPanel("loading OIFits files ...", progressBar,
                 new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        OIFitsCollectionManager.cancelTaskLoadOIFits();
-                    }
-                });
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                OIFitsCollectionManager.cancelTaskLoadOIFits();
+            }
+        });
     }
 }
