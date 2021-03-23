@@ -185,43 +185,37 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             for (int i = 0; i < tabCount; i++) {
                 final Component com = tabbedPaneTop.getComponentAt(i);
                 if (com instanceof PlotView) {
-                    final PlotView plotView = (PlotView) com;
+                    final PlotView view = (PlotView) com;
 
-                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+                    final PlotChartPanel plotChartPanel = view.getPlotPanel();
 
                     if (plotChartPanel.canExportPlotFile()) {
                         numberOfPages++;
 
                         // warning: use pageIndex = 1 (unused) but may change in future !
-                        this.pages.add(
-                                new DocumentPage(plotChartPanel.preparePage(1))
-                        );
+                        this.pages.add(new DocumentPage(plotChartPanel.preparePage(1)));
                     }
                 } else if (com instanceof GlobalView) {
-                    final GlobalView globalView = (GlobalView) com;
+                    final GlobalView view = (GlobalView) com;
                     numberOfPages++;
 
                     // warning: use pageIndex = 1 (unused) but may change in future !
-                    this.pages.add(
-                            new DocumentPage(globalView.preparePage(1))
-                    );
+                    this.pages.add(new DocumentPage(view.preparePage(1)));
                 }
             }
         } else if (DocumentMode.DEFAULT == options.getMode()) {
             for (int i = 0; i < tabCount; i++) {
                 final Component com = tabbedPaneTop.getComponentAt(i);
                 if (com instanceof PlotView) {
-                    final PlotView plotView = (PlotView) com;
+                    final PlotView view = (PlotView) com;
 
-                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+                    final PlotChartPanel plotChartPanel = view.getPlotPanel();
 
                     if (plotChartPanel.canExportPlotFile()) {
                         numberOfPages++;
 
                         // warning: use pageIndex = 1 (unused) but may change in future !
-                        this.pages.add(
-                                new DocumentPage(plotChartPanel.preparePage(1))
-                        );
+                        this.pages.add(new DocumentPage(plotChartPanel.preparePage(1)));
                     }
                 }
             }
@@ -233,9 +227,9 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             for (int i = 0; i < tabCount; i++) {
                 final Component com = tabbedPaneTop.getComponentAt(i);
                 if (com instanceof PlotView) {
-                    final PlotView plotView = (PlotView) com;
+                    final PlotView view = (PlotView) com;
 
-                    final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+                    final PlotChartPanel plotChartPanel = view.getPlotPanel();
 
                     if (plotChartPanel.canExportPlotFile()) {
                         chartList.add(plotChartPanel.getChart());
@@ -244,9 +238,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             }
 
             // put all charts in one page:
-            this.pages.add(
-                    new DocumentPage(chartList.toArray(new Drawable[chartList.size()]))
-            );
+            this.pages.add(new DocumentPage(chartList.toArray(new Drawable[chartList.size()])));
 
         } else {
             logger.info("unsupported DocumentMode: {}", options.getMode());
@@ -469,9 +461,9 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * Add the given panel or one new if null given.
      *
      * @param panel Panel to add (PlotView instance)
-     * @param panelName name of panel to be added
+     * @param tabName name of panel to be added
      */
-    private void addView(final JPanel panel, final String panelName) {
+    public void addView(final JPanel panel, final String tabName) {
         JPanel panelToAdd = panel;
 
         if (panelToAdd == null) {
@@ -481,8 +473,8 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         }
 
         final String name;
-        if ((panelName != null) && (panelName.length() > 0)) {
-            name = panelName;
+        if ((tabName != null) && (tabName.length() > 0)) {
+            name = tabName;
         } else {
             name = panelToAdd.getClass().getSimpleName();
         }
@@ -502,6 +494,19 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
         logger.debug("Added '{}' panel to PreferenceView tabbed pane.", name);
 
         updateOverviewTab();
+    }
+
+    public boolean hasView(final String tabName) {
+        return (findView(tabbedPaneTop, tabName) != -1);
+    }
+
+    public void setSelectedView(final String tabName) {
+        logger.debug("setSelectedView: {}", tabName);
+
+        final int idx = findView(tabbedPaneTop, tabName);
+        if (idx != -1) {
+            this.tabbedPaneTop.setSelectedIndex(idx);
+        }
     }
 
     /**
@@ -588,6 +593,8 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final String plotId = getSelectedPlotId();
             if (plotId != null) {
                 ocm.removePlot(plotId);
+            } else {
+                removeView(index);
             }
         }
     }
@@ -612,7 +619,6 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             // free resources (unregister event notifiers):
             plotView.dispose();
         }
-
         tabbedPaneTop.removeTabAt(index);
 
         updateOverviewTab();
@@ -630,7 +636,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
      * Find the plot view given its plot identifier
      * @param tabbedPane tabbed pane
      * @param plotId plot identifier
-     * @return PlotView instance or null if not found
+     * @return view index or -1 if not found
      */
     private static int findPlotView(final JTabbedPane tabbedPane, final String plotId) {
         Component com;
@@ -641,6 +647,22 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
                 if (plotId.equals(plotView.getPlotId())) {
                     return i;
                 }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Find the view given its name
+     * @param tabbedPane tabbed pane
+     * @param tabName name of the tabbed pane
+     * @return view index or -1 if not found
+     */
+    private static int findView(final JTabbedPane tabbedPane, final String tabName) {
+        for (int i = 0, tabCount = tabbedPane.getTabCount(); i < tabCount; i++) {
+            final String name = tabbedPane.getTitleAt(i);
+            if (tabName.equalsIgnoreCase(name)) {
+                return i;
             }
         }
         return -1;

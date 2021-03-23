@@ -6,6 +6,8 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.core.gui.OIFitsTableBrowser;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
@@ -19,6 +21,7 @@ import fr.jmmc.oitools.model.OIFitsFile;
 import fr.jmmc.oitools.model.OITable;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -93,17 +96,58 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jScrollPaneFileList = new javax.swing.JScrollPane();
         oifitsFileList = createOIFitsFileList();
+        jToolBarActions = new javax.swing.JToolBar();
+        jButtonBrowser = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setViewportView(oifitsFileList);
+        jScrollPaneFileList.setViewportView(oifitsFileList);
 
-        add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        add(jScrollPaneFileList, java.awt.BorderLayout.CENTER);
+
+        jToolBarActions.setRollover(true);
+
+        jButtonBrowser.setText("Browser");
+        jButtonBrowser.setToolTipText("Open FITS table browser on the selected oifits file");
+        jButtonBrowser.setFocusable(false);
+        jButtonBrowser.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonBrowser.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonBrowser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonBrowserActionPerformed(evt);
+            }
+        });
+        jToolBarActions.add(jButtonBrowser);
+
+        add(jToolBarActions, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonBrowserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBrowserActionPerformed
+        final OIFitsFile oiFitsFile = (OIFitsFile) this.oifitsFileList.getSelectedValue();
+
+        if (oiFitsFile != null) {
+            final String oiFitsFileName = oiFitsFile.getFileName();
+
+            final MainPanel mainPanel = OIFitsExplorer.getInstance().getMainPanel();
+
+            if (!mainPanel.hasView(oiFitsFileName)) {
+                final WeakReference<OIFitsFile> oiFitsFileRef = new WeakReference<OIFitsFile>(oiFitsFile);
+
+                final OIFitsTableBrowser fb = new OIFitsTableBrowser();
+                fb.setOiFitsFileRef(oiFitsFileRef);
+                
+                mainPanel.addView(fb, oiFitsFileName);
+            }
+            mainPanel.setSelectedView(oiFitsFileName);
+        }
+    }//GEN-LAST:event_jButtonBrowserActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton jButtonBrowser;
+    private javax.swing.JScrollPane jScrollPaneFileList;
+    private javax.swing.JToolBar jToolBarActions;
     private javax.swing.JList oifitsFileList;
     // End of variables declaration//GEN-END:variables
 
