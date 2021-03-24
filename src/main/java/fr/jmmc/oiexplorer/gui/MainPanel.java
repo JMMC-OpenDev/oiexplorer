@@ -12,6 +12,7 @@ import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
+import fr.jmmc.jmcs.gui.component.Disposable;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.export.DocumentExportable;
 import fr.jmmc.oiexplorer.core.export.DocumentMode;
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class MainPanel extends javax.swing.JPanel implements DocumentExportable, OIFitsCollectionManagerEventListener {
+public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener, DocumentExportable {
 
     /**
      * default serial UID for Serializable interface
@@ -488,6 +489,7 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final PlotView plotView = (PlotView) panelToAdd;
 
             final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+            // update global view:
             this.globalView.addChart(plotChartPanel.getChart(), plotChartPanel.getCrosshairOverlay());
         }
 
@@ -614,10 +616,16 @@ public class MainPanel extends javax.swing.JPanel implements DocumentExportable,
             final PlotView plotView = (PlotView) com;
 
             final PlotChartPanel plotChartPanel = plotView.getPlotPanel();
+            // update global view:
             this.globalView.removeChart(plotChartPanel.getChart());
 
             // free resources (unregister event notifiers):
             plotView.dispose();
+        } else if (com instanceof Disposable) {
+            final Disposable d = (Disposable) com;
+
+            // free resources (unregister event notifiers):
+            d.dispose();
         }
         tabbedPaneTop.removeTabAt(index);
 
