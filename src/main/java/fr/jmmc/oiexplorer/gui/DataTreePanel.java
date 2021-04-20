@@ -513,7 +513,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     sb.append(' ').append(oiData.getInsName());
                     return sb.toString();
                 }
-                return table.toString();
+                return (table != null) ? table.toString() : "UNDEFINED";
             }
         };
     }
@@ -545,10 +545,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             sb.setLength(0);
 
             if (value instanceof Target) {
-                final Target t = (Target) value;
-                sb.append("<b>name:</b> ").append(t.getTarget());
+                final Target target = (Target) value;
+                sb.append("<b>name:</b> ").append(target.getTarget());
 
-                final List<String> aliases = getTargetManager().getSortedUniqueAliases(t);
+                final List<String> aliases = getTargetManager().getSortedUniqueAliases(target);
                 if (aliases != null) {
                     sb.append("<hr>");
                     sb.append("<b>Aliases:</b><br>");
@@ -563,28 +563,28 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     sb.append("<br>");
                 }
                 sb.append("<b>Coords:</b> ");
-                ALX.toHMS(sb, t.getRaEp0());
+                ALX.toHMS(sb, target.getRaEp0());
                 sb.append(' ');
-                ALX.toDMS(sb, t.getDecEp0());
+                ALX.toDMS(sb, target.getDecEp0());
 
                 // TODO: check units
-                if (!Double.isNaN(t.getPmRa()) && !Double.isNaN(t.getPmDec())) {
+                if (!Double.isNaN(target.getPmRa()) && !Double.isNaN(target.getPmDec())) {
                     // convert deg/year in mas/year :
-                    sb.append("<br><b>Proper motion</b> (mas/yr): ").append(t.getPmRa() * ALX.DEG_IN_MILLI_ARCSEC)
-                            .append(' ').append(t.getPmDec() * ALX.DEG_IN_MILLI_ARCSEC);
+                    sb.append("<br><b>Proper motion</b> (mas/yr): ").append(target.getPmRa() * ALX.DEG_IN_MILLI_ARCSEC)
+                            .append(' ').append(target.getPmDec() * ALX.DEG_IN_MILLI_ARCSEC);
                 }
-                if (!Double.isNaN(t.getParallax()) && !Double.isNaN(t.getParaErr())) {
-                    sb.append("<br><b>Parallax</b> (mas): ").append(t.getParallax() * ALX.DEG_IN_MILLI_ARCSEC)
-                            .append(" [").append(t.getParaErr() * ALX.DEG_IN_MILLI_ARCSEC).append(']');
+                if (!Double.isNaN(target.getParallax()) && !Double.isNaN(target.getParaErr())) {
+                    sb.append("<br><b>Parallax</b> (mas): ").append(target.getParallax() * ALX.DEG_IN_MILLI_ARCSEC)
+                            .append(" [").append(target.getParaErr() * ALX.DEG_IN_MILLI_ARCSEC).append(']');
                 }
-                if (t.getSpecTyp() != null && !t.getSpecTyp().isEmpty()) {
-                    sb.append("<br><b>Spectral types</b>: ").append(t.getSpecTyp());
+                if (target.getSpecTyp() != null && !target.getSpecTyp().isEmpty()) {
+                    sb.append("<br><b>Spectral types</b>: ").append(target.getSpecTyp());
                 }
             } else if (value instanceof InstrumentMode) {
-                final InstrumentMode i = (InstrumentMode) value;
-                sb.append("<b>name:</b> ").append(i.getInsName());
+                final InstrumentMode insMode = (InstrumentMode) value;
+                sb.append("<b>name:</b> ").append(insMode.getInsName());
 
-                final List<String> aliases = getInstrumentModeManager().getSortedUniqueAliases(i);
+                final List<String> aliases = getInstrumentModeManager().getSortedUniqueAliases(insMode);
                 if (aliases != null) {
                     sb.append("<hr>");
                     sb.append("<b>Aliases:</b><br>");
@@ -598,10 +598,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 } else {
                     sb.append("<br>");
                 }
-                sb.append("<b>Nb channels:</b> ").append(i.getNbChannels());
-                sb.append("<br><b>Lambda min:</b> ").append(i.getLambdaMin());
-                sb.append("<br><b>Lambda max:</b> ").append(i.getLambdaMax());
-                sb.append("<br><b>Resolution:</b> ").append(i.getResPower());
+                sb.append("<b>Nb channels:</b> ").append(insMode.getNbChannels());
+                sb.append("<br><b>Lambda min:</b> ").append(insMode.getLambdaMin());
+                sb.append("<br><b>Lambda max:</b> ").append(insMode.getLambdaMax());
+                sb.append("<br><b>Resolution:</b> ").append(insMode.getResPower());
             } else if (value instanceof OIData) {
                 final OIData oiData = (OIData) value;
                 sb.append("<b>Table:</b> ").append(oiData.getExtName()).append('#').append(oiData.getExtNb());
@@ -611,6 +611,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 sb.append("<br><b>INSNAME:</b> ").append(oiData.getInsName());
                 sb.append("<br><b>NB_MEASUREMENTS:</b> ").append(oiData.getNbMeasurements());
 
+                sb.append("<br><b>Baselines:</b> ");
+                for (short[] staIndex : oiData.getDistinctStaIndex()) {
+                    sb.append(oiData.getStaNames(staIndex)).append(' '); // cached
+                }
                 sb.append("<br><b>Configurations:</b> ");
                 for (short[] staConf : oiData.getDistinctStaConf()) {
                     sb.append(oiData.getStaNames(staConf)).append(' '); // cached
