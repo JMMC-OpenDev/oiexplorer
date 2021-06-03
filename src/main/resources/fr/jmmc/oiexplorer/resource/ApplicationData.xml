@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.2.6 beta 4"/>
+    <program name="OIFitsExplorer" version="0.2.6"/>
     <compilation date="03/06/2021" compiler="JDK 1.6.0_24"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
@@ -164,7 +164,7 @@
 
     <releasenotes>
         <release version="0.2.6">
-            <pubDate>Thu, 03 Jun 2021 18:00:00 GMT</pubDate>
+            <pubDate>Thu, 03 Jun 2021 20:00:00 GMT</pubDate>
             <prerelease version="0.2.6 beta 4">
                 <change type="FEATURE">Added a new Preference 'Max target separation' (1 as by default) to set the crossmatch distance used to consider two targets are the same in the OIFITS collection</change>
             </prerelease>
@@ -172,7 +172,7 @@
                 <change type="BUGFIX">OITools updates</change>
             </prerelease>
             <prerelease version="0.2.6 beta 2">
-                <change type="FEATURE">Switched to the new OIFitsTableBrowser to display / browse OIFITS tables</change>
+                <change type="FEATURE">Switched to the new OIFitsTableBrowser to display, browse OIFITS tables (selected data point on the plot is highlighted)</change>
             </prerelease>
             <prerelease version="0.2.6 beta 1">
                 <change type="FEATURE">Added more plot presets (errors, SNR ...)</change>
