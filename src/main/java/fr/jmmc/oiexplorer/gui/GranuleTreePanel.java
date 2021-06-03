@@ -398,6 +398,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         jScrollPaneTable = new javax.swing.JScrollPane();
         jTableCols = new javax.swing.JTable();
         jLabelStats = new javax.swing.JLabel();
+        jPanelButtons = new javax.swing.JPanel();
         jToggleButtonExpandTree = new javax.swing.JToggleButton();
         jToggleButtonCollapseTree = new javax.swing.JToggleButton();
 
@@ -443,8 +444,6 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
         jPanelTable.setPreferredSize(new java.awt.Dimension(452, 12));
         jPanelTable.setLayout(new java.awt.BorderLayout());
-
-        jScrollPaneTable.setPreferredSize(null);
 
         jTableCols.setAutoCreateRowSorter(true);
         jTableCols.setModel(new javax.swing.table.DefaultTableModel(
@@ -496,11 +495,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 jToggleButtonExpandTreeActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        add(jToggleButtonExpandTree, gridBagConstraints);
+        jPanelButtons.add(jToggleButtonExpandTree);
 
         jToggleButtonCollapseTree.setText("Collapse");
         jToggleButtonCollapseTree.addActionListener(new java.awt.event.ActionListener() {
@@ -508,11 +503,14 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 jToggleButtonCollapseTreeActionPerformed(evt);
             }
         });
+        jPanelButtons.add(jToggleButtonCollapseTree);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(jToggleButtonCollapseTree, gridBagConstraints);
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        add(jPanelButtons, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jRadioButtonFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonFileActionPerformed
@@ -542,6 +540,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel genericTreePanel;
     private javax.swing.JLabel jLabelStats;
+    private javax.swing.JPanel jPanelButtons;
     private javax.swing.JPanel jPanelTable;
     private javax.swing.JRadioButton jRadioButtonFile;
     private javax.swing.JRadioButton jRadioButtonOITable;
