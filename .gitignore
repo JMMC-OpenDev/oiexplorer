@@ -1,0 +1,5 @@
+/target/
+/fest-screenshots/
+/failed-gui-tests/
+/nbactions.xml
+/nb-configuration.xml
