@@ -4,9 +4,7 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.data.preference.PreferencesException;
-import fr.jmmc.jmcs.gui.component.ComponentResizeAdapter;
 import fr.jmmc.oiexplorer.Preferences;
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
@@ -69,9 +67,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
                 }
             }
         });
-        final Dimension dim = new Dimension(500, 300);
-        setMinimumSize(dim);
-        addComponentListener(new ComponentResizeAdapter(dim));
     }
 
     /**
