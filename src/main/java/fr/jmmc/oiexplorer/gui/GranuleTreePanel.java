@@ -6,6 +6,7 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.jmal.ALX;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oitools.model.InstrumentModeManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
@@ -43,7 +44,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

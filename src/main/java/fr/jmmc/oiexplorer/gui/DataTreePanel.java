@@ -7,6 +7,7 @@ import fr.jmmc.jmal.ALX;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
+import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
@@ -37,7 +38,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
