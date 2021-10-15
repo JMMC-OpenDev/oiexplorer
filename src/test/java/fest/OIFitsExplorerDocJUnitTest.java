@@ -9,6 +9,8 @@ import fest.common.JmcsFestSwingJUnitTestCase;
 import fr.jmmc.jmcs.Bootstrapper;
 import fr.jmmc.jmcs.data.preference.CommonPreferences;
 import fr.jmmc.jmcs.data.preference.PreferencesException;
+import fr.jmmc.jmcs.data.preference.SessionSettingsPreferences;
+import fr.jmmc.oiexplorer.Preferences;
 import static java.awt.event.KeyEvent.*;
 import java.awt.image.BufferedImage;
 import org.fest.swing.annotation.GUITest;
@@ -51,14 +53,12 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
      */
     @BeforeClass
     public static void intializeAndStartApplication() {
-        // Hack to reset LAF & ui scale:
-        CommonPreferences.getInstance().resetToDefaultPreferences();
-
         // invoke Bootstrapper method to initialize logback now:
         Bootstrapper.getState();
 
         // reset Preferences:
-//        Preferences.getInstance().resetToDefaultPreferences();
+        Preferences.getInstance().resetToDefaultPreferences();
+        SessionSettingsPreferences.getInstance().resetToDefaultPreferences();
         try {
             CommonPreferences.getInstance().setPreference(CommonPreferences.SHOW_STARTUP_SPLASHSCREEN, false);
         } catch (PreferencesException pe) {
