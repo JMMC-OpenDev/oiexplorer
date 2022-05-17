@@ -34,6 +34,7 @@ import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
+import fr.jmmc.oiexplorer.gui.action.RemoveAction;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -346,6 +347,8 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIFitsAction.className, LoadOIFitsAction.actionName)).setHideActionText(true);
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIDataCollectionAction.className, LoadOIDataCollectionAction.actionName)).setHideActionText(true);
         toolBar.add(OIFitsExplorerExportAction.getInstance(MimeType.PDF)).setHideActionText(true);
+        toolBar.add(ActionRegistrar.getInstance().get(
+                RemoveAction.className, RemoveAction.ACTION_CURRENT_SUBSET_DEF)).setHideActionText(true);
     }
 
     /**

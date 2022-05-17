@@ -32,6 +32,7 @@ import fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction;
+import fr.jmmc.oiexplorer.gui.action.RemoveAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
 import fr.jmmc.oiexplorer.interop.SendOIFitsAction;
 import fr.jmmc.oitools.model.DataModel;
@@ -333,6 +334,8 @@ public final class OIFitsExplorer extends App {
         new OIFitsExplorerExportAllAction(MimeType.PDF);
         new OIFitsExplorerExportAllAction(MimeType.PNG);
         new OIFitsExplorerExportAllAction(MimeType.JPG);
+
+        new RemoveAction(RemoveAction.ACTION_CURRENT_SUBSET_DEF);
 
         // Edit menu :
         // Interop menu :
