@@ -6,6 +6,7 @@ This module contains the OIFits Explorer java application developed by the JMMC 
 
 
 See [OIFits Explorer](https://www.jmmc.fr/oifitsexplorer)
+See [JMMC releases](https://www.jmmc.fr/releases/)
 See [JMMC OpenDev @ github](https://github.com/JMMC-OpenDev/)
 
 See [CI nightly builds](https://github.com/JMMC-OpenDev/jmmc-java-build/actions/workflows/build.yml)
