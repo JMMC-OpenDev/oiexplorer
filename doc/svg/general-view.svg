@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="25cm" height="17cm" viewBox="147 -41 494 327" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs/>
+  <g id="Background">
+    <rect style="fill: #e8e8e8; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="148.456" y="-39.3264" width="491" height="324" rx="0" ry="0"/>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="393.956" y="122.674">
+      <tspan x="393.956" y="122.674"></tspan>
+    </text>
+    <text font-size="14.6756" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="336.6" y="-16.6397">
+      <tspan x="336.6" y="-16.6397">OIFits Explorer</tspan>
+    </text>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="317.274" y="-1.26799" width="308.442" height="272.2" rx="0" ry="0"/>
+    <text font-size="14.6756" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="439.494" y="138.381">
+      <tspan x="439.494" y="138.381">View Panel</tspan>
+    </text>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="156.884" y="0.274216" width="151.137" height="137.257" rx="0" ry="0"/>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="158.427" y="149.097" width="148.052" height="122.606" rx="0" ry="0"/>
+    <text font-size="14.6756" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="164.323" y="73.2778">
+      <tspan x="164.323" y="73.2778">Granule Tree Panel</tspan>
+    </text>
+    <text font-size="14.6756" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="178.405" y="213.396">
+      <tspan x="178.405" y="213.396">Data Tree Panel</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="236" y="67">
+      <tspan x="236" y="67"></tspan>
+    </text>
+  </g>
+</svg>
