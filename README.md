@@ -12,6 +12,11 @@ See [JMMC OpenDev @ github](https://github.com/JMMC-OpenDev/)
 See [CI nightly builds](https://github.com/JMMC-OpenDev/jmmc-java-build/actions/workflows/build.yml)
 
 
+## Issues / Board
+
+See the [OIFitsExplorer Board](https://github.com/orgs/JMMC-OpenDev/projects/4) to see issues & activity.
+
+
 ## Documentation
 
 This module contains the source code of the JMMC OIFits Explorer Graphical interface.
