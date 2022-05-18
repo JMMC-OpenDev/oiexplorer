@@ -6,7 +6,11 @@ package fr.jmmc.oiexplorer.gui.action;
 
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.MessagePane;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.gui.OIFitsFileListPanel;
+import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +54,47 @@ public class RemoveAction extends RegisteredAction {
      */
     @Override
     public void actionPerformed(final ActionEvent evt) {
-        MessagePane.showMessage(action);
+        if (action == null) {
+            LOGGER.error("action is null.");
+            return;
+        }
+
+        switch (action) {
+            case ACTION_CURRENT_SUBSET_DEF:
+                actionCurrentSubsetDefinition();
+                break;
+            default:
+                LOGGER.error("unknown action.");
+                break;
+        }
+    }
+
+    private void actionCurrentSubsetDefinition() {
+        OIFitsFileListPanel oiFitsFileListPanel = OIFitsExplorer.getInstance().getMainPanel().getOIFitsFileListPanel();
+
+        List<OIFitsFile> selecteds = oiFitsFileListPanel.getSelectedOIFitsFiles();
+
+        if (selecteds.isEmpty()) {
+            MessagePane.showMessage("There is no file to delete.");
+        } else {
+
+            StringBuilder message = new StringBuilder(selecteds.size() * 200);
+
+            message.append("Do you confirm to remove the following OIFits file(s):\n");
+            for (OIFitsFile file : selecteds) {
+                message.append("\n").append(file.getFileName()).append("\n(");
+                message.append(file.getAcceptedTargetIds().length).append(" target(s), ");
+                message.append(file.getNbOiVis()).append(" OI_VIS, ");
+                message.append(file.getNbOiVis2()).append(" OI_VIS2, ");
+                message.append(file.getNbOiT3()).append(" OI_T3)\n");
+            }
+
+            final boolean confirm = MessagePane.showConfirmMessage(message.toString());
+
+            if (confirm) {
+                oiFitsFileListPanel.removeSelectedOIFitsFiles();
+            }
+        }
     }
 
 }

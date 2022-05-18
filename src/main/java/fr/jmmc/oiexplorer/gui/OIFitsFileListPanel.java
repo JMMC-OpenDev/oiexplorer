@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.ListIterator;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -366,5 +367,35 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         };
 
         return list;
+    }
+
+    /** Returns the list of selected Values. which is equivalent to the files concerned by the current subset definition.
+     *
+     * @return the list of selected values.
+     */
+    public List<OIFitsFile> getSelectedOIFitsFiles() {
+        return this.oifitsFileList.getSelectedValuesList();
+    }
+
+    /**
+     * Removes from collection all OIFitsFiles that are concerned by the current SubsetDefinition.
+     * This list of files is exactly the current selection of this.oifitsFileList.
+     * @return the list of removed files, without the (potential) null failure values.
+     */
+    public List<OIFitsFile> removeSelectedOIFitsFiles() {
+        List<OIFitsFile> filesToRemove = this.oifitsFileList.getSelectedValuesList();
+
+        List<OIFitsFile> filesRemoved = ocm.removeListOIFitsFile(filesToRemove);
+
+        // remove nulls
+        ListIterator<OIFitsFile> iterator = filesRemoved.listIterator();
+        while (iterator.hasNext()) {
+            if (iterator.next() == null) {
+                iterator.remove();
+                logger.error("Attempted to remove a file from SubsetDefinition and failed.");
+            }
+        }
+
+        return filesRemoved;
     }
 }
