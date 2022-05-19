@@ -152,9 +152,9 @@
             <menu label="Export all plots to JPG" classpath="fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction" action="exportJPG"
                   description="Export all plots to JPG images"/>
             <menu/> <!-- menu separator -->
-            <menu label="Remove selected OIFits file(s)" classpath="fr.jmmc.oiexplorer.gui.action.RemoveAction"
-                  action="currentSubsetDefinition" icon="fr/jmmc/jmcs/resource/image/x-mark.png"
-                  accelerator="DELETE" description="Remove OIFits files belonging to the current SubsetDefinition" />
+            <menu label="Remove" classpath="fr.jmmc.oiexplorer.gui.action.RemoveAction"
+                  action="remove" icon="fr/jmmc/jmcs/resource/image/x-mark.png"
+                  accelerator="DELETE" description="Remove" />
         </menu>
 
         <menu label="Edit">

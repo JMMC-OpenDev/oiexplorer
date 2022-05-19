@@ -4,6 +4,7 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
@@ -22,6 +23,7 @@ import fr.jmmc.oitools.model.OITable;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import javax.swing.DefaultListCellRenderer;
@@ -369,33 +371,48 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         return list;
     }
 
-    /** Returns the list of selected Values. which is equivalent to the files concerned by the current subset definition.
-     *
-     * @return the list of selected values.
-     */
-    public List<OIFitsFile> getSelectedOIFitsFiles() {
-        return this.oifitsFileList.getSelectedValuesList();
-    }
-
     /**
      * Removes from collection all OIFitsFiles that are concerned by the current SubsetDefinition.
      * This list of files is exactly the current selection of this.oifitsFileList.
-     * @return the list of removed files, without the (potential) null failure values.
+     * Displays a confirm dialog to the user to list him concerned files and some info.
+     * @return the list of effectively removed files.
      */
     public List<OIFitsFile> removeSelectedOIFitsFiles() {
         List<OIFitsFile> filesToRemove = this.oifitsFileList.getSelectedValuesList();
+        List<OIFitsFile> removedFiles = null;
 
-        List<OIFitsFile> filesRemoved = ocm.removeListOIFitsFile(filesToRemove);
+        if (filesToRemove.isEmpty()) {
+            MessagePane.showMessage("There is no file to delete.");
+        } else {
 
-        // remove nulls
-        ListIterator<OIFitsFile> iterator = filesRemoved.listIterator();
-        while (iterator.hasNext()) {
-            if (iterator.next() == null) {
-                iterator.remove();
-                logger.error("Attempted to remove a file from SubsetDefinition and failed.");
+            StringBuilder message = new StringBuilder(filesToRemove.size() * 200);
+
+            message.append("Do you confirm to remove the following OIFits file(s):\n");
+            for (OIFitsFile file : filesToRemove) {
+                message.append("\n").append(file.getFileName()).append("\n");
+                message.append(file.getOiTarget().getTarget().length).append(" target(s):");
+                for (String targetName : file.getOiTarget().getTarget()) {
+                    message.append(" ").append(targetName);
+                }
+                message.append(".\n");
+                message.append(file.getNbOiVis()).append(" OI_VIS, ");
+                message.append(file.getNbOiVis2()).append(" OI_VIS2, ");
+                message.append(file.getNbOiT3()).append(" OI_T3.\n");
+            }
+
+            final boolean confirm = MessagePane.showConfirmMessage(message.toString());
+
+            if (confirm) {
+                removedFiles = ocm.removeOIFitsFileList(filesToRemove);
+                if (removedFiles.size() != filesToRemove.size()) {
+                    logger.error("Some files were not deleted.");
+                }
             }
         }
 
-        return filesRemoved;
+        if (removedFiles == null) {
+            removedFiles = new ArrayList<>(0);
+        }
+        return removedFiles;
     }
 }

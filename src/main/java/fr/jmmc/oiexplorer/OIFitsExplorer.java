@@ -335,7 +335,7 @@ public final class OIFitsExplorer extends App {
         new OIFitsExplorerExportAllAction(MimeType.PNG);
         new OIFitsExplorerExportAllAction(MimeType.JPG);
 
-        new RemoveAction(RemoveAction.ACTION_CURRENT_SUBSET_DEF);
+        new RemoveAction();
 
         // Edit menu :
         // Interop menu :

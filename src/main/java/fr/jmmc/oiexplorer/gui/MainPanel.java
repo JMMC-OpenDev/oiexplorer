@@ -348,7 +348,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIDataCollectionAction.className, LoadOIDataCollectionAction.actionName)).setHideActionText(true);
         toolBar.add(OIFitsExplorerExportAction.getInstance(MimeType.PDF)).setHideActionText(true);
         toolBar.add(ActionRegistrar.getInstance().get(
-                RemoveAction.className, RemoveAction.ACTION_CURRENT_SUBSET_DEF)).setHideActionText(true);
+                RemoveAction.className, RemoveAction.actionName)).setHideActionText(true);
     }
 
     /**
