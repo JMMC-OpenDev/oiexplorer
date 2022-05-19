@@ -7,7 +7,6 @@ import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
-import static fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction.loadOIFitsCollectionFromFile;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public final class LoadOIFitsFromCollectionAction extends RegisteredAction {
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {
-            loadOIFitsCollectionFromFile(file, ocm, true);
+            LoadOIDataCollectionAction.loadOIFitsCollectionFromFile(file, ocm, true);
         }
     }
 }

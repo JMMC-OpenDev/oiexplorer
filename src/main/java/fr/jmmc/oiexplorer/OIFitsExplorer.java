@@ -29,7 +29,6 @@ import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.PreferencePanel;
 import fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
-import static fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction.loadOIFitsCollectionFromFile;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
@@ -437,7 +436,7 @@ public final class OIFitsExplorer extends App {
                             @Override
                             public void run() {
                                 App.showFrameToFront();
-                                loadOIFitsCollectionFromFile(oixpFile, ocm, true);
+                                LoadOIDataCollectionAction.loadOIFitsCollectionFromFile(oixpFile, ocm, true);
                            }
                         });
                             
