@@ -1,12 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 /*******************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
-
 package fest;
 
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -21,6 +15,10 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestRemoveAction extends OIExplorerFestBase {
 
+    private static final String GAMMA2_VELORUM_FILENAME
+                                = "PRODUCT_Gamma2_Velorum_2.02-2.09micron_2007-03-31T01_39_00.5372.fits";
+    private static final String GAM_VIC_FILENAME = "2008-Contest_Binary.fits";
+
     private final OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
     /**
@@ -29,11 +27,13 @@ public class TestRemoveAction extends OIExplorerFestBase {
     @Test
     @GUITest
     public void m1_addOneFileRemoveIt() {
+        newCollection(); // reset app
 
         addOIFitsFile(RESOURCE_TEST_FOLDER, GAMMA2_VELORUM_FILENAME);
+
         remove();
 
-        pauseShort();
+        // saveScreenshot(window, "OIXP-addOneFile-remove.png");
         // assert that there is no files remaining in OIFitsCollection
         Assert.assertEquals(0, OCM.getOIFitsCollection().getOIFitsFiles().size());
         // assert that there is no files remaining in OIDataCollection
@@ -48,23 +48,29 @@ public class TestRemoveAction extends OIExplorerFestBase {
     @Test
     @GUITest
     public void m2_addTwoFilesTwoTargetRemoveOneTarget() {
-        newCollection(); // reboot app (a complete reboot would be better)
+        newCollection(); // reset app
 
+        // load and select Gamma2_Velorum target:
         addOIFitsFile(RESOURCE_TEST_FOLDER, GAMMA2_VELORUM_FILENAME);
+
         addOIFitsFile(RESOURCE_TEST_FOLDER, GAM_VIC_FILENAME);
 
-        // memorize targets: GAMMA2_VELORUM, GAM_VIC
+        // memorize sorted targets: GAM_VIC, GAMMA2_VELORUM
         List<Target> targets = OCM.getOIFitsCollection().getTargetManager().getGlobals();
+        // logger.info("targets: " + targets);
 
-        remove(); // will remove the first one: GAMMA2_VELORUM
+        remove(); // will remove the selected one: Gamma2_Velorum
 
-        pauseShort();
+        // saveScreenshot(window, "OIXP-addTwoFiles-remove.png");
+        // logger.info("global targets:  " + OCM.getOIFitsCollection().getTargetManager().getGlobals());
         // assert that only one granule remains
         Assert.assertEquals(1, OCM.getOIFitsCollection().getSortedGranules().size());
-        // assert that there is only one target remaining
-        Assert.assertEquals(1, OCM.getOIFitsCollection().getTargetManager().getGlobals().size());
-        // assert that the remaining target is the one of GAM_VIC
-        Assert.assertEquals(targets.get(1), OCM.getOIFitsCollection().getTargetManager().getGlobals().get(0));
+
+        // assert that there is one target less (GAM_VIC, UNDEFINED)
+        Assert.assertEquals(targets.size() - 1, OCM.getOIFitsCollection().getTargetManager().getGlobals().size());
+
+        // assert that the remaining target is GAM_VIC
+        Assert.assertEquals(targets.get(0), OCM.getOIFitsCollection().getTargetManager().getGlobals().get(0));
     }
 
 }

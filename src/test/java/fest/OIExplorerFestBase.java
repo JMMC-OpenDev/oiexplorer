@@ -1,7 +1,6 @@
 /** *****************************************************************************
  * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
  ******************************************************************************/
-
 package fest;
 
 import fest.common.JmcsFestSwingJUnitTestCase;
@@ -21,23 +20,20 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
 
-    public static int MY_DELAY = NULL_DELAY;  // choose NULL_DELAY for speed and MEDIUM_DELAY for debug
-
     public static final String MENU_FILE = "File";
     public static final String MENU_NEW = "New OIFits Collection";
     public static final String MENU_ADD = "Add OIFits file";
     public static final String MENU_REMOVE = "Remove selected OIFits file(s)";
 
-    public static File RESOURCE_TEST_FOLDER = new File(getProjectFolderPath() + "src/test/resources/");
-    public static String GAMMA2_VELORUM_FILENAME
-            = "PRODUCT_Gamma2_Velorum_2.02-2.09micron_2007-03-31T01_39_00.5372.fits";
-    public static String GAM_VIC_FILENAME = "2008-Contest_Binary.fits";
+    public static final File RESOURCE_TEST_FOLDER = new File(getProjectFolderPath() + "src/test/resources/");
 
-    @BeforeClass
     /**
-     * FIRST method, starts the app.
+     * Initialize system properties & static variables and finally starts the application
      */
+    @BeforeClass
     public static void m0_init() {
+        // Hack to reset LAF & ui scale:
+        CommonPreferences.getInstance().resetToDefaultPreferences();
 
         // invoke Bootstrapper method to initialize logback now:
         Bootstrapper.getState();
@@ -54,8 +50,10 @@ public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
         }
 
         // define robot delays :
-        defineRobotDelayBetweenEvents(MY_DELAY);
+        defineRobotDelayBetweenEvents(SHORT_DELAY);
 
+        // define delay before taking screenshot :
+        defineScreenshotDelay(SHORT_DELAY);
 
         // disable tooltips :
         enableTooltips(false);
@@ -64,11 +62,11 @@ public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
         JmcsFestSwingJUnitTestCase.startApplication(fr.jmmc.oiexplorer.OIFitsExplorer.class);
     }
 
+    /**
+     * Test the application exit sequence : ALWAYS THE LAST TEST
+     */
     @Test
     @GUITest
-    /**
-     * LAST method, exits the app.
-     */
     public void m999_exit() {
         window.close();
         confirmDialogDontSave();
@@ -76,6 +74,9 @@ public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
 
     public void newCollection() {
         window.menuItemWithPath(MENU_FILE, MENU_NEW).click();
+
+        // waits for queued events to finish:
+        OIExplorerTestUtils.checkPendingEvents();
     }
 
     public void addOIFitsFile(File directory, String filename) {
@@ -84,6 +85,9 @@ public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
         window.fileChooser().selectFile(new File(filename));
         window.fileChooser().approve();
         window.optionPane().okButton().click();
+
+        // waits for queued events to finish:
+        OIExplorerTestUtils.checkPendingEvents();
     }
 
     public void remove() {
@@ -93,5 +97,8 @@ public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
         } catch (ComponentLookupException e) {
             window.optionPane().okButton().click();
         }
+
+        // waits for queued events to finish:
+        OIExplorerTestUtils.checkPendingEvents();
     }
 }
