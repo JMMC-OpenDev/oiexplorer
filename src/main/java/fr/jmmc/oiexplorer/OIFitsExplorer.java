@@ -15,9 +15,11 @@ import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.task.TaskSwingWorkerExecutor;
 import fr.jmmc.jmcs.gui.util.ResourceImage;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.network.http.Http;
 import fr.jmmc.jmcs.network.interop.SampCapability;
 import fr.jmmc.jmcs.network.interop.SampMessageHandler;
 import fr.jmmc.jmcs.util.CommandLineUtils;
+import fr.jmmc.jmcs.util.FileUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.export.DocumentOptions;
@@ -27,6 +29,7 @@ import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.PreferencePanel;
 import fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
+import static fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction.loadOIFitsCollectionFromFile;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.NewAction;
@@ -46,6 +49,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
@@ -383,6 +388,66 @@ public final class OIFitsExplorer extends App {
                 }
             }
         };
+        
+        // Add handler to load one new oifits
+        new SampMessageHandler(SampCapability.OIFITSEXPLORER_LOAD_COLLECTION) {
+            @Override
+            protected void processMessage(final String senderId, final Message message) throws SampException {
+                final String url = (String) message.getParam("url");
+                final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+          
+                if (!StringUtils.isEmpty(url)) {
+                    URI uri;
+
+                    try {
+                        uri = new URI(url);
+                    } catch (URISyntaxException use) {
+                        logger.error("invalid URI", use);
+
+                        throw new SampException("Can not read the file : " + url, use);
+                    }
+
+                    final File oixpFile;
+
+                    try {
+                        final String scheme = uri.getScheme();
+
+                        if (scheme.equalsIgnoreCase("file")) {
+                            try {
+                                oixpFile = new File(uri);
+                            } catch (IllegalArgumentException iae) {
+                                logger.debug("Invalid URI: {}", url, iae);                                
+                                throw new SampException("Invalid URI: " + url);
+                            }                            
+                        } else {
+                            final File file = FileUtils.getTempFile("samp-collection-", ".oixp");
+
+                            if (Http.download(uri, file, false)) {
+                                oixpFile = file;
+                            }else{
+                                throw new SampException("Can not read the file : " + url);
+                            }
+                        }                    
+                    
+                        // bring this application to front and load data
+                        SwingUtils.invokeLaterEDT(new Runnable() {
+                            @Override
+                            public void run() {
+                                App.showFrameToFront();
+                                loadOIFitsCollectionFromFile(oixpFile, ocm, true);
+                           }
+                        });
+                            
+                    
+                    } catch (IOException ioe) {
+                        MessagePane.showErrorMessage("Can not read the collection file at :\n\n" + url);
+                        
+                        throw new SampException("Can not read the file : " + url, ioe);
+                    }
+                    
+                }
+            }
+        };
     }
 
     /**
@@ -392,6 +457,7 @@ public final class OIFitsExplorer extends App {
      * @throws IllegalArgumentException if one (or several) argument is missing or invalid
      */
     @Override
+
     protected void processShellCommandLine() throws IllegalArgumentException {
         final Map<String, String> argValues = getCommandLineArguments();
         logger.debug("processShellCommandLine: {}", argValues);
@@ -446,7 +512,7 @@ public final class OIFitsExplorer extends App {
     }
 
     private static boolean initializeExport(final String filePath, final MimeType mimeType,
-                                            final String mode, final String dims) throws IOException {
+            final String mode, final String dims) throws IOException {
 
         if (filePath != null) {
             final DocumentOptions options = DocumentOptions.createInstance(mimeType).setMode(mode);

@@ -10,6 +10,7 @@ import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
+import fr.jmmc.jmcs.util.jaxb.XmlBindException;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
@@ -90,59 +91,66 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {
-            final String fileLocation = file.getAbsolutePath();
+            loadOIFitsCollectionFromFile(file, ocm, false);
+        }
+    }
 
+    public static void loadOIFitsCollectionFromFile(File file, final OIFitsCollectionManager ocm, final boolean appendOIFitsFilesOnly) throws XmlBindException {
+        final String fileLocation = file.getAbsolutePath();
+        if (appendOIFitsFilesOnly) {
+            StatusBar.show("loading OIFits from OIFits Explorer Collection: " + fileLocation);
+        } else {
             StatusBar.show("loading OIFits Explorer Collection: " + fileLocation);
+        }
 
-            // Create progress panel:
-            final JProgressBar progressBar = new JProgressBar();
-            final JPanel progressPanel = LoadOIFitsAction.createLoadOIFitsProgressPanel(progressBar);
+        // Create progress panel:
+        final JProgressBar progressBar = new JProgressBar();
+        final JPanel progressPanel = LoadOIFitsAction.createLoadOIFitsProgressPanel(progressBar);
 
-            StatusBar.addCustomPanel(progressPanel);
+        StatusBar.addCustomPanel(progressPanel);
 
-            Exception e = null;
-            try {
-                final OIFitsChecker checker = new OIFitsChecker();
+        Exception e = null;
+        try {
+            final OIFitsChecker checker = new OIFitsChecker();
 
-                ocm.loadOIFitsCollection(file, checker,
-                        new LoadOIFitsListener() {
+            ocm.loadOIFitsCollection(file, checker,
+                    new LoadOIFitsListener() {
 
-                            @Override
-                            public void propertyChange(final PropertyChangeEvent pce) {
-                                if ("progress".equals(pce.getPropertyName())) {
-                                    progressBar.setValue((Integer) pce.getNewValue());
-                                }
-                            }
+                @Override
+                public void propertyChange(final PropertyChangeEvent pce) {
+                    if ("progress".equals(pce.getPropertyName())) {
+                        progressBar.setValue((Integer) pce.getNewValue());
+                    }
+                }
 
-                            @Override
-                            public void done(final boolean cancelled) {
-                                StatusBar.removeCustomPanel(progressPanel);
-
-                                // log validation messages anyway:
-                                final String checkReport = checker.getCheckReport();
-                                logger.info("validation results:\n{}", checkReport);
-
-                                // TODO: use a preference to show or hide the validation report:
-                                if (false && !cancelled) {
-                                    MessagePane.showMessage(checkReport);
-                                }
-
-                                // Fire the Ready event to any listener:
-                                ocm.fireReady(this, null);
-                            }
-                        });
-
-            } catch (IllegalStateException ise) {
-                e = ise;
-            } catch (IOException ioe) {
-                e = ioe;
-            } finally {
-                if (e != null) {
+                @Override
+                public void done(final boolean cancelled) {
                     StatusBar.removeCustomPanel(progressPanel);
 
-                    StatusBar.show("Could not load OIFits Explorer Collection: " + fileLocation);
-                    MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);
+                    // log validation messages anyway:
+                    final String checkReport = checker.getCheckReport();
+                    logger.info("validation results:\n{}", checkReport);
+
+                    // TODO: use a preference to show or hide the validation report:
+                    if (false && !cancelled) {
+                        MessagePane.showMessage(checkReport);
+                    }
+
+                    // Fire the Ready event to any listener:
+                    ocm.fireReady(this, null);
                 }
+            }, appendOIFitsFilesOnly);
+
+        } catch (IllegalStateException ise) {
+            e = ise;
+        } catch (IOException ioe) {
+            e = ioe;
+        } finally {
+            if (e != null) {
+                StatusBar.removeCustomPanel(progressPanel);
+
+                StatusBar.show("Could not load OIFits Explorer Collection: " + fileLocation);
+                MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);
             }
         }
     }
