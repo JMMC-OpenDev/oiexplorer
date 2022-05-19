@@ -1,16 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+/*******************************************************************************
+ * JMMC project ( http://www.jmmc.fr ) - Copyright (C) CNRS.
+ ******************************************************************************/
 package fr.jmmc.oiexplorer.gui.action;
 
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
-import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.gui.OIFitsFileListPanel;
-import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.event.ActionEvent;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +15,9 @@ import org.slf4j.LoggerFactory;
  * collection all OIFitsFiles that are concerned by the current SubsetDefinition.
  */
 public class RemoveAction extends RegisteredAction {
+
+    /** default serial UID for Serializable interface */
+    private static final long serialVersionUID = 1;
 
     /**
      * Class name. This name is used to register to the ActionRegistrar

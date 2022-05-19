@@ -18,12 +18,12 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
+public abstract class OIExplorerFestBase extends JmcsFestSwingJUnitTestCase {
 
     public static final String MENU_FILE = "File";
     public static final String MENU_NEW = "New OIFits Collection";
     public static final String MENU_ADD = "Add OIFits file";
-    public static final String MENU_REMOVE = "Remove selected OIFits file(s)";
+    public static final String MENU_REMOVE = "Remove OIFits files";
 
     public static final File RESOURCE_TEST_FOLDER = new File(getProjectFolderPath() + "src/test/resources/");
 

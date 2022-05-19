@@ -343,12 +343,11 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         newPlotTabAction.putValue(Action.NAME, " + ");
         newPlotTabAction.putValue(Action.SHORT_DESCRIPTION, "add a new plot view ...");
 
-        // Build toolBar
+        // Build toolbar
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIFitsAction.className, LoadOIFitsAction.actionName)).setHideActionText(true);
+        toolBar.add(ActionRegistrar.getInstance().get(RemoveAction.className, RemoveAction.actionName)).setHideActionText(true);
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIDataCollectionAction.className, LoadOIDataCollectionAction.actionName)).setHideActionText(true);
         toolBar.add(OIFitsExplorerExportAction.getInstance(MimeType.PDF)).setHideActionText(true);
-        toolBar.add(ActionRegistrar.getInstance().get(
-                RemoveAction.className, RemoveAction.actionName)).setHideActionText(true);
     }
 
     /**
