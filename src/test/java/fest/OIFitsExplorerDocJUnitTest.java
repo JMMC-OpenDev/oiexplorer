@@ -36,6 +36,9 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
     private final static String FAKE_EMAIL = "FAKE_EMAIL";
     private static String CURRENT_EMAIL = "";
 
+    private static final int M_TOP = 14;
+
+    /* font scale = 1.0 */
     private static void defineEmailPref(final String email) {
         try {
             final CommonPreferences prefs = CommonPreferences.getInstance();
@@ -53,6 +56,14 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
      */
     @BeforeClass
     public static void intializeAndStartApplication() {
+        // GNOME3: window issue:
+        setScreenshotTakerMargins(M_TOP, 0, 0, 0);
+
+        logger.warn("Using top margin = {} px", M_TOP);
+
+        // Hack to reset LAF & ui scale:
+        CommonPreferences.getInstance().resetToDefaultPreferences();
+
         // invoke Bootstrapper method to initialize logback now:
         Bootstrapper.getState();
 
@@ -87,6 +98,9 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
     @Test
     @GUITest
     public void m01_shouldShowPlot() {
+
+        // waits for queued events to finish:
+        OIExplorerTestUtils.checkPendingEvents();
 
         // Capture UV Coverage plot :
         final BufferedImage image = GetScreenshot();
@@ -129,7 +143,7 @@ public final class OIFitsExplorerDocJUnitTest extends JmcsFestSwingJUnitTestCase
         // hide my email address :
         emailField.setText("type your email address here");
 
-        saveScreenshot(dialog, "Aspro2-FeebackReport.png");
+        saveScreenshot(dialog, "OIFitsExplorer-FeebackReport.png");
 
         // restore my preferences :
         emailField.setText(FAKE_EMAIL);

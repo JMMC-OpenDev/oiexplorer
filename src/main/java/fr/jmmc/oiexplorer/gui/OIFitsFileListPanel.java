@@ -4,6 +4,7 @@
 package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmcs.gui.component.GenericListModel;
+import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
@@ -137,7 +138,7 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
 
                 final OIFitsTableBrowser fb = new OIFitsTableBrowser();
                 fb.setOiFitsFileRef(oiFitsFileRef);
-                
+
                 mainPanel.addView(fb, oiFitsFileName);
             }
             mainPanel.setSelectedView(oiFitsFileName);
@@ -366,5 +367,43 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
         };
 
         return list;
+    }
+
+    /**
+     * Removes from collection all OIFitsFiles that are concerned by the current SubsetDefinition.
+     * This list of files is exactly the current selection of this.oifitsFileList.
+     * Displays a confirm dialog to the user to list him concerned files and some info.
+     */
+    public void removeSelectedOIFitsFiles() {
+        List<OIFitsFile> filesToRemove = this.oifitsFileList.getSelectedValuesList();
+        List<OIFitsFile> removedFiles = null;
+
+        if (filesToRemove.isEmpty()) {
+            MessagePane.showMessage("There is no file to remove.");
+        } else {
+            final StringBuilder sb = new StringBuilder(filesToRemove.size() * 200);
+
+            sb.append("Do you confirm to remove the following OIFits file(s):\n");
+            for (OIFitsFile file : filesToRemove) {
+                sb.append("\n").append(file.getFileName()).append("\n");
+                sb.append(file.getOiTarget().getTarget().length).append(" target(s):");
+                for (String targetName : file.getOiTarget().getTarget()) {
+                    sb.append(" ").append(targetName);
+                }
+                sb.append(".\n");
+                sb.append(file.getNbOiVis()).append(" OI_VIS, ");
+                sb.append(file.getNbOiVis2()).append(" OI_VIS2, ");
+                sb.append(file.getNbOiT3()).append(" OI_T3.\n");
+            }
+
+            final boolean confirm = MessagePane.showConfirmMessage(sb.toString());
+
+            if (confirm) {
+                removedFiles = ocm.removeOIFitsFileList(filesToRemove);
+                if (removedFiles.size() != filesToRemove.size()) {
+                    logger.error("Some files were not removed.");
+                }
+            }
+        }
     }
 }
