@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 1"/>
-    <compilation date="19/05/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 2"/>
+    <compilation date="23/05/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,7 +169,11 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Thu, 19 May 2022 16:00:00 GMT</pubDate>
+            <pubDate>Mon, 23 May 2022 20:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 2">
+                <!--<change type="FEATURE">embed new jmcs that exposes specific mtypes over the web profile</change>-->
+                <change type="CHANGE">Email field now is mandatory to submit a feedback report</change>-->
+            </prerelease>
             <prerelease version="0.3.0 beta 1">
                 <change type="FEATURE">Added 'Remove OIFits files' action to remove OIFITS files corresponding to the current selection</change>
                 <change type="FEATURE">Support SAMP message to add OIFits of a remote collection</change>
