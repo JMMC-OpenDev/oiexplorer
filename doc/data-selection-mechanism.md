@@ -1,6 +1,6 @@
 # Data Selection Mechanism
 
-![schéma de la sélection des données jusqu'à leur affichage](http://www.jmmc.fr/twiki/pub/Jmmc/Software/OImagingAntoineK/data-selection-mechanism.png)
+![schéma de la sélection des données jusqu'à leur affichage](img/data-selection-mechanism.png)
 
 ## Interface
 

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="68cm" height="41cm" viewBox="-512 -174 1343 801" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g id="Background">
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="222.169,-156.678 199.617,-156.678 199.617,-158.795 174.829,-158.795 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="222.169,-148.678 238.169,-156.678 222.169,-164.678 "/>
+    </g>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="518.829" y="168.687" width="301.6" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="669.629" y="187.538">abstract GenericEvent&lt;Type,Value&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="518.829" y="196.687" width="301.6" height="36"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="521.829" y="210.568">-Type</text>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="521.829" y="226.568">-Value</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="518.829" y="232.687" width="301.6" height="8"/>
+    </g>
+    <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-113.389" y="-125.4" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-71.9406" y="-107.54">
+      <tspan x="-71.9406" y="-107.54">OIFits Explorer (core included)</tspan>
+    </text>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="579.4" y="340.992" width="179.4" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="669.1" y="359.844">OCMEvent</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="579.4" y="368.992" width="179.4" height="8"/>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="579.4" y="376.992" width="179.4" height="20"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="582.4" y="390.873">+resolveSubjectValue()</text>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="686.755" y="310.676">
+      <tspan x="686.755" y="310.676">Type = OCMEventType</tspan>
+      <tspan x="686.755" y="326.676">Value = Object</tspan>
+    </text>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="280.528" y="404.614" width="200.15" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="380.603" y="423.466">enum OCMEventType</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="280.528" y="432.614" width="200.15" height="52"/>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="283.528" y="446.495"> COLLECTION_CHANGED</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="283.528" y="462.495"> SUBSET_CHANGED</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="283.528" y="478.495"> ACTIVE_PLOT_CHANGED</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="280.528" y="484.614" width="200.15" height="8"/>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-112.889" y="-150.8">
+      <tspan x="-112.889" y="-150.8">"OCM" = "OIFitsCollectionManager"</tspan>
+    </text>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 578.391,394.1 A 219.845,219.845 0 0 1 486.157,420.499"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="493.725,415.25 483.925,420.63 494.11,425.242 "/>
+    </g>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="419.836" y="-170.437" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="507.836" y="-168.937" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 445.114,-157.69 A 64.1126,64.1126 0 0 1 502.884,-158.717"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="493.73,-158.369 504.893,-157.747 498.693,-167.051 "/>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="549.336" y="-152.837">
+      <tspan x="549.336" y="-152.837">A uses B</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="429.336" y="-152.337">
+      <tspan x="429.336" y="-152.337">A</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="517.836" y="-150.837">
+      <tspan x="517.836" y="-150.837">B</tspan>
+    </text>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-4.82693" y="174.462" width="422.3" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="206.323" y="193.314">interface GenericEventListener&lt;Event,Type,Value&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-4.82693" y="202.462" width="422.3" height="20"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-1.82693" y="216.343">+onProcess(Event)</text>
+    </g>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 325.893,343.998 A 1695.81,1695.81 0 0 1 573.964,361.734"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="565.551,365.534 576.177,362.057 567.02,355.643 "/>
+    </g>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="90.6347" y="317.395" width="234.25" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="207.76" y="336.247">interface OCMEventListener</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="90.6347" y="345.395" width="234.25" height="8"/>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="206.323,241.7 206.323,278.313 207.76,278.313 207.76,316.414 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="214.323,241.7 206.323,225.7 198.323,241.7 "/>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="216.759" y="275.914">
+      <tspan x="216.759" y="275.914">Event = OCMEvent</tspan>
+      <tspan x="216.759" y="291.914">Type = OCMEventType</tspan>
+      <tspan x="216.759" y="307.914">Value = Object</tspan>
+    </text>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 252.463,354.398 A 71.8304,71.8304 0 0 1 310.389,399.397"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="303.374,393.494 311.205,401.474 312.891,390.421 "/>
+    </g>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="247.664" y="-7.67558" width="318" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="406.664" y="11.176">EventContext&lt;Event,Type,Value&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="247.664" y="20.3244" width="318" height="52"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="250.664" y="34.2057">-Event</text>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="250.664" y="50.2057">-sources: Set&lt;Object&gt;</text>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="250.664" y="66.2057">-destinations: Set&lt;GenericEventListener&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="247.664" y="72.3244" width="318" height="8"/>
+    </g>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 351.073,81.3206 A 158.654,158.654 0 0 1 242.061,172.501"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="248.666,166.094 239.886,173.016 250.691,175.886 "/>
+    </g>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 476.937,81.3212 A 196.321,196.321 0 0 0 607.379,166.961"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="598.948,170.799 609.582,167.344 600.438,160.91 "/>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="314.75" y="-17.2435">
+      <tspan x="314.75" y="-17.2435">Event &lt;= GenericEvent&lt;Type,Value&gt;</tspan>
+    </text>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-367.962" y="3.6234" width="510.5" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-112.712" y="22.475">EventNotifier&lt;Event,Type,Value&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-367.962" y="31.6234" width="510.5" height="20"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-364.962" y="45.5046">-eventQueue: Map&lt;Event,EventContext&lt;Event,Type,Value&gt;&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-367.962" y="51.6234" width="510.5" height="20"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-364.962" y="65.5047">+queueEvent(source:Object,Event,destination:GenericEventListener)</text>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-107.229" y="-6.26422">
+      <tspan x="-107.229" y="-6.26422">Event &lt;= GenericEvent&lt;Type,Value&gt;</tspan>
+    </text>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="150.553" y="-171.337" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="240.405" y="-169.22" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="280.363" y="-153.12">
+      <tspan x="280.363" y="-153.12">A herits from B</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="159.435" y="-153.855">
+      <tspan x="159.435" y="-153.855">A</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="252.543" y="-156.678">
+      <tspan x="252.543" y="-156.678">B</tspan>
+    </text>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-35.9188" y="526.142" width="487.4" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="207.781" y="544.993">OCM</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-35.9188" y="554.142" width="487.4" height="20"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-32.9188" y="568.023">-Map&lt;OCMEventType,EventNotifier&lt;OCMEvent,OCMEventType,Object&gt;&gt;</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-35.9188" y="574.142" width="487.4" height="52"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-32.9188" y="588.023">+onProcess(Event)</text>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-32.9188" y="604.023">+fireOIFitsCollectionChanged(source:Object,</text>
+      <text xml:space="preserve" font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-32.9188" y="620.023">                             destination:OCMEventListener)</text>
+    </g>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 452.464,546.734 A 192.564,192.564 0 0 0 603.546,402.355"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="606.857,411.007 604.066,400.18 597.079,408.909 "/>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="168.705,37.6234 186.292,37.6234 186.292,36.3244 246.712,36.3244 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="143.533,37.6234 157.533,32.8234 171.533,37.6234 157.533,42.4234 "/>
+      <text font-size="12.7998" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="188.292" y="33.9553"/>
+      <text font-size="12.7998" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="175.533" y="34.6048"/>
+      <text font-size="12.7998" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="242.712" y="33.3059">*</text>
+    </g>
+    <g>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-510.094" y="151.033" width="309.7" height="28"/>
+      <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="-355.244" y="169.884">singleton EventNotifierController</text>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-510.094" y="179.033" width="309.7" height="8"/>
+      <rect style="fill: #c0f0ff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="-510.094" y="187.033" width="309.7" height="57"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-507.094" y="200.914">+queueEventNotifier(EventNotifier)</text>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="-507.094" y="216.914">+fireQueuedNotifiers()</text>
+      <text font-size="11.2" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-507.094" y="231.429">called by EDT</text>
+    </g>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="419.598" y="-119.492" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="509.995" y="-118.227" width="22.7599" height="23.5186" rx="0" ry="0"/>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="550.95" y="-101.274">
+      <tspan x="550.95" y="-101.274">A contains several B</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="428.48" y="-102.009">
+      <tspan x="428.48" y="-102.009">A</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="521.375" y="-106.468">
+      <tspan x="521.375" y="-106.468">B</tspan>
+    </text>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="469.996,-106.949 483.919,-106.949 483.919,-106.468 509.014,-106.468 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="444.824,-106.949 458.824,-111.749 472.824,-106.949 458.824,-102.149 "/>
+      <text xml:space="preserve" font-size="12.7998" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:end;font-family:monospace;font-style:normal;font-weight:normal" x="505.014" y="-118.348"> *</text>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="-62.087,576.142 -67.8632,576.142 -67.8632,578.283 -117.985,578.283 "/>
+      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="-36.9154,576.142 -50.9154,580.942 -64.9154,576.142 -50.9154,571.342 "/>
+    </g>
+    <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="-116.828" y1="577.512" x2="-112.979" y2="72.6269"/>
+    <text font-size="12.7998" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-101.148" y="88.7457">
+      <tspan x="-101.148" y="88.7457">*</tspan>
+    </text>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="207.76,372.641 207.76,447.77 207.781,447.77 207.781,525.136 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="215.76,372.641 207.76,356.641 199.76,372.641 "/>
+    </g>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="152.848" y="-121.391" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="242.7" y="-119.273" width="24.2757" height="25.0849" rx="0" ry="0"/>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="282.658" y="-103.173">
+      <tspan x="282.658" y="-103.173">A implements B</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="161.73" y="-103.908">
+      <tspan x="161.73" y="-103.908">A</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="254.838" y="-106.731">
+      <tspan x="254.838" y="-106.731">B</tspan>
+    </text>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="223.513,-106.731 201.912,-106.731 201.912,-108.848 178.074,-108.848 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="223.513,-98.731 239.513,-106.731 223.513,-114.731 "/>
+    </g>
+    <g>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="669.629,259.932 669.629,298.84 669.1,298.84 669.1,339.985 "/>
+      <polygon style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="677.629,259.932 669.629,243.932 661.629,259.932 "/>
+    </g>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M -279.03,148.362 A 340.702,340.702 0 0 0 -168.967,75.7876"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="-273.627,140.892 -281.1,149.208 -269.963,150.197 "/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="-170.853,84.8444 -167.374,74.2189 -177.962,77.8114 "/>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-1.83012" y="165.168">
+      <tspan x="-1.83012" y="165.168">Event &lt;= GenericEvent&lt;Type,Value&gt;</tspan>
+    </text>
+    <g>
+      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke-dasharray: 4; stroke: #000000" d="M 418.484,201.314 A 163.341,163.341 0 0 0 513.526,203.893"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="507.571,210.996 515.681,203.3 504.658,201.43 "/>
+    </g>
+  </g>
+</svg>
