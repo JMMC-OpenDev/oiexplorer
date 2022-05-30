@@ -12,7 +12,7 @@ The set of the loaded files forms an "OIFits Collection" which can be saved to t
 
 ## Interface Scheme
 
-![general view of the oifits explorer interface](http://www.jmmc.fr/twiki/pub/Jmmc/Software/OImagingAntoineK/general-view.svg)
+![general view of the oifits explorer interface](svg/general-view.svg)
 
 The Viewer Panel (VP) displays the plots and the data.
 You can add some other views (tabs), but currently all views display the same datas. You can only tune the plot of each view (change the axis column, change colors etc). Each view has exactly one plot, but one plot have in fact several Y axes so you could say that it contains several subplots.
@@ -31,7 +31,7 @@ The OIFitsCollectionManager (OCM) stores all loaded files, derived data structur
 
 OCM contains two main objects, in summary OIFitsCollection which stores the OIFitsFiles and analysis results (immutable state), and OiDataCollection which contains everything that is exported to the disk as a collection (oixp files).
 
-![three of the data structures in OIFits Explorer](http://www.jmmc.fr/twiki/pub/Jmmc/Software/OImagingAntoineK/data-structures.svg)
+![three of the data structures in OIFits Explorer](svg/data-structures.svg)
 
 
 ### OIFitsCollection
