@@ -12,6 +12,8 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
+import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.ACTIVE_PLOT_CHANGED;
+import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.COLLECTION_CHANGED;
 import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
@@ -130,7 +132,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         // ALWAYS select a target
         // TODO: the selection should be in sync with subset modification (load, external updates)
         if (oiFitsCollection.isEmpty()) {
-            processSelection(new SubsetFilter());
+            processSelection(null, null, null);
         } else {
 
             // Restore subset selection:
@@ -263,23 +265,14 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         return;
                     }
 
-                    final SubsetFilter filter = computeSubsetFilterFromTreeSelection(selection);
+                    updateSubsetFilterFromTreeSelection(selection);
 
                     // we compute a new selection, because it can prune the old one from unwanted paths
-                    final TreePath[] newSelection = computeSelectionFromSubsetFilter(filter, ocm.getOIFitsCollection());
+                    final TreePath[] newSelection = computeSelectionFromSubsetFilter(
+                            getSubsetDefinition().getFilter(), ocm.getOIFitsCollection());
 
-                    if (newSelection.length == 0) { // should never happen
-                        logger.error("New selection is empty.");
-                        return;
-                    }
-
-                    // if selection has been changed, first ask to change the selection,
-                    // instead of modifying the subsetDefinition
                     if (!Arrays.equals(selection, newSelection)) {
-                        dataTree.selectPaths(newSelection);
-                    }
-                    else {
-                        processSelection(filter);
+                        dataTree.selectPaths(newSelection); // ask to change the selection if it has changed
                     }
                 }
             });
@@ -287,67 +280,59 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     }
 
     /**
-     * Computes a subsetFilter from a list of selected TreePath. currently only allows one target and one instrument.
+     * Updates the current subsetFilter from a list of selected TreePath. currently only allows one target.
      *
      * @param selection the list of selected paths
      * @return the subsetFilter computed
      */
-    private SubsetFilter computeSubsetFilterFromTreeSelection(final TreePath[] selection) {
+    private void updateSubsetFilterFromTreeSelection(final TreePath[] selection) {
 
-        // the future SubsetFilter
-        final SubsetFilter filter = new SubsetFilter();
+        Target target = null;
+        InstrumentMode insMode = null;
+        boolean allInstruments = false;
+        final List<OITable> listOITable = new ArrayList<>();
 
         // go through all selected paths. two examples of typical paths : [root,target], [root,target,insMode,table]
         for (TreePath selectedPath : selection) {
+            // go through all nodes of the path: root, target, instrument mode, table
+            // as soon as one of them is not consistent (i.e a different target), we skip the path
+            for (Object node : selectedPath.getPath()) {
 
-            final DefaultMutableTreeNode lastNode
-                    = (DefaultMutableTreeNode) selectedPath.getLastPathComponent();
-            final Object userObject = lastNode.getUserObject();
-
-            if (userObject == dataTree.getRootNode()) {
-                // ignore root node
-            } else if (userObject instanceof Target) {
-                // only the first target is registered
-                if (filter.getTargetUID() == null) {
-                    filter.setTargetUID(((Target) userObject).getTarget());
+                if (node.equals(dataTree.getRootNode())) {
+                    continue; // ignore root node, process to the next node (a target)
                 }
-            } else if (userObject instanceof InstrumentMode) {
-                // only first instrument is registered, if compatible with registered target
 
-                final String parentTargetUID = ((Target) dataTree.getParentNode(lastNode).getUserObject()).getTarget();
-                final String insModeUID = ((InstrumentMode) userObject).getInsName();
+                final Object userObject = ((DefaultMutableTreeNode) node).getUserObject(); // associated user object
 
-                if (((filter.getTargetUID() == null) || filter.getTargetUID().equals(parentTargetUID))
-                        && ((filter.getInsModeUID() == null) || filter.getInsModeUID().equals(insModeUID))) {
-
-                    filter.setTargetUID(parentTargetUID);
-                    filter.setInsModeUID(insModeUID);
-                }
-            } else if (userObject instanceof OITable) {
-                // every table is registered if compatible with registered target & instrument
-
-                final DefaultMutableTreeNode parentNode = dataTree.getParentNode(lastNode);
-                final DefaultMutableTreeNode grandParentNode = dataTree.getParentNode(parentNode);
-                final String grandParentTargetUID = ((Target) grandParentNode.getUserObject()).getTarget();
-                final String parentInsModeUID = ((InstrumentMode) parentNode.getUserObject()).getInsName();
-                final OITable oiTable = (OITable) userObject;
-
-                if (((filter.getTargetUID() == null) || filter.getTargetUID().equals(grandParentTargetUID))
-                        && ((filter.getInsModeUID() == null) || filter.getInsModeUID().equals(parentInsModeUID))) {
-
-                    final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
-                    if (dataFile != null) {
-                        filter.setTargetUID(grandParentTargetUID);
-                        filter.setInsModeUID(parentInsModeUID);
-                        filter.getTables().add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+                if (userObject instanceof Target) {
+                    final Target thisTarget = (Target) userObject;
+                    if (target == null) {
+                        target = thisTarget; // first target encountered: register it
+                    } else if (!target.equals(thisTarget)) {
+                        break; // a target is already registered, and the two targets are different: skip this path !!
                     }
+                } else if (userObject instanceof InstrumentMode) {
+                    if (!allInstruments) { // if not all instruments are already enabled
+                        final InstrumentMode thisInsMode = (InstrumentMode) userObject;
+                        if (insMode == null) {
+                            insMode = thisInsMode; // first instrument encountered: register it
+                        } else if (!insMode.equals(thisInsMode)) {
+                            insMode = null; // an instrument is already registered, and the two are different:
+                            allInstruments = true; // set to null to enable all instruments
+                        }
+                    }
+                } else if (userObject instanceof OITable) {
+                    // if we reach this table node, it means we already passed through its
+                    // parent insMode and its grandparent target
+                    listOITable.add((OITable) userObject); // add the table to the list
+                } else {
+                    logger.error("Encountered unknown node in the selected path."); // should never happen
                 }
-            } else {
-                logger.error("Encountered unknown node in the selected path."); // should never happen
             }
         }
 
-        return filter;
+        processSelection(target, insMode, listOITable);
+        logger.info("new subsetFilter: {}", getSubsetDefinition().getFilter().toShortString());
     }
 
     /**
@@ -379,14 +364,25 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 if (filter.getInsModeUID() != null) {
                     final InstrumentMode insMode = oiFitsCollection.getInstrumentModeManager().getGlobalByUID(filter.getInsModeUID());
                     insModeTreeNode = GenericJTree.findTreeNode(targetTreeNode, insMode);
+                }
 
+                // for every instrument
+                for (int i = 0, sizeI = targetTreeNode.getChildCount(); i < sizeI; i++) {
+                    DefaultMutableTreeNode insNode = (DefaultMutableTreeNode) targetTreeNode.getChildAt(i);
+
+                    // skip instrument if it is not the one specified (null means all instruments)
+                    if (insModeTreeNode != null && !insModeTreeNode.equals(insNode)) {
+                        continue;
+                    }
+
+                    // for every table of the filter
                     for (TableUID tableUID : filter.getTables()) {
 
                         final String filePath = tableUID.getFile().getFile();
                         final Integer extNb = tableUID.getExtNb();
 
-                        for (int i = 0, size = insModeTreeNode.getChildCount(); i < size; i++) {
-                            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) insModeTreeNode.getChildAt(i);
+                        for (int j = 0, sizeJ = insNode.getChildCount(); j < sizeJ; j++) {
+                            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) insNode.getChildAt(j);
                             final OITable oiTable = (OITable) node.getUserObject();
 
                             if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
@@ -414,7 +410,9 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             }
         }
 
-        return selection.toArray(new TreePath[0]);
+        final TreePath[] arraySelection = selection.toArray(new TreePath[0]);
+        logger.info("new selection : {}", selectionToString(arraySelection));
+        return arraySelection;
     }
 
     /**
@@ -422,23 +420,76 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      *
      * @param newFilter new SubsetFilter to apply to the old one
      */
-    private void processSelection(final SubsetFilter newFilter) {
-        logger.debug("processSelection: {}", newFilter);
+    private void processSelection(final Target target, final InstrumentMode insMode, final List<OITable> listOITable) {
+        logger.debug("processSelection: {}", target, insMode, listOITable);
 
         // update subset definition (copy):
         final SubsetDefinition subsetCopy = getSubsetDefinition();
         if (subsetCopy != null) {
             final SubsetFilter filter = subsetCopy.getFilter();
-            filter.setTargetUID(newFilter.getTargetUID());
-            filter.setInsModeUID(newFilter.getInsModeUID());
+
+            filter.setTargetUID(target == null ? null : target.getTarget());
+            filter.setInsModeUID(insMode == null ? null : insMode.getInsName());
 
             final List<TableUID> tables = filter.getTables();
             tables.clear();
-            tables.addAll(newFilter.getTables());
+            if (listOITable != null) {
+                for (OITable oiTable : listOITable) {
+                    final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
+                    if (dataFile != null) {
+                        tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
+                    }
+                }
+            }
 
             // fire subset changed event:
             ocm.updateSubsetDefinition(this, subsetCopy);
         }
+    }
+
+    /**
+     * Computes a pretty string from a selection. Used for logging for example.
+     *
+     * @param selection the selection to export to a string
+     * @return the string computed from the selection
+     */
+    private String selectionToString(final TreePath[] selection) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < selection.length; i++) {
+            sb.append(i == 0 ? "[" : ",[");
+            final Object[] nodes = selection[i].getPath();
+
+            for (int j = 0; j < nodes.length; j++) {
+                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) nodes[j];
+                if (j > 0) {
+                    sb.append(",");
+                }
+                if (node.equals(dataTree.getRootNode())) {
+                    sb.append("Root");
+                } else {
+                    final Object userObject = node.getUserObject();
+                    if (userObject == null) {
+                        sb.append("null");
+                    } else if (userObject instanceof Target) {
+                        sb.append(((Target) userObject).getTarget());
+                    } else if (userObject instanceof InstrumentMode) {
+                        sb.append(((InstrumentMode) userObject).getInsName());
+                    } else if (userObject instanceof OITable) {
+                        final OITable oiTable = (OITable) userObject;
+                        final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
+                        if (dataFile == null) {
+                            sb.append(((OITable) userObject).getExtName());
+                        } else {
+                            (new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb())).appendShortString(sb);
+                        }
+                    } else {
+                        sb.append(userObject.getClass().getSimpleName());
+                    }
+                }
+            }
+            sb.append("]");
+        }
+        return sb.toString();
     }
 
     /** 
