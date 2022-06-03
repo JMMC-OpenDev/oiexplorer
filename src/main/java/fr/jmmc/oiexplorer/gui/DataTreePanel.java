@@ -85,7 +85,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     }
 
     /**
-     * Free any ressource or reference to this instance :
+     * Free any resource or reference to this instance :
      * remove this instance from OIFitsCollectionManager event notifiers
      */
     @Override
@@ -257,7 +257,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             SwingUtils.invokeLaterEDT(new Runnable() {
                 @Override
                 public void run() {
-
                     // Check if the root node is selected and is the only one.
                     final DefaultMutableTreeNode rootNode = dataTree.getRootNode();
                     if (selection.length == 1 && selection[0].getLastPathComponent() == rootNode) {
@@ -280,10 +279,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     }
 
     /**
-     * Updates the current subsetFilter from a list of selected TreePath. currently only allows one target.
+     * Updates the current subsetFilter from selected TreePath array. 
+     * Currently only allows one target.
      *
      * @param selection the list of selected paths
-     * @return the subsetFilter computed
      */
     private void updateSubsetFilterFromTreeSelection(final TreePath[] selection) {
 
@@ -308,7 +307,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     final Target thisTarget = (Target) userObject;
                     if (target == null) {
                         target = thisTarget; // first target encountered: register it
-                    } else if (!target.equals(thisTarget)) {
+                    } else if (target != thisTarget) {
                         break; // a target is already registered, and the two targets are different: skip this path !!
                     }
                 } else if (userObject instanceof InstrumentMode) {
@@ -316,7 +315,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         final InstrumentMode thisInsMode = (InstrumentMode) userObject;
                         if (insMode == null) {
                             insMode = thisInsMode; // first instrument encountered: register it
-                        } else if (!insMode.equals(thisInsMode)) {
+                        } else if (insMode != thisInsMode) {
                             insMode = null; // an instrument is already registered, and the two are different:
                             allInstruments = true; // set to null to enable all instruments
                         }
@@ -332,7 +331,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         }
 
         processSelection(target, insMode, listOITable);
-        logger.info("new subsetFilter: {}", getSubsetDefinition().getFilter().toShortString());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("new subsetFilter: {}", getSubsetDefinition().getFilter().toShortString());
+        }
     }
 
     /**
@@ -352,8 +354,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             // if target null, select first target as a default
             DefaultMutableTreeNode firstTargetNode = (DefaultMutableTreeNode) dataTree.getRootNode().getFirstChild();
             selection.add(new TreePath(firstTargetNode.getPath()));
-        }
-        else {
+        } else {
             final Target target = oiFitsCollection.getTargetManager().getGlobalByUID(filter.getTargetUID());
             final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(target);
 
@@ -366,32 +367,35 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     insModeTreeNode = GenericJTree.findTreeNode(targetTreeNode, insMode);
                 }
 
-                // for every instrument
-                for (int i = 0, sizeI = targetTreeNode.getChildCount(); i < sizeI; i++) {
-                    DefaultMutableTreeNode insNode = (DefaultMutableTreeNode) targetTreeNode.getChildAt(i);
+                if (!filter.getTables().isEmpty()) {
 
-                    // skip instrument if it is not the one specified (null means all instruments)
-                    if (insModeTreeNode != null && !insModeTreeNode.equals(insNode)) {
-                        continue;
-                    }
+                    // for every instrument
+                    for (int i = 0, sizeI = targetTreeNode.getChildCount(); i < sizeI; i++) {
+                        DefaultMutableTreeNode insNode = (DefaultMutableTreeNode) targetTreeNode.getChildAt(i);
 
-                    // for every table of the filter
-                    for (TableUID tableUID : filter.getTables()) {
+                        // skip instrument if it is not the one specified (null means all instruments)
+                        if (insModeTreeNode != null && !insModeTreeNode.equals(insNode)) {
+                            continue;
+                        }
 
-                        final String filePath = tableUID.getFile().getFile();
-                        final Integer extNb = tableUID.getExtNb();
+                        // for every table of the filter
+                        for (TableUID tableUID : filter.getTables()) {
 
-                        for (int j = 0, sizeJ = insNode.getChildCount(); j < sizeJ; j++) {
-                            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) insNode.getChildAt(j);
-                            final OITable oiTable = (OITable) node.getUserObject();
+                            final String filePath = tableUID.getFile().getFile();
+                            final Integer extNb = tableUID.getExtNb();
 
-                            if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
-                                if (extNb != null && extNb.intValue() == oiTable.getExtNb()) {
-                                    if (listTableTreeNode == null) {
-                                        listTableTreeNode = new ArrayList<>();
+                            for (int j = 0, sizeJ = insNode.getChildCount(); j < sizeJ; j++) {
+                                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) insNode.getChildAt(j);
+                                final OITable oiTable = (OITable) node.getUserObject();
+
+                                if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
+                                    if (extNb != null && extNb.intValue() == oiTable.getExtNb()) {
+                                        if (listTableTreeNode == null) {
+                                            listTableTreeNode = new ArrayList<>();
+                                        }
+                                        listTableTreeNode.add(node);
+                                        break;
                                     }
-                                    listTableTreeNode.add(node);
-                                    break;
                                 }
                             }
                         }
@@ -411,14 +415,18 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         }
 
         final TreePath[] arraySelection = selection.toArray(new TreePath[0]);
-        logger.info("new selection : {}", selectionToString(arraySelection));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("new selection : {}", selectionToString(arraySelection));
+        }
         return arraySelection;
     }
 
     /**
      * Update the SubsetDefinition depending on the data tree selection
-     *
-     * @param newFilter new SubsetFilter to apply to the old one
+     * @param target selected target UID
+     * @param insMode selected InstrumentMode UID
+     * @param listOITable selected tables
      */
     private void processSelection(final Target target, final InstrumentMode insMode, final List<OITable> listOITable) {
         logger.debug("processSelection: {}", target, insMode, listOITable);
