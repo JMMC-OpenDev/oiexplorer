@@ -67,10 +67,8 @@ public final class LoadOIFitsAction extends RegisteredAction {
             } else {
                 // update current directory for oidata:
                 SessionSettingsPreferences.setCurrentDirectoryForMimeType(mimeType, file.getParent());
-
                 files = new File[]{file};
             }
-
         } else {
             files = FileChooser.showOpenFilesChooser("Load oifits file", null, mimeType);
         }

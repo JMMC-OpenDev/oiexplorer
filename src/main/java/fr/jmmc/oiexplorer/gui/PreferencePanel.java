@@ -41,7 +41,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
      */
     private void postInit() {
 
-        // Set the Aspro Preferences:
+        // Set the Preferences:
         this.chartPreferencesView.setPreferences(myPreferences);
 
         // register this instance as a Preference Observer :
