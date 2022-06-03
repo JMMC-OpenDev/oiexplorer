@@ -28,6 +28,8 @@ See the `pom.xml` file to get all dependencies, including other JMMC OpenDev mod
 
 To be continued...
 
+See [technical documents](doc/summary.md)
+
 
 ## Build
 
