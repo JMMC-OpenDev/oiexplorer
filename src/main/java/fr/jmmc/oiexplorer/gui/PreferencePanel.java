@@ -106,7 +106,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jPanelPrefs.setLayout(new java.awt.GridBagLayout());
 
         jLabelTargetSep.setText("Max target separation (as)");
-        jLabelTargetSep.setToolTipText("All related values below this threshold will be flagged out (V2, T3...)");
+        jLabelTargetSep.setToolTipText("Targets within this separation radius are considered the same object");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -116,6 +116,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
 
         jFieldTargetSep.setColumns(5);
         jFieldTargetSep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.0#"))));
+        jFieldTargetSep.setToolTipText("");
         jFieldTargetSep.setName("jFieldMinElev"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
