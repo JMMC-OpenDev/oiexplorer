@@ -130,20 +130,22 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         generateTree(oiFitsCollection);
 
         // ALWAYS select a target
-        // TODO: the selection should be in sync with subset modification (load, external updates)
         if (oiFitsCollection.isEmpty()) {
             processSelection(null, null, null);
         } else {
-
             // Restore subset selection:
             final SubsetDefinition subsetRef = getSubsetDefinitionRef();
 
-            if (subsetRef == null) {
+            TreePath[] newSelection = null;
+
+            if (subsetRef != null) {
+                newSelection = computeSelectionFromSubsetFilter(subsetRef.getFilter(), oiFitsCollection);
+            }
+
+            if ((newSelection == null) || (newSelection.length == 0)) {
                 // select first target :
                 dataTree.selectFirstChildNode(dataTree.getRootNode());
             } else {
-                final SubsetFilter filter = subsetRef.getFilter();
-                final TreePath[] newSelection = computeSelectionFromSubsetFilter(filter, oiFitsCollection);
                 dataTree.selectPaths(newSelection);
             }
         }
@@ -250,8 +252,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         final TreePath[] selection = dataTree.getSelectionPaths();
 
-        if (selection == null) { // should never happen
-            logger.error(("Selection is null."));
+        if (selection == null) {
+            logger.error("Selection is null.");
         } else {
             // Use invokeLater to selection change issues with editors :
             SwingUtils.invokeLaterEDT(new Runnable() {
@@ -268,7 +270,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
                     // we compute a new selection, because it can prune the old one from unwanted paths
                     final TreePath[] newSelection = computeSelectionFromSubsetFilter(
-                            getSubsetDefinition().getFilter(), ocm.getOIFitsCollection());
+                            getSubsetDefinitionRef().getFilter(), ocm.getOIFitsCollection());
 
                     if (!Arrays.equals(selection, newSelection)) {
                         dataTree.selectPaths(newSelection); // ask to change the selection if it has changed
@@ -325,7 +327,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     // parent insMode and its grandparent target
                     listOITable.add((OITable) userObject); // add the table to the list
                 } else {
-                    logger.error("Encountered unknown node in the selected path."); // should never happen
+                    logger.error("Encountered unsupported node in the selected path : {}", userObject);
                 }
             }
         }
@@ -333,7 +335,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         processSelection(target, insMode, listOITable);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("new subsetFilter: {}", getSubsetDefinition().getFilter().toShortString());
+            logger.debug("new subsetFilter: {}", getSubsetDefinitionRef().getFilter().toShortString());
         }
     }
 
@@ -463,6 +465,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
      */
     private String selectionToString(final TreePath[] selection) {
         final StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < selection.length; i++) {
             sb.append(i == 0 ? "[" : ",[");
             final Object[] nodes = selection[i].getPath();
