@@ -252,9 +252,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         final TreePath[] selection = dataTree.getSelectionPaths();
 
-        if (selection == null) {
-            logger.error("Selection is null.");
-        } else {
+        if (selection != null) {
             // Use invokeLater to selection change issues with editors :
             SwingUtils.invokeLaterEDT(new Runnable() {
                 @Override
