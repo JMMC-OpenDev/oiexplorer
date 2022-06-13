@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 3"/>
-    <compilation date="03/06/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 4"/>
+    <compilation date="13/06/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,7 +169,10 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Fri, 03 Jun 2022 17:00:00 GMT</pubDate>
+            <pubDate>Mon, 13 Jun 2022 15:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 4">
+               <change type="BUGFIX">Improved internal data model coherence when oifits files are updated, removed...</change>-->
+            </prerelease>
             <prerelease version="0.3.0 beta 3">
                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/3">Handle multiple selection (tables) in the bottom left tree</change>-->
             </prerelease>
