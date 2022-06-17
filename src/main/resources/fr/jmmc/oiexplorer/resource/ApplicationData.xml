@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 4"/>
-    <compilation date="13/06/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 5"/>
+    <compilation date="17/06/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,16 +169,20 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Mon, 13 Jun 2022 15:00:00 GMT</pubDate>
+            <pubDate>Fri, 17 Jun 2022 17:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 5">
+               <change type="BUGFIX">Added XML Model view in dev mode (-Doixp.devMode=true)</change>
+               <change type="BUGFIX">Always remove all views when clicking on 'New OIFits Collection' action</change>
+            </prerelease>
             <prerelease version="0.3.0 beta 4">
-               <change type="BUGFIX">Improved internal data model coherence when oifits files are updated, removed...</change>-->
+               <change type="BUGFIX">Improved internal data model coherence when oifits files are updated, removed...</change>
             </prerelease>
             <prerelease version="0.3.0 beta 3">
-               <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/3">Handle multiple selection (tables) in the bottom left tree</change>-->
+               <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/3">Handle multiple selection (tables) in the bottom left tree</change>
             </prerelease>
             <prerelease version="0.3.0 beta 2">
                 <!--<change type="FEATURE">embed new jmcs that exposes specific mtypes over the web profile</change>-->
-                <change type="CHANGE">Email field now is mandatory to submit a feedback report</change>-->
+                <change type="CHANGE">Email field now is mandatory to submit a feedback report</change>
             </prerelease>
             <prerelease version="0.3.0 beta 1">
                 <change type="FEATURE">Added 'Remove OIFits files' action to remove OIFITS files corresponding to the current selection</change>

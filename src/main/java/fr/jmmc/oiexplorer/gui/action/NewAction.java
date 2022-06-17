@@ -7,6 +7,7 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.MessagePane.ConfirmSaveChanges;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import java.awt.event.ActionEvent;
 import org.slf4j.Logger;
@@ -69,6 +70,9 @@ public final class NewAction extends RegisteredAction {
         }
         // If the user clicked the "Don't Save" button, go on
         OIFitsCollectionManager.getInstance().reset();
+
+        // Remove other views (oifits browser):
+        OIFitsExplorer.getInstance().getMainPanel().removeOtherViews();
 
         StatusBar.show("new OIFits collection created.");
     }

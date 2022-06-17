@@ -13,6 +13,7 @@ import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.action.ActionRegistrar;
 import fr.jmmc.jmcs.gui.action.RegisteredAction;
 import fr.jmmc.jmcs.gui.component.Disposable;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.oiexplorer.core.export.DocumentExportable;
 import fr.jmmc.oiexplorer.core.export.DocumentMode;
@@ -36,14 +37,18 @@ import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import fr.jmmc.oiexplorer.gui.action.RemoveAction;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
@@ -66,6 +71,12 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(MainPanel.class);
 
+    /** view name prefix for DEBUG views */
+    public final static String DEBUG_VIEW_PREFIX = "DEBUG - ";
+
+    /** dev mode flag (-Doixp.devMode=true) */
+    public final static boolean DEV_MODE = "true".equalsIgnoreCase(System.getProperty("oixp.devMode", "false"));
+
     /* members */
     /** OIFitsCollectionManager singleton reference */
     private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
@@ -76,6 +87,9 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     /** prepared page content */
     private List<DocumentPage> pages = null;
 
+    // debug support:
+    private JEditorPane editorPane = null;
+
     /**
      * Creates new form MainPanel
      */
@@ -84,6 +98,10 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         ocm.bindCollectionChangedEvent(this);
         ocm.bindPlotListChangedEvent(this);
         ocm.getActivePlotChangedEventNotifier().register(this);
+
+        if (DEV_MODE) {
+            ocm.getPlotChangedEventNotifier().register(this);
+        }
 
         // Build GUI
         initComponents();
@@ -366,11 +384,11 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
                 final PlotView plotView = (PlotView) com;
 
                 if (!Identifiable.hasIdentifiable(plotView.getPlotId(), plotList)) {
-                    removeView(i);
-
-                    // restart loop (global view may be added/removed):
-                    i = 0;
-                    tabCount = tabbedPaneTop.getTabCount();
+                    if (removeView(i)) {
+                        // restart loop (global view may be added/removed):
+                        i = 0;
+                        tabCount = tabbedPaneTop.getTabCount();
+                    }
                 }
             }
         }
@@ -466,8 +484,8 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
      * @param panel Panel to add (PlotView instance)
      * @param tabName name of panel to be added
      */
-    public void addView(final JPanel panel, final String tabName) {
-        JPanel panelToAdd = panel;
+    public void addView(final JComponent panel, final String tabName) {
+        JComponent panelToAdd = panel;
 
         if (panelToAdd == null) {
             // note: as a plot is added, then updateTabContent() is called by event notifier:
@@ -604,14 +622,36 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     }
 
     /**
+     * Remove other views
+     */
+    public void removeOtherViews() {
+        // remove views except plot views:
+        for (int i = 0, tabCount = tabbedPaneTop.getTabCount(); i < tabCount; i++) {
+            final Component com = tabbedPaneTop.getComponentAt(i);
+            if (!(com instanceof PlotView)) {
+                if (removeView(i)) {
+                    // restart loop (global view may be added/removed):
+                    i = 0;
+                    tabCount = tabbedPaneTop.getTabCount();
+                }
+            }
+        }
+    }
+
+    /**
      * Remove view at the given index
      * @param index view index
+     * @return true if removed; false otherwise
      */
-    private void removeView(final int index) {
+    private boolean removeView(final int index) {
+        final String name = tabbedPaneTop.getTitleAt(index);
+        if (name.startsWith(DEBUG_VIEW_PREFIX)) {
+            return false;
+        }
+
         // Note: views should be freed by GC soon
         // EventNotifier can remove them automatically from its listeners (weak reference)
         // BUT not immediately so such phantom views can still process useless events !
-
         // CONCLUSION: it is better to do it explicitely even if EventNotifier could do it but asynchronously:
         final Component com = tabbedPaneTop.getComponentAt(index);
         if (com instanceof PlotView) {
@@ -632,6 +672,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         tabbedPaneTop.removeTabAt(index);
 
         updateOverviewTab();
+        return true;
     }
 
     private void updateOverviewTab() {
@@ -760,9 +801,14 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     /**
      * This action open prepare plot objects and open one new tab.
      */
-    private class NewPlotTabAction extends RegisteredAction {
+    private final class NewPlotTabAction extends RegisteredAction {
 
-        public NewPlotTabAction(final String className, final String actionName) {
+        /**
+         * default serial UID for Serializable interface
+         */
+        private static final long serialVersionUID = 1;
+
+        NewPlotTabAction(final String className, final String actionName) {
             super(className, actionName);
         }
 
@@ -772,7 +818,12 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         }
     }
 
-    class JideButtonUIResource extends JideButton implements UIResource {
+    private final static class JideButtonUIResource extends JideButton implements UIResource {
+
+        /**
+         * default serial UID for Serializable interface
+         */
+        private static final long serialVersionUID = 1;
 
         public JideButtonUIResource(String text) {
             super(text);
@@ -808,16 +859,29 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         switch (event.getType()) {
             case COLLECTION_CHANGED:
                 // TODO init first tab if empty ?
+                if (DEV_MODE) {
+                    if (editorPane == null) {
+                        addView(createDebugPanel(), DEBUG_VIEW_PREFIX + "Model");
+                    }
+                }
                 break;
             case PLOT_LIST_CHANGED:
                 // Update tabpane content
                 updateTabContent(event.getPlotList());
+                break;
+            case PLOT_CHANGED:
+                // nothing to do (debug model below)
                 break;
             case ACTIVE_PLOT_CHANGED:
                 setSelectedPlotId(event.getActivePlot().getId());
                 break;
             default:
         }
+
+        if (editorPane != null) {
+            editorPane.setText(ocm.dumpOIFitsCollection());
+        }
+
         logger.debug("onProcess {} - done", event);
     }
 
@@ -826,5 +890,18 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
             return new JTabbedPane();
         }
         return new JideTabbedPane();
+    }
+
+    private JComponent createDebugPanel() {
+        if (editorPane == null) {
+            editorPane = new JTextPane();
+            editorPane.setEditable(false);
+            editorPane.setFont(new Font("Monospaced", Font.PLAIN, SwingUtils.adjustUISize(12)));
+        }
+
+        final JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(editorPane);
+        scrollPane.setBorder(null);
+        return scrollPane;
     }
 }
