@@ -6,6 +6,7 @@ package fr.jmmc.oiexplorer.gui;
 import fr.jmmc.jmal.ALX;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.util.NumberUtils;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -21,6 +22,7 @@ import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetFilter;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
+import fr.jmmc.oiexplorer.core.model.plot.Range;
 import static fr.jmmc.oitools.OIFitsConstants.COLUMN_EFF_WAVE;
 import fr.jmmc.oitools.model.Granule;
 import fr.jmmc.oitools.model.InstrumentMode;
@@ -32,15 +34,21 @@ import fr.jmmc.oitools.model.Target;
 import fr.jmmc.oitools.model.TargetManager;
 import fr.jmmc.oitools.util.GranuleComparator;
 import java.awt.Component;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JFormattedTextField;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -132,13 +140,13 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         generateTree(oiFitsCollection);
 
+        final SubsetDefinition subsetRef = getSubsetDefinitionRef();
+
         // ALWAYS select a target
         if (oiFitsCollection.isEmpty()) {
             processSelection(null, null, null);
         } else {
             // Restore subset selection:
-            final SubsetDefinition subsetRef = getSubsetDefinitionRef();
-
             TreePath[] newSelection = null;
 
             if (subsetRef != null) {
@@ -151,6 +159,26 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             } else {
                 dataTree.selectPaths(newSelection);
             }
+        }
+
+        // update generic filters
+        if (subsetRef != null) {
+            for (GenericFilter genericFilter : subsetRef.getGenericFilters()) {
+
+                if (COLUMN_EFF_WAVE.equals(genericFilter.getColumnName())) {
+                    if (DataType.NUMERIC.equals(genericFilter.getDataType())) {
+
+                        jCheckBoxWVEnable.setSelected(genericFilter.isEnabled());
+
+                        for (Range range : genericFilter.getAcceptedRanges()) {
+                            jFormattedTextFieldWVMin.setText(NumberUtils.format(range.getMin()));
+                            jFormattedTextFieldWVMax.setText(NumberUtils.format(range.getMax()));
+                        }
+                    }
+                }
+            }
+            // the gui may have made some changes to the values. thus collection must be synced with these new values
+            processGenericFilters();
         }
     }
 
@@ -453,19 +481,39 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 }
             }
 
-            // TODO: remove this hardcoded generic filter, replace by GUI widget
-            final GenericFilter wvFilter = new GenericFilter();
-            wvFilter.setEnabled(true);
-            wvFilter.setColumnName(COLUMN_EFF_WAVE);
-            wvFilter.setDataType(DataType.NUMERIC);
-            final fr.jmmc.oiexplorer.core.model.plot.Range range = new fr.jmmc.oiexplorer.core.model.plot.Range();
-            range.setMin(1.9E-6);
-            range.setMax(2.3E-6);
-            wvFilter.getAcceptedRanges().add(range);
-            subsetCopy.getGenericFilters().clear();
-            subsetCopy.getGenericFilters().add(wvFilter);
-
             // fire subset changed event:
+            ocm.updateSubsetDefinition(this, subsetCopy);
+        }
+    }
+
+    private void processGenericFilters() {
+        final SubsetDefinition subsetCopy = getSubsetDefinition();
+        if (subsetCopy != null) {
+
+            final boolean wvEnable = jCheckBoxWVEnable.isSelected();
+            final Double wvMin = NumberUtils.parseDouble(jFormattedTextFieldWVMin.getText());
+            final Double wvMax = NumberUtils.parseDouble(jFormattedTextFieldWVMax.getText());
+
+            subsetCopy.getGenericFilters().clear();
+
+            if ((wvMin != null) && (wvMax != null)) {
+
+                final GenericFilter wvFilter = new GenericFilter();
+                wvFilter.setEnabled(wvEnable);
+                wvFilter.setColumnName(COLUMN_EFF_WAVE);
+                wvFilter.setDataType(DataType.NUMERIC);
+                final fr.jmmc.oiexplorer.core.model.plot.Range range = new fr.jmmc.oiexplorer.core.model.plot.Range();
+                range.setMin(wvMin);
+                range.setMax(wvMax);
+                wvFilter.getAcceptedRanges().add(range);
+
+                subsetCopy.getGenericFilters().add(wvFilter);
+                logger.info("Set GenericFilter wavelength {} {} enabled={}.", wvMin, wvMax, wvEnable);
+            }
+            else {
+                logger.info("Cannot set Wavelength generic Filter because null values.");
+            }
+
             ocm.updateSubsetDefinition(this, subsetCopy);
         }
     }
@@ -529,6 +577,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         jScrollPane = new javax.swing.JScrollPane();
         genericTreePanel = new javax.swing.JPanel();
+        jPanelGenericFilters = new javax.swing.JPanel();
+        jCheckBoxWVEnable = new javax.swing.JCheckBox();
+        jFormattedTextFieldWVMin = new javax.swing.JFormattedTextField();
+        jFormattedTextFieldWVMax = new javax.swing.JFormattedTextField();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -542,9 +594,59 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(jScrollPane, gridBagConstraints);
+
+        jCheckBoxWVEnable.setText("wavelength range");
+        jCheckBoxWVEnable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxWVEnableActionPerformed(evt);
+            }
+        });
+        jPanelGenericFilters.add(jCheckBoxWVEnable);
+
+        jFormattedTextFieldWVMin.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("0.000E0"))));
+        jFormattedTextFieldWVMin.setText("1.000E-6");
+        jFormattedTextFieldWVMin.setPreferredSize(new java.awt.Dimension(80, 27));
+        jFormattedTextFieldWVMin.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextFieldWVMinPropertyChange(evt);
+            }
+        });
+        jPanelGenericFilters.add(jFormattedTextFieldWVMin);
+
+        jFormattedTextFieldWVMax.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("0.000E0"))));
+        jFormattedTextFieldWVMax.setText("2.000E-6");
+        jFormattedTextFieldWVMax.setPreferredSize(new java.awt.Dimension(80, 27));
+        jFormattedTextFieldWVMax.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextFieldWVMaxPropertyChange(evt);
+            }
+        });
+        jPanelGenericFilters.add(jFormattedTextFieldWVMax);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        add(jPanelGenericFilters, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jFormattedTextFieldWVMinPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldWVMinPropertyChange
+        processGenericFilters();
+    }//GEN-LAST:event_jFormattedTextFieldWVMinPropertyChange
+
+    private void jFormattedTextFieldWVMaxPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldWVMaxPropertyChange
+        processGenericFilters();
+    }//GEN-LAST:event_jFormattedTextFieldWVMaxPropertyChange
+
+    private void jCheckBoxWVEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxWVEnableActionPerformed
+        processGenericFilters();
+    }//GEN-LAST:event_jCheckBoxWVEnableActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel genericTreePanel;
+    private javax.swing.JCheckBox jCheckBoxWVEnable;
+    private javax.swing.JFormattedTextField jFormattedTextFieldWVMax;
+    private javax.swing.JFormattedTextField jFormattedTextFieldWVMin;
+    private javax.swing.JPanel jPanelGenericFilters;
     private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
 
@@ -772,5 +874,33 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             }
             return sb.toString();
         }
+    }
+
+    public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
+        return new DefaultFormatterFactory(new NumberFormatter(new DecimalFormat("0.0####E00")) {
+            private static final long serialVersionUID = 1L;
+
+            private final NumberFormat fmtDef = new DecimalFormat("0.0####");
+
+            @Override
+            public String valueToString(final Object value) throws ParseException {
+                if (value == null) {
+                    return "";
+                }
+                if (value instanceof Double) {
+                    // check value range:
+                    final double abs = Math.abs((Double) value);
+
+                    if ((abs > 1e-3d) && (abs < 1e3d)) {
+                        return fmtDef.format(value);
+                    }
+                }
+                final String formatted = super.valueToString(value);
+                if (formatted.endsWith("E00")) {
+                    return formatted.substring(0, formatted.length() - 3);
+                }
+                return formatted;
+            }
+        });
     }
 }
