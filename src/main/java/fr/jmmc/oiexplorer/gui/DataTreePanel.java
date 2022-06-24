@@ -14,11 +14,14 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.ACTIVE_PLOT_CHANGED;
 import static fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType.COLLECTION_CHANGED;
+import fr.jmmc.oiexplorer.core.model.oi.DataType;
+import fr.jmmc.oiexplorer.core.model.oi.GenericFilter;
 import fr.jmmc.oiexplorer.core.model.oi.OIDataFile;
 import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetFilter;
 import fr.jmmc.oiexplorer.core.model.oi.TableUID;
+import static fr.jmmc.oitools.OIFitsConstants.COLUMN_EFF_WAVE;
 import fr.jmmc.oitools.model.Granule;
 import fr.jmmc.oitools.model.InstrumentMode;
 import fr.jmmc.oitools.model.InstrumentModeManager;
@@ -449,6 +452,18 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     }
                 }
             }
+
+            // TODO: remove this hardcoded generic filter, replace by GUI widget
+            final GenericFilter wvFilter = new GenericFilter();
+            wvFilter.setEnabled(true);
+            wvFilter.setColumnName(COLUMN_EFF_WAVE);
+            wvFilter.setDataType(DataType.NUMERIC);
+            final fr.jmmc.oiexplorer.core.model.plot.Range range = new fr.jmmc.oiexplorer.core.model.plot.Range();
+            range.setMin(1.9E-6);
+            range.setMax(2.3E-6);
+            wvFilter.getAcceptedRanges().add(range);
+            subsetCopy.getGenericFilters().clear();
+            subsetCopy.getGenericFilters().add(wvFilter);
 
             // fire subset changed event:
             ocm.updateSubsetDefinition(this, subsetCopy);
