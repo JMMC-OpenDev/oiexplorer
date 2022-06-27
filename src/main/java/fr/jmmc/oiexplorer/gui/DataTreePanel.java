@@ -165,8 +165,13 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         if (subsetRef != null) {
             for (GenericFilter genericFilter : subsetRef.getGenericFilters()) {
 
+                // if the generic filter is about wavelength range and has correct data type
                 if (COLUMN_EFF_WAVE.equals(genericFilter.getColumnName())) {
                     if (DataType.NUMERIC.equals(genericFilter.getDataType())) {
+
+                        // we set the checkbox and the text fields.
+                        // indeed the last wavelength generic filter will be the only one actually used.
+                        // the GUI currently has strictly exactly one wavelength generic filter.
 
                         jCheckBoxWVEnable.setSelected(genericFilter.isEnabled());
 
@@ -177,7 +182,9 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     }
                 }
             }
-            // the gui may have made some changes to the values. thus collection must be synced with these new values
+            // the gui may have made some changes to the values. thus collection must be synced with these new values.
+            // Typically, the GUI always have one wavelength filter, so if the loaded SubsetDefinition did not have any
+            // wavelength filter, then it will have one, to keep the coherence with the GUI.
             processGenericFilters();
         }
     }
@@ -486,18 +493,27 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         }
     }
 
+    /**
+     * Reads the GUI generic filters, and updates the current SubsetDefinition so it is consistent with the GUI values.
+     * Note that the GUI is currently limited to exactly one wavelength generic filter, so the SubsetDefinition will
+     * be constrained to this.
+     */
     private void processGenericFilters() {
         final SubsetDefinition subsetCopy = getSubsetDefinition();
         if (subsetCopy != null) {
 
+            // read the wavelength generic filter of the GUI
             final boolean wvEnable = jCheckBoxWVEnable.isSelected();
             final Double wvMin = NumberUtils.parseDouble(jFormattedTextFieldWVMin.getText());
             final Double wvMax = NumberUtils.parseDouble(jFormattedTextFieldWVMax.getText());
 
+            // clear any generic filter of the subset definition copy
             subsetCopy.getGenericFilters().clear();
 
+            // register the filter only if the parsed double values are not null
             if ((wvMin != null) && (wvMax != null)) {
 
+                // create a wavelength generic filter with the values from the GUI
                 final GenericFilter wvFilter = new GenericFilter();
                 wvFilter.setEnabled(wvEnable);
                 wvFilter.setColumnName(COLUMN_EFF_WAVE);
@@ -507,6 +523,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 range.setMax(wvMax);
                 wvFilter.getAcceptedRanges().add(range);
 
+                // add the generic filter to the subset definition copy
                 subsetCopy.getGenericFilters().add(wvFilter);
                 logger.info("Set GenericFilter wavelength {} {} enabled={}.", wvMin, wvMax, wvEnable);
             }
@@ -514,6 +531,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 logger.info("Cannot set Wavelength generic Filter because null values.");
             }
 
+            // ask to update the current SubsetDefinition
             ocm.updateSubsetDefinition(this, subsetCopy);
         }
     }
