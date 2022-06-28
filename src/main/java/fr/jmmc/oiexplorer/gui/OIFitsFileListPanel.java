@@ -19,7 +19,6 @@ import fr.jmmc.oiexplorer.core.model.oi.Plot;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oitools.model.OIFitsCollection;
 import fr.jmmc.oitools.model.OIFitsFile;
-import fr.jmmc.oitools.model.OITable;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.lang.ref.WeakReference;
@@ -177,12 +176,12 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
 
         final SubsetDefinition subset = getSubsetDefinitionRef();
         // ignore for non valid oifitsSubset associated
-        if (subset == null || subset.getOIFitsSubset() == null) {
+        if (subset == null || subset.getSelectorResult()== null) {
             return;
         }
 
         // select element present in both lists
-        final List<OITable> oiFitsOfSubset = subset.getOIFitsSubset().getOITableList();
+        final List<OIFitsFile> oiFitsOfSubset = subset.getSelectorResult().getSortedOIFitsFiles();
         oifitsFileList.clearSelection();
 
         final ListSelectionModel sm = oifitsFileList.getSelectionModel();
@@ -190,8 +189,8 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
 
         int found = -1;
         for (int i = 0; i < size; i++) {
-            for (OITable table : oiFitsOfSubset) {
-                if (table.getOIFitsFile() == lm.getElementAt(i)) {
+            for (OIFitsFile oiFitsFile : oiFitsOfSubset) {
+                if (oiFitsFile == lm.getElementAt(i)) {
                     sm.addSelectionInterval(i, i);
                     if (found == -1) {
                         found = i;
