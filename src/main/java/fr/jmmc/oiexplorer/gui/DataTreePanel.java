@@ -172,7 +172,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         // we set the checkbox and the text fields.
                         // indeed the last wavelength generic filter will be the only one actually used.
                         // the GUI currently has strictly exactly one wavelength generic filter.
-
                         jCheckBoxWVEnable.setSelected(genericFilter.isEnabled());
 
                         for (Range range : genericFilter.getAcceptedRanges()) {
@@ -526,8 +525,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 // add the generic filter to the subset definition copy
                 subsetCopy.getGenericFilters().add(wvFilter);
                 logger.info("Set GenericFilter wavelength {} {} enabled={}.", wvMin, wvMax, wvEnable);
-            }
-            else {
+            } else {
                 logger.info("Cannot set Wavelength generic Filter because null values.");
             }
 
@@ -613,37 +611,48 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         gridBagConstraints.weighty = 1.0;
         add(jScrollPane, gridBagConstraints);
 
-        jCheckBoxWVEnable.setText("wavelength range");
+        jPanelGenericFilters.setLayout(new java.awt.GridBagLayout());
+
+        jCheckBoxWVEnable.setText("EFF_WAVE");
         jCheckBoxWVEnable.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxWVEnableActionPerformed(evt);
             }
         });
-        jPanelGenericFilters.add(jCheckBoxWVEnable);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanelGenericFilters.add(jCheckBoxWVEnable, gridBagConstraints);
 
+        jFormattedTextFieldWVMin.setColumns(8);
         jFormattedTextFieldWVMin.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("0.000E0"))));
         jFormattedTextFieldWVMin.setText("1.000E-6");
-        jFormattedTextFieldWVMin.setPreferredSize(new java.awt.Dimension(80, 27));
         jFormattedTextFieldWVMin.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 jFormattedTextFieldWVMinPropertyChange(evt);
             }
         });
-        jPanelGenericFilters.add(jFormattedTextFieldWVMin);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanelGenericFilters.add(jFormattedTextFieldWVMin, gridBagConstraints);
 
+        jFormattedTextFieldWVMax.setColumns(8);
         jFormattedTextFieldWVMax.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("0.000E0"))));
         jFormattedTextFieldWVMax.setText("2.000E-6");
-        jFormattedTextFieldWVMax.setPreferredSize(new java.awt.Dimension(80, 27));
         jFormattedTextFieldWVMax.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 jFormattedTextFieldWVMaxPropertyChange(evt);
             }
         });
-        jPanelGenericFilters.add(jFormattedTextFieldWVMax);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanelGenericFilters.add(jFormattedTextFieldWVMax, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(jPanelGenericFilters, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
