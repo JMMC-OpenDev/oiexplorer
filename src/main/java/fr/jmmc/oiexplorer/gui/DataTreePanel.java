@@ -174,7 +174,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         // the GUI currently has strictly exactly one wavelength generic filter.
                         jCheckBoxWVEnable.setSelected(genericFilter.isEnabled());
 
-                        for (Range range : genericFilter.getAcceptedRanges()) {
+                        if (!genericFilter.getAcceptedRanges().isEmpty()) {
+                            final Range range = genericFilter.getAcceptedRanges().get(0);
                             jFormattedTextFieldWVMin.setText(NumberUtils.format(range.getMin()));
                             jFormattedTextFieldWVMax.setText(NumberUtils.format(range.getMax()));
                         }
@@ -510,23 +511,24 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             subsetCopy.getGenericFilters().clear();
 
             // register the filter only if the parsed double values are not null
-            if ((wvMin != null) && (wvMax != null)) {
-
+            if ((wvMin != null) || (wvMax != null)) {
                 // create a wavelength generic filter with the values from the GUI
                 final GenericFilter wvFilter = new GenericFilter();
                 wvFilter.setEnabled(wvEnable);
                 wvFilter.setColumnName(COLUMN_EFF_WAVE);
                 wvFilter.setDataType(DataType.NUMERIC);
+
                 final fr.jmmc.oiexplorer.core.model.plot.Range range = new fr.jmmc.oiexplorer.core.model.plot.Range();
-                range.setMin(wvMin);
-                range.setMax(wvMax);
+                range.setMin((wvMin != null) ? wvMin : Double.NaN);
+                range.setMax((wvMax != null) ? wvMax : Double.NaN);
                 wvFilter.getAcceptedRanges().add(range);
 
                 // add the generic filter to the subset definition copy
                 subsetCopy.getGenericFilters().add(wvFilter);
-                logger.info("Set GenericFilter wavelength {} {} enabled={}.", wvMin, wvMax, wvEnable);
-            } else {
-                logger.info("Cannot set Wavelength generic Filter because null values.");
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Set GenericFilter wavelength {} {} enabled={}.", wvMin, wvMax, wvEnable);
+                }
             }
 
             // ask to update the current SubsetDefinition
@@ -657,11 +659,15 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     }// </editor-fold>//GEN-END:initComponents
 
     private void jFormattedTextFieldWVMinPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldWVMinPropertyChange
-        processGenericFilters();
+        if ("value".equals(evt.getPropertyName())) {
+            processGenericFilters();
+        }
     }//GEN-LAST:event_jFormattedTextFieldWVMinPropertyChange
 
     private void jFormattedTextFieldWVMaxPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextFieldWVMaxPropertyChange
-        processGenericFilters();
+        if ("value".equals(evt.getPropertyName())) {
+            processGenericFilters();
+        }
     }//GEN-LAST:event_jFormattedTextFieldWVMaxPropertyChange
 
     private void jCheckBoxWVEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxWVEnableActionPerformed
