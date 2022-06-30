@@ -640,7 +640,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         jFormattedTextFieldWVMax.setColumns(8);
         jFormattedTextFieldWVMax.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("0.000E0"))));
-        jFormattedTextFieldWVMax.setText("2.000E-6");
+        jFormattedTextFieldWVMax.setText("9.000E-6");
         jFormattedTextFieldWVMax.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 jFormattedTextFieldWVMaxPropertyChange(evt);
@@ -907,33 +907,5 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             }
             return sb.toString();
         }
-    }
-
-    public static JFormattedTextField.AbstractFormatterFactory getDecimalFormatterFactory() {
-        return new DefaultFormatterFactory(new NumberFormatter(new DecimalFormat("0.0####E00")) {
-            private static final long serialVersionUID = 1L;
-
-            private final NumberFormat fmtDef = new DecimalFormat("0.0####");
-
-            @Override
-            public String valueToString(final Object value) throws ParseException {
-                if (value == null) {
-                    return "";
-                }
-                if (value instanceof Double) {
-                    // check value range:
-                    final double abs = Math.abs((Double) value);
-
-                    if ((abs > 1e-3d) && (abs < 1e3d)) {
-                        return fmtDef.format(value);
-                    }
-                }
-                final String formatted = super.valueToString(value);
-                if (formatted.endsWith("E00")) {
-                    return formatted.substring(0, formatted.length() - 3);
-                }
-                return formatted;
-            }
-        });
     }
 }
