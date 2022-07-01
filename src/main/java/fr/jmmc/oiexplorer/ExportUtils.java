@@ -126,7 +126,7 @@ public final class ExportUtils {
                 for (String subsetId : ocm.getSubsetDefinitionIds()) {
                     final SubsetDefinition subsetDefinition = ocm.getSubsetDefinitionRef(subsetId);
                     if (subsetDefinition != null) {
-                        if (subsetDefinition.getOIFitsSubset() != null) {
+                        if (subsetDefinition.getSelectorResult()!= null) {
                             noData = false;
                         } else {
                             logger.warn("Subset[{}] has no data with filter {}", subsetId, subsetDefinition.getFilter());

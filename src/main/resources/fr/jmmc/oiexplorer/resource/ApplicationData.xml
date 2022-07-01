@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 5"/>
-    <compilation date="17/06/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 6"/>
+    <compilation date="30/06/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,7 +169,10 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Fri, 17 Jun 2022 17:00:00 GMT</pubDate>
+            <pubDate>Thu, 30 Jun 2022 16:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 6">
+               <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/11">Added new dynamic filter on wavelength (only 1 range for now)</change>
+            </prerelease>
             <prerelease version="0.3.0 beta 5">
                <change type="BUGFIX">Added XML Model view in dev mode (-Doixp.devMode=true)</change>
                <change type="BUGFIX">Always remove all views when clicking on 'New OIFits Collection' action</change>
