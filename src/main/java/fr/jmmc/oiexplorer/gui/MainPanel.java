@@ -744,7 +744,9 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         jTabbedPaneBrowser = new javax.swing.JTabbedPane();
         granuleTreePanel = new fr.jmmc.oiexplorer.gui.GranuleTreePanel();
         oifitsFileListPanel = new fr.jmmc.oiexplorer.gui.OIFitsFileListPanel();
+        jSplitPane1 = new javax.swing.JSplitPane();
         dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
+        genericFiltersPanel1 = new fr.jmmc.oiexplorer.gui.GenericFiltersPanel();
         tabbedPaneTop = createTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
@@ -773,7 +775,13 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         dataSplitTopPanel.add(jTabbedPaneBrowser, gridBagConstraints);
 
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
-        dataSplitPane.setRightComponent(dataTreePanel);
+
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.66);
+        jSplitPane1.setTopComponent(dataTreePanel);
+        jSplitPane1.setBottomComponent(genericFiltersPanel1);
+
+        dataSplitPane.setRightComponent(jSplitPane1);
 
         mainSplitPane.setLeftComponent(dataSplitPane);
         mainSplitPane.setRightComponent(tabbedPaneTop);
@@ -790,7 +798,9 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
     private javax.swing.JSplitPane dataSplitPane;
     private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
+    private fr.jmmc.oiexplorer.gui.GenericFiltersPanel genericFiltersPanel1;
     private fr.jmmc.oiexplorer.gui.GranuleTreePanel granuleTreePanel;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPaneBrowser;
     private javax.swing.JSplitPane mainSplitPane;
     private fr.jmmc.oiexplorer.gui.OIFitsFileListPanel oifitsFileListPanel;
@@ -879,7 +889,7 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
         }
 
         if (editorPane != null) {
-            editorPane.setText(ocm.dumpOIFitsCollection());
+            editorPane.setText(ocm.dumpOIFitsCollection() + ocm.getCurrentSubsetDefinitionRef());
         }
 
         logger.debug("onProcess {} - done", event);
