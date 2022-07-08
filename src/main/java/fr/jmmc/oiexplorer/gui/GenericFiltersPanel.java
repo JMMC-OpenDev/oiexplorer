@@ -8,20 +8,26 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
+import fr.jmmc.oiexplorer.core.model.oi.DataType;
 import fr.jmmc.oiexplorer.core.model.oi.GenericFilter;
+import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
-import fr.jmmc.oitools.model.DataModel;
+import fr.jmmc.oiexplorer.core.model.plot.Range;
+import static fr.jmmc.oitools.OIFitsConstants.COLUMN_EFF_WAVE;
 import fr.jmmc.oitools.processing.SelectorResult;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GenericFiltersPanel extends javax.swing.JPanel
-        implements OIFitsCollectionManagerEventListener, ChangeListener {
+        implements OIFitsCollectionManagerEventListener, ChangeListener, ActionListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -59,14 +65,15 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         logger.debug("updates Model");
 
         final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
-        subsetDefinitionCopy.getGenericFilters().clear();
+
+        final List<GenericFilter> filters = subsetDefinitionCopy.getGenericFilters();
+        filters.clear();
 
         // take every genericFilter value from the genericFilterEditors and put it in a SubsetDefinition copy
         for (final GenericFilterEditor genericFilterEditor : this.genericFilterEditorList) {
-            final GenericFilter genericFilterCopy = (GenericFilter) genericFilterEditor.getGenericFilter().clone();
-            subsetDefinitionCopy.getGenericFilters().add(genericFilterCopy);
+            final GenericFilter genericFilterCopy = Identifiable.clone(genericFilterEditor.getGenericFilter());
+            filters.add(genericFilterCopy);
         }
-
         OCM.updateSubsetDefinition(this, subsetDefinitionCopy);
     }
 
@@ -78,36 +85,25 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             updatingGUI = true;
 
             // we clear and re-create GenericFilterEditors
-            this.removeAll();
+            jPanelGenericFilters.removeAll();
             genericFilterEditorList.forEach(GenericFilterEditor::dispose);
             genericFilterEditorList.clear();
 
             final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
 
             if (subsetDefinitionCopy != null) {
-                // TODO begin: temporary static value, to remove later
-                boolean modified = false;
-                if (subsetDefinitionCopy.getGenericFilters().isEmpty()) {
-                    modified = true;
-                    subsetDefinitionCopy.getGenericFilters().add(new GenericFilter());
-                }
-                // TODO end
+
+                boolean changed = false; // some generic filters values can be modified by GenericFilterEditor
+
+                final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
 
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
-
-                    final GenericFilterEditor genericFilterEditor = new GenericFilterEditor();
-                    genericFilterEditor.setGenericFilter(subsetDefinitionCopy.getSelectorResult(), genericFilter);
-                    genericFilterEditor.addChangeListener(this);
-
-                    genericFilterEditorList.add(genericFilterEditor);
-                    this.add(genericFilterEditor);
+                    changed |= addGenericFilterEditor(selectorResult, genericFilter);
                 }
 
-                // TODO begin: remove when the genericFilter does not receive temporary static value anymore
-                if (modified) {
-                    OCM.updateSubsetDefinition(this, subsetDefinitionCopy);
+                if (changed) { // if some generic filters have been modified, submit the changes to the model
+                    updateModel();
                 }
-                // TODO end
             }
 
             revalidate();
@@ -116,7 +112,84 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         }
     }
 
-    /** Listener on changes on GenericFilterEditors.
+    /** Adds a GenericFilterEditor to the Panel, along with a delete button */
+    private boolean addGenericFilterEditor(final SelectorResult selectorResult, final GenericFilter genericFilter) {
+
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+        final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
+        newGenericFilterEditor.addChangeListener(this);
+
+        final boolean modified = newGenericFilterEditor.setGenericFilter(selectorResult, genericFilter);
+
+        genericFilterEditorList.add(newGenericFilterEditor);
+        panel.add(newGenericFilterEditor);
+
+        final JButton delButton = new JButton("-");
+        delButton.addActionListener(this);
+        panel.add(delButton);
+
+        jPanelGenericFilters.add(panel, 0);
+
+        return modified;
+    }
+
+    /** Handler for the Add button, adds a new generic filter editor */
+    private void handlerAddGenericFilter() {
+        if (!updatingGUI) {
+
+            GenericFilter newGenericFilter = new GenericFilter();
+            newGenericFilter.setEnabled(true);
+            newGenericFilter.setColumnName(COLUMN_EFF_WAVE);
+            newGenericFilter.setDataType(DataType.NUMERIC);
+            final Range range = new Range();
+            range.setMin(Double.NaN);
+            range.setMax(Double.NaN);
+            newGenericFilter.getAcceptedRanges().add(range);
+
+            final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
+            final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
+
+            addGenericFilterEditor(selectorResult, newGenericFilter);
+
+            revalidate();
+
+            updateModel();
+        }
+    }
+
+    /** Handler for the Del button. removes the generic filter editor associated to the button */
+    private void handlerDelGenericFilter(final JButton delButton) {
+        if (!updatingGUI) {
+            try {
+                /* retrieve the panel containing the actioned button and the generic filter editor to delete */
+                delButton.removeActionListener(this);
+                JPanel panel = (JPanel) delButton.getParent();
+                GenericFilterEditor genericFilterEditorToDel = (GenericFilterEditor) panel.getComponent(0);
+                genericFilterEditorList.remove(genericFilterEditorToDel);
+                jPanelGenericFilters.remove(panel);
+                revalidate();
+                repaint();
+                updateModel();
+            } catch (ClassCastException e) {
+                logger.error("Cannot find GenericFilterEditor panel to remove.");
+            }
+        }
+    }
+
+    /** Listener on actions on the del buttons.
+     *
+     * @param evt Event, the del button is the source
+     */
+    @Override
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        if (evt.getSource() instanceof JButton) {
+            handlerDelGenericFilter((JButton) evt.getSource());
+        }
+    }
+
+    /** Listener on changes on GenericFilterEditors
      *
      * @param ce Event
      */
@@ -162,10 +235,51 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanelGenericFilters = new javax.swing.JPanel();
+        jButtonAddGenericFilter = new javax.swing.JButton();
+
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Generic Filters"));
+        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+        layout.columnWidths = new int[] {0, 10, 0};
+        layout.rowHeights = new int[] {0, 7, 0};
+        setLayout(layout);
+
+        jPanelGenericFilters.setLayout(new javax.swing.BoxLayout(jPanelGenericFilters, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPane1.setViewportView(jPanelGenericFilters);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.9;
+        gridBagConstraints.weighty = 0.9;
+        add(jScrollPane1, gridBagConstraints);
+
+        jButtonAddGenericFilter.setText("+");
+        jButtonAddGenericFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAddGenericFilterActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        add(jButtonAddGenericFilter, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButtonAddGenericFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddGenericFilterActionPerformed
+        handlerAddGenericFilter();
+    }//GEN-LAST:event_jButtonAddGenericFilterActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonAddGenericFilter;
+    private javax.swing.JPanel jPanelGenericFilters;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+
 }
