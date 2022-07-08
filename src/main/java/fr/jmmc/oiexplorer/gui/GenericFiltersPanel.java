@@ -111,6 +111,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         }
     }
 
+    /** Adds a GenericFilterEditor to the Panel, along with a delete button */
     private boolean addGenericFilterEditor(final GenericFilter genericFilter) {
 
         JPanel newPanel = new JPanel();
@@ -131,6 +132,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         return modified;
     }
 
+    /** Handler for the Add button, adds a new generic filter editor */
     private void handlerAddGenericFilter() {
         if (!updatingGUI) {
 
@@ -151,9 +153,11 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         }
     }
 
+    /** Handler for the Del button. removes the generic filter editor associated to the button */
     private void handlerDelGenericFilter(final JButton delButton) {
         if (!updatingGUI) {
             try {
+                /* retrieve the panel containing the actioned button and the generic filter editor to delete */
                 delButton.removeActionListener(this);
                 JPanel panel = (JPanel) delButton.getParent();
                 GenericFilterEditor genericFilterEditorToDel = (GenericFilterEditor) panel.getComponent(0);
@@ -169,6 +173,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         }
     }
 
+    /** Listener on actions on the del buttons.
+     *
+     * @param evt Event, the del button is the source
+     */
     @Override
     public void actionPerformed(java.awt.event.ActionEvent evt) {
         if (evt.getSource() instanceof JButton) {
@@ -176,7 +184,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         }
     }
 
-    /** Listener on changes on GenericFilterEditors.
+    /** Listener on changes on GenericFilterEditors
      *
      * @param ce Event
      */
@@ -187,15 +195,6 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         }
     }
 
-    /*
-     * OIFitsCollectionManagerEventListener implementation
-     */
-    /**
-     * Return the optional subject id i.e. related object id that this listener accepts
-     *
-     * @param type event type
-     * @return subject id (null means accept any event) or DISCARDED_SUBJECT_ID to discard event
-     */
     @Override
     public String getSubjectId(final OIFitsCollectionManagerEventType type) {
         // accept all
