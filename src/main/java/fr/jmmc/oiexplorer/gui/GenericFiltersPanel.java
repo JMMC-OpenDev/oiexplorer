@@ -10,8 +10,11 @@ import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEventType;
 import fr.jmmc.oiexplorer.core.model.oi.GenericFilter;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
+import fr.jmmc.oitools.model.DataModel;
+import fr.jmmc.oitools.processing.SelectorResult;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
@@ -93,7 +96,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
 
                     final GenericFilterEditor genericFilterEditor = new GenericFilterEditor();
-                    genericFilterEditor.setGenericFilter(genericFilter);
+                    genericFilterEditor.setGenericFilter(subsetDefinitionCopy.getSelectorResult(), genericFilter);
                     genericFilterEditor.addChangeListener(this);
 
                     genericFilterEditorList.add(genericFilterEditor);
