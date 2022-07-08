@@ -18,46 +18,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
+public class GenericFiltersPanel extends javax.swing.JPanel
+        implements OIFitsCollectionManagerEventListener, ChangeListener {
 
-    /**
-     * default serial UID for Serializable interface
-     */
+    /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
 
-    /**
-     * Logger
-     */
+    /** Logger */
     private static final Logger logger = LoggerFactory.getLogger(GenericFiltersPanel.class);
 
-    /**
-     * OIFitsCollectionManager singleton reference
-     */
+    /** OIFitsCollectionManager singleton reference */
     private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
-    private final GenericFilterEditorChangeListener genericFilterEditorChangeListener;
-
+    /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final List<GenericFilterEditor> genericFilterEditorList;
 
+    /** when true, disables handler of Changes set on GenericFilterEditors. Used in updateGUI(). */
     private boolean updatingGUI = false;
 
-    /**
-     * Creates new form GenericFiltersPanel
-     */
+    /** Creates new form GenericFiltersPanel */
     public GenericFiltersPanel() {
         logger.debug("creates GenericFiltersPanel");
         initComponents();
-        genericFilterEditorChangeListener = new GenericFilterEditorChangeListener();
         genericFilterEditorList = new ArrayList<>(1);
         OCM.getSubsetDefinitionChangedEventNotifier().register(this);
     }
 
+    /** Removes listeners references */
     @Override
     public void dispose() {
         genericFilterEditorList.forEach(GenericFilterEditor::dispose);
         OCM.unbind(this);
     }
 
+    /** Updates OIExplorer Model from the GUI values. Here it updates the generic filters. Called when there is a change
+     * on GenericFilterEditors. */
     private void updateModel() {
         logger.debug("updates Model");
 
@@ -65,6 +60,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCol
 
         subsetDefinitionCopy.getGenericFilters().clear();
 
+        // take every genericFilter value from the genericFilterEditors and put it in a SubsetDefinition copy
         for (GenericFilterEditor genericFilterEditor : this.genericFilterEditorList) {
             GenericFilter genericFilterCopy = (GenericFilter) genericFilterEditor.getGenericFilter().clone();
             subsetDefinitionCopy.getGenericFilters().add(genericFilterCopy);
@@ -73,6 +69,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCol
         OCM.updateSubsetDefinition(this, subsetDefinitionCopy);
     }
 
+    /** Updates GenericFilterEditors from the OIExplorer Model values. Called when a SUBSET_CHANGED event is received */
     private void updateGUI() {
         logger.debug("updates GUI");
 
@@ -81,6 +78,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCol
 
             SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
 
+            // we clear and re-create GenericFilterEditors
             this.removeAll();
             genericFilterEditorList.forEach(GenericFilterEditor::dispose);
             genericFilterEditorList.clear();
@@ -98,7 +96,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCol
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
 
                     GenericFilterEditor genericFilterEditor = new GenericFilterEditor();
-                    genericFilterEditor.addChangeListener(genericFilterEditorChangeListener);
+                    genericFilterEditor.addChangeListener(this);
                     genericFilterEditor.setGenericFilter(genericFilter);
                     genericFilterEditorList.add(genericFilterEditor);
                     this.add(genericFilterEditor);
@@ -115,6 +113,17 @@ public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCol
         }
         finally {
             updatingGUI = false;
+        }
+    }
+
+    /** Listener on changes on GenericFilterEditors.
+     *
+     * @param ce Event
+     */
+    @Override
+    public void stateChanged(ChangeEvent ce) {
+        if (!updatingGUI) {
+            updateModel();
         }
     }
 
@@ -144,15 +153,6 @@ public class GenericFiltersPanel extends javax.swing.JPanel implements OIFitsCol
             default:
         }
         logger.debug("onProcess done {}", event);
-    }
-
-    private class GenericFilterEditorChangeListener implements ChangeListener {
-        @Override
-        public void stateChanged(ChangeEvent ce) {
-            if (!updatingGUI) {
-                updateModel();
-            }
-        }
     }
 
     /**
