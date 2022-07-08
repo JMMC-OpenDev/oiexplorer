@@ -17,7 +17,6 @@ import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class GenericFiltersPanel extends javax.swing.JPanel
         implements OIFitsCollectionManagerEventListener, ChangeListener {
 
@@ -56,13 +55,12 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private void updateModel() {
         logger.debug("updates Model");
 
-        SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
-
+        final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
         subsetDefinitionCopy.getGenericFilters().clear();
 
         // take every genericFilter value from the genericFilterEditors and put it in a SubsetDefinition copy
-        for (GenericFilterEditor genericFilterEditor : this.genericFilterEditorList) {
-            GenericFilter genericFilterCopy = (GenericFilter) genericFilterEditor.getGenericFilter().clone();
+        for (final GenericFilterEditor genericFilterEditor : this.genericFilterEditorList) {
+            final GenericFilter genericFilterCopy = (GenericFilter) genericFilterEditor.getGenericFilter().clone();
             subsetDefinitionCopy.getGenericFilters().add(genericFilterCopy);
         }
 
@@ -76,15 +74,14 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         try {
             updatingGUI = true;
 
-            SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
-
             // we clear and re-create GenericFilterEditors
             this.removeAll();
             genericFilterEditorList.forEach(GenericFilterEditor::dispose);
             genericFilterEditorList.clear();
 
-            if (subsetDefinitionCopy != null) {
+            final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
 
+            if (subsetDefinitionCopy != null) {
                 // TODO begin: temporary static value, to remove later
                 boolean modified = false;
                 if (subsetDefinitionCopy.getGenericFilters().isEmpty()) {
@@ -95,9 +92,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
 
-                    GenericFilterEditor genericFilterEditor = new GenericFilterEditor();
-                    genericFilterEditor.addChangeListener(this);
+                    final GenericFilterEditor genericFilterEditor = new GenericFilterEditor();
                     genericFilterEditor.setGenericFilter(genericFilter);
+                    genericFilterEditor.addChangeListener(this);
+
                     genericFilterEditorList.add(genericFilterEditor);
                     this.add(genericFilterEditor);
                 }
@@ -110,8 +108,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             }
 
             revalidate();
-        }
-        finally {
+        } finally {
             updatingGUI = false;
         }
     }
@@ -168,5 +165,4 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
 }
