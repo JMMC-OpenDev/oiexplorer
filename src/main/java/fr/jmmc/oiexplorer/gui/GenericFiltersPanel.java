@@ -3,6 +3,7 @@
  ***************************************************************************** */
 package fr.jmmc.oiexplorer.gui;
 
+import fr.jmmc.jmcs.gui.component.GenericListModel;
 import fr.jmmc.oiexplorer.core.gui.GenericFilterEditor;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManagerEvent;
@@ -13,11 +14,16 @@ import fr.jmmc.oiexplorer.core.model.oi.GenericFilter;
 import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.Range;
+import fr.jmmc.oitools.OIFitsConstants;
 import static fr.jmmc.oitools.OIFitsConstants.COLUMN_EFF_WAVE;
+import fr.jmmc.oitools.model.DataModel;
 import fr.jmmc.oitools.processing.SelectorResult;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -38,8 +44,16 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     /** OIFitsCollectionManager singleton reference */
     private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
+    private static final List<String> SPECIAL_COLUMN_NAMES = Arrays.asList(new String[]{
+        OIFitsConstants.COLUMN_EFF_WAVE,
+        OIFitsConstants.COLUMN_EFF_BAND}
+    );
+
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final List<GenericFilterEditor> genericFilterEditorList;
+
+    /** Store all column choices available */
+    private final List<String> columnChoices = new LinkedList<String>();
 
     /** when true, disables handler of Changes set on GenericFilterEditors. Used in updateGUI(). */
     private boolean updatingGUI = false;
@@ -49,6 +63,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         logger.debug("creates GenericFiltersPanel");
         initComponents();
         genericFilterEditorList = new ArrayList<>(1);
+        jComboBoxColumnName.setModel(new GenericListModel<String>(columnChoices, true));
         OCM.getSubsetDefinitionChangedEventNotifier().register(this);
     }
 
@@ -89,6 +104,9 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             genericFilterEditorList.forEach(GenericFilterEditor::dispose);
             genericFilterEditorList.clear();
 
+            // we clear and recreate column name choices
+            columnChoices.clear();
+
             final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
 
             if (subsetDefinitionCopy != null) {
@@ -98,7 +116,18 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
 
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
-                    changed |= addGenericFilterEditor(selectorResult, genericFilter);
+                    changed |= addGenericFilterEditor(genericFilter);
+                }
+
+                // updating column choices from SelectorResult
+                for (String specialName : SPECIAL_COLUMN_NAMES) {
+                    columnChoices.add(specialName);
+                }
+                for (String columnName : getDistinctColumns1D(selectorResult)) {
+                    columnChoices.add(columnName);
+                }
+                if (jComboBoxColumnName.getSelectedIndex() == -1) {
+                    jComboBoxColumnName.setSelectedIndex(0);
                 }
 
                 if (changed) { // if some generic filters have been modified, submit the changes to the model
@@ -113,7 +142,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     }
 
     /** Adds a GenericFilterEditor to the Panel, along with a delete button */
-    private boolean addGenericFilterEditor(final SelectorResult selectorResult, final GenericFilter genericFilter) {
+    private boolean addGenericFilterEditor(final GenericFilter genericFilter) {
 
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -121,7 +150,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
         newGenericFilterEditor.addChangeListener(this);
 
-        final boolean modified = newGenericFilterEditor.setGenericFilter(selectorResult, genericFilter);
+        final boolean modified = newGenericFilterEditor.setGenericFilter(genericFilter);
 
         genericFilterEditorList.add(newGenericFilterEditor);
         panel.add(newGenericFilterEditor);
@@ -139,19 +168,21 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private void handlerAddGenericFilter() {
         if (!updatingGUI) {
 
+            String columnName = (String) jComboBoxColumnName.getSelectedItem();
+            if (columnName == null) {
+                columnName = COLUMN_EFF_WAVE;
+            }
+
             GenericFilter newGenericFilter = new GenericFilter();
             newGenericFilter.setEnabled(true);
-            newGenericFilter.setColumnName(COLUMN_EFF_WAVE);
+            newGenericFilter.setColumnName(columnName);
             newGenericFilter.setDataType(DataType.NUMERIC);
             final Range range = new Range();
             range.setMin(Double.NaN);
             range.setMax(Double.NaN);
             newGenericFilter.getAcceptedRanges().add(range);
 
-            final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
-            final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
-
-            addGenericFilterEditor(selectorResult, newGenericFilter);
+            addGenericFilterEditor(newGenericFilter);
 
             revalidate();
 
@@ -229,6 +260,19 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     }
 
     /**
+     * Return the set of distinct columns available in tables of the given SelectorResult.
+     *
+     * @param selectorResult Selector result from plot's subset definition
+     * @return a Set of Strings with every distinct column names
+     */
+    private static Set<String> getDistinctColumns1D(final SelectorResult selectorResult) {
+        final DataModel dataModel = (selectorResult == null) ? DataModel.getInstance() : selectorResult.getDataModel();
+        logger.debug("datamodel : {}", dataModel);
+
+        return dataModel.getNumericalColumnNames1D();
+    }
+
+    /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
      */
@@ -237,26 +281,16 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanelGenericFilters = new javax.swing.JPanel();
+        jPanelToolbar = new javax.swing.JPanel();
         jButtonAddGenericFilter = new javax.swing.JButton();
+        jComboBoxColumnName = new javax.swing.JComboBox<>();
+        jScrollPaneFilters = new javax.swing.JScrollPane();
+        jPanelGenericFilters = new javax.swing.JPanel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Generic Filters"));
-        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-        layout.columnWidths = new int[] {0, 10, 0};
-        layout.rowHeights = new int[] {0, 7, 0};
-        setLayout(layout);
+        setLayout(new java.awt.GridBagLayout());
 
-        jPanelGenericFilters.setLayout(new javax.swing.BoxLayout(jPanelGenericFilters, javax.swing.BoxLayout.Y_AXIS));
-        jScrollPane1.setViewportView(jPanelGenericFilters);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.9;
-        gridBagConstraints.weighty = 0.9;
-        add(jScrollPane1, gridBagConstraints);
+        jPanelToolbar.setLayout(new java.awt.GridBagLayout());
 
         jButtonAddGenericFilter.setText("+");
         jButtonAddGenericFilter.addActionListener(new java.awt.event.ActionListener() {
@@ -267,9 +301,33 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        add(jButtonAddGenericFilter, gridBagConstraints);
+        jPanelToolbar.add(jButtonAddGenericFilter, gridBagConstraints);
+
+        jComboBoxColumnName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "COLUMN_NAME" }));
+        jComboBoxColumnName.setPrototypeDisplayValue("XXXX");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.8;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanelToolbar.add(jComboBoxColumnName, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(jPanelToolbar, gridBagConstraints);
+
+        jPanelGenericFilters.setLayout(new javax.swing.BoxLayout(jPanelGenericFilters, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPaneFilters.setViewportView(jPanelGenericFilters);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.9;
+        gridBagConstraints.weighty = 0.9;
+        add(jScrollPaneFilters, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddGenericFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddGenericFilterActionPerformed
@@ -278,8 +336,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAddGenericFilter;
+    private javax.swing.JComboBox<String> jComboBoxColumnName;
     private javax.swing.JPanel jPanelGenericFilters;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel jPanelToolbar;
+    private javax.swing.JScrollPane jScrollPaneFilters;
     // End of variables declaration//GEN-END:variables
 
 }
