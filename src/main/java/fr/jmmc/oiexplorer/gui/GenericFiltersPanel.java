@@ -173,13 +173,20 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 columnName = COLUMN_EFF_WAVE;
             }
 
+            final fr.jmmc.oitools.model.range.Range oitoolsRange = OCM.getOIFitsCollection().getMinMaxRange(columnName);
+            final Range range = new Range();
+            if (oitoolsRange == null) {
+                range.setMin(Double.NaN);
+                range.setMax(Double.NaN);
+            } else {
+                range.setMin(oitoolsRange.getMin());
+                range.setMax(oitoolsRange.getMax());
+            }
+
             GenericFilter newGenericFilter = new GenericFilter();
             newGenericFilter.setEnabled(true);
             newGenericFilter.setColumnName(columnName);
             newGenericFilter.setDataType(DataType.NUMERIC);
-            final Range range = new Range();
-            range.setMin(Double.NaN);
-            range.setMax(Double.NaN);
             newGenericFilter.getAcceptedRanges().add(range);
 
             addGenericFilterEditor(newGenericFilter);
