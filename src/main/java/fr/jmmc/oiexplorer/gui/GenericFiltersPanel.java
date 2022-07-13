@@ -47,12 +47,12 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
     private static final List<String> SPECIAL_COLUMN_NAMES = Arrays.asList(new String[]{
         Selector.FILTER_EFFWAVE,
-        Selector.FILTER_EFFBAND, /* uncomment once supported (String values)
-        /*
-        Selector.FILTER_NIGHT_ID, 
+        Selector.FILTER_EFFBAND,
+        // uncomment once supported (String values)
+        // Selector.FILTER_NIGHT_ID,
         Selector.FILTER_STAINDEX,
         Selector.FILTER_STACONF
-     */});
+    });
 
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final List<GenericFilterEditor> genericFilterEditorList;
@@ -116,12 +116,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
             if (subsetDefinitionCopy != null) {
 
-                boolean changed = false; // some generic filters values can be modified by GenericFilterEditor
-
                 final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
 
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
-                    changed |= addGenericFilterEditor(genericFilter);
+                    addGenericFilterEditor(genericFilter);
                 }
 
                 // updating column choices from SelectorResult
@@ -134,10 +132,6 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 if (jComboBoxColumnName.getSelectedIndex() == -1) {
                     jComboBoxColumnName.setSelectedIndex(0);
                 }
-
-                if (changed) { // if some generic filters have been modified, submit the changes to the model
-                    updateModel();
-                }
             }
 
             revalidate();
@@ -147,7 +141,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     }
 
     /** Adds a GenericFilterEditor to the Panel, along with a delete button */
-    private boolean addGenericFilterEditor(final GenericFilter genericFilter) {
+    private void addGenericFilterEditor(final GenericFilter genericFilter) {
 
         final JPanel panel = new JPanel(new GridBagLayout());
 
@@ -156,7 +150,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
         newGenericFilterEditor.addChangeListener(this);
 
-        final boolean modified = newGenericFilterEditor.setGenericFilter(genericFilter);
+        newGenericFilterEditor.setGenericFilter(genericFilter);
 
         genericFilterEditorList.add(newGenericFilterEditor);
         layoutConsts.gridx = 0;
@@ -173,34 +167,40 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         panel.add(delButton, layoutConsts);
 
         jPanelGenericFilters.add(panel, 0);
-
-        return modified;
     }
 
     /** Handler for the Add button, adds a new generic filter editor */
     private void handlerAddGenericFilter() {
         if (!updatingGUI) {
 
+            GenericFilter newGenericFilter = new GenericFilter();
+            newGenericFilter.setEnabled(true);
+
             String columnName = (String) jComboBoxColumnName.getSelectedItem();
             if (columnName == null) {
                 columnName = Selector.FILTER_EFFWAVE;
             }
-
-            final fr.jmmc.oitools.model.range.Range oitoolsRange = OCM.getOIFitsCollection().getColumnRange(columnName);
-            final Range range = new Range();
-            if (oitoolsRange == null) {
-                range.setMin(Double.NaN);
-                range.setMax(Double.NaN);
-            } else {
-                range.setMin(oitoolsRange.getMin());
-                range.setMax(oitoolsRange.getMax());
-            }
-
-            GenericFilter newGenericFilter = new GenericFilter();
-            newGenericFilter.setEnabled(true);
             newGenericFilter.setColumnName(columnName);
-            newGenericFilter.setDataType(DataType.NUMERIC);
-            newGenericFilter.getAcceptedRanges().add(range);
+
+            DataType dataType = DataType.NUMERIC;
+            if (Selector.FILTER_STACONF.equals(columnName) || Selector.FILTER_STAINDEX.equals(columnName)) {
+                dataType = DataType.STRING;
+            }
+            newGenericFilter.setDataType(dataType);
+
+            if (dataType == DataType.NUMERIC) {
+                final fr.jmmc.oitools.model.range.Range oitoolsRange
+                        = OCM.getOIFitsCollection().getColumnRange(columnName);
+                final Range range = new Range();
+                range.setMin(Double.isFinite(oitoolsRange.getMin()) ? oitoolsRange.getMin() : Double.NaN);
+                range.setMax(Double.isFinite(oitoolsRange.getMax()) ? oitoolsRange.getMax() : Double.NaN);
+                newGenericFilter.getAcceptedRanges().add(range);
+            } else if (dataType == DataType.STRING) {
+                final List<String> initValues = OCM.getOIFitsCollection().getDistinctValues(columnName);
+                if (initValues != null) {
+                    newGenericFilter.getAcceptedValues().addAll(initValues);
+                }
+            }
 
             addGenericFilterEditor(newGenericFilter);
 
