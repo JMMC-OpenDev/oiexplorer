@@ -18,13 +18,15 @@ import fr.jmmc.oitools.OIFitsConstants;
 import static fr.jmmc.oitools.OIFitsConstants.COLUMN_EFF_WAVE;
 import fr.jmmc.oitools.model.DataModel;
 import fr.jmmc.oitools.processing.SelectorResult;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
@@ -144,8 +146,9 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     /** Adds a GenericFilterEditor to the Panel, along with a delete button */
     private boolean addGenericFilterEditor(final GenericFilter genericFilter) {
 
-        final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        final JPanel panel = new JPanel(new GridBagLayout());
+
+        final GridBagConstraints layoutConsts = new GridBagConstraints();
 
         final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
         newGenericFilterEditor.addChangeListener(this);
@@ -153,11 +156,18 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         final boolean modified = newGenericFilterEditor.setGenericFilter(genericFilter);
 
         genericFilterEditorList.add(newGenericFilterEditor);
-        panel.add(newGenericFilterEditor);
+        layoutConsts.gridx = 0;
+        layoutConsts.fill = GridBagConstraints.HORIZONTAL;
+        layoutConsts.weightx = 0.9;
+        panel.add(newGenericFilterEditor, layoutConsts);
 
         final JButton delButton = new JButton("-");
         delButton.addActionListener(this);
-        panel.add(delButton);
+        layoutConsts.gridx = 1;
+        layoutConsts.fill = GridBagConstraints.NONE;
+        layoutConsts.weightx = 0;
+        layoutConsts.insets = new Insets(2, 2, 2, 2);
+        panel.add(delButton, layoutConsts);
 
         jPanelGenericFilters.add(panel, 0);
 
