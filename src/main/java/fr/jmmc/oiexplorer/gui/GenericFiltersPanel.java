@@ -183,7 +183,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 columnName = COLUMN_EFF_WAVE;
             }
 
-            final fr.jmmc.oitools.model.range.Range oitoolsRange = OCM.getOIFitsCollection().getMinMaxRange(columnName);
+            final fr.jmmc.oitools.model.range.Range oitoolsRange = OCM.getOIFitsCollection().getColumnRange(columnName);
             final Range range = new Range();
             if (oitoolsRange == null) {
                 range.setMin(Double.NaN);
