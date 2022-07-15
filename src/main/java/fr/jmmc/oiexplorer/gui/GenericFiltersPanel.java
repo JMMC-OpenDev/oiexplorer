@@ -14,9 +14,8 @@ import fr.jmmc.oiexplorer.core.model.oi.GenericFilter;
 import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.Range;
-import fr.jmmc.oitools.OIFitsConstants;
-import static fr.jmmc.oitools.OIFitsConstants.COLUMN_EFF_WAVE;
 import fr.jmmc.oitools.model.DataModel;
+import fr.jmmc.oitools.processing.Selector;
 import fr.jmmc.oitools.processing.SelectorResult;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -47,9 +46,13 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
     private static final List<String> SPECIAL_COLUMN_NAMES = Arrays.asList(new String[]{
-        OIFitsConstants.COLUMN_EFF_WAVE,
-        OIFitsConstants.COLUMN_EFF_BAND}
-    );
+        Selector.FILTER_EFFWAVE,
+        Selector.FILTER_EFFBAND, /* uncomment once supported (String values)
+        /*
+        Selector.FILTER_NIGHT_ID, 
+        Selector.FILTER_STAINDEX,
+        Selector.FILTER_STACONF
+     */});
 
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final List<GenericFilterEditor> genericFilterEditorList;
@@ -180,7 +183,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
             String columnName = (String) jComboBoxColumnName.getSelectedItem();
             if (columnName == null) {
-                columnName = COLUMN_EFF_WAVE;
+                columnName = Selector.FILTER_EFFWAVE;
             }
 
             final fr.jmmc.oitools.model.range.Range oitoolsRange = OCM.getOIFitsCollection().getColumnRange(columnName);
