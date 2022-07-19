@@ -14,6 +14,7 @@ import fr.jmmc.oiexplorer.core.model.oi.GenericFilter;
 import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.Range;
+import fr.jmmc.oitools.OIFitsProcessor;
 import fr.jmmc.oitools.model.DataModel;
 import fr.jmmc.oitools.processing.Selector;
 import fr.jmmc.oitools.processing.SelectorResult;
@@ -94,7 +95,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             final GenericFilter genericFilterCopy = Identifiable.clone(genericFilterEditor.getGenericFilter());
             filters.add(genericFilterCopy);
         }
-        OCM.updateSubsetDefinition(this, subsetDefinitionCopy);
+        OCM.updateSubsetDefinition(null, subsetDefinitionCopy);
     }
 
     /** Updates GenericFilterEditors from the OIExplorer Model values. Called when a SUBSET_CHANGED event is received */
@@ -131,6 +132,13 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 if (jComboBoxColumnName.getSelectedIndex() == -1) {
                     jComboBoxColumnName.setSelectedIndex(0);
                 }
+
+                // CLI args
+                final String cliArgs
+                        = (selectorResult == null)
+                                ? ""
+                                : OIFitsProcessor.generateCLIargs(selectorResult.getSelector());
+                jTextAreaCLI.setText(cliArgs);
             }
 
             revalidate();
@@ -161,6 +169,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         layoutConsts.fill = GridBagConstraints.NONE;
         layoutConsts.weightx = 0;
         layoutConsts.insets = new Insets(2, 2, 2, 2);
+        layoutConsts.anchor = GridBagConstraints.NORTH;
         panel.add(delButton, layoutConsts);
 
         jPanelGenericFilters.add(panel, 0);
@@ -302,6 +311,8 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         jComboBoxColumnName = new javax.swing.JComboBox<>();
         jScrollPaneFilters = new javax.swing.JScrollPane();
         jPanelGenericFilters = new javax.swing.JPanel();
+        jScrollPaneCLI = new javax.swing.JScrollPane();
+        jTextAreaCLI = new javax.swing.JTextArea();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Generic Filters"));
         setLayout(new java.awt.GridBagLayout());
@@ -331,7 +342,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         jPanelToolbar.add(jComboBoxColumnName, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.9;
         add(jPanelToolbar, gridBagConstraints);
 
         jPanelGenericFilters.setLayout(new javax.swing.BoxLayout(jPanelGenericFilters, javax.swing.BoxLayout.Y_AXIS));
@@ -344,6 +358,21 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints.weightx = 0.9;
         gridBagConstraints.weighty = 0.9;
         add(jScrollPaneFilters, gridBagConstraints);
+
+        jTextAreaCLI.setEditable(false);
+        jTextAreaCLI.setColumns(20);
+        jTextAreaCLI.setRows(1);
+        jTextAreaCLI.setText("CLI arguments equivalent to these generic filters");
+        jTextAreaCLI.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        jScrollPaneCLI.setViewportView(jTextAreaCLI);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.9;
+        gridBagConstraints.weighty = 0.1;
+        add(jScrollPaneCLI, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddGenericFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddGenericFilterActionPerformed
@@ -355,7 +384,9 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private javax.swing.JComboBox<String> jComboBoxColumnName;
     private javax.swing.JPanel jPanelGenericFilters;
     private javax.swing.JPanel jPanelToolbar;
+    private javax.swing.JScrollPane jScrollPaneCLI;
     private javax.swing.JScrollPane jScrollPaneFilters;
+    private javax.swing.JTextArea jTextAreaCLI;
     // End of variables declaration//GEN-END:variables
 
 }
