@@ -55,10 +55,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     });
 
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
-    private final List<GenericFilterEditor> genericFilterEditorList;
+    private final transient List<GenericFilterEditor> genericFilterEditorList;
 
     /** Store all column choices available */
-    private final List<String> columnChoices = new LinkedList<String>();
+    private final transient List<String> columnChoices = new LinkedList<String>();
 
     /** when true, disables handler of Changes set on GenericFilterEditors. Used in updateGUI(). */
     private boolean updatingGUI = false;
@@ -115,7 +115,6 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
 
             if (subsetDefinitionCopy != null) {
-
                 final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
 
                 for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
@@ -142,9 +141,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
     /** Adds a GenericFilterEditor to the Panel, along with a delete button */
     private void addGenericFilterEditor(final GenericFilter genericFilter) {
-
         final JPanel panel = new JPanel(new GridBagLayout());
-
         final GridBagConstraints layoutConsts = new GridBagConstraints();
 
         final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
@@ -172,8 +169,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     /** Handler for the Add button, adds a new generic filter editor */
     private void handlerAddGenericFilter() {
         if (!updatingGUI) {
-
-            GenericFilter newGenericFilter = new GenericFilter();
+            final GenericFilter newGenericFilter = new GenericFilter();
             newGenericFilter.setEnabled(true);
 
             String columnName = (String) jComboBoxColumnName.getSelectedItem();
@@ -182,30 +178,29 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             }
             newGenericFilter.setColumnName(columnName);
 
-            DataType dataType = DataType.NUMERIC;
-            if (Selector.FILTER_STACONF.equals(columnName) || Selector.FILTER_STAINDEX.equals(columnName)) {
-                dataType = DataType.STRING;
-            }
+            final DataType dataType = Selector.isRangeFilter(columnName) ? DataType.NUMERIC : DataType.STRING;
             newGenericFilter.setDataType(dataType);
 
-            if (dataType == DataType.NUMERIC) {
-                final fr.jmmc.oitools.model.range.Range oitoolsRange
-                        = OCM.getOIFitsCollection().getColumnRange(columnName);
-                final Range range = new Range();
-                range.setMin(Double.isFinite(oitoolsRange.getMin()) ? oitoolsRange.getMin() : Double.NaN);
-                range.setMax(Double.isFinite(oitoolsRange.getMax()) ? oitoolsRange.getMax() : Double.NaN);
-                newGenericFilter.getAcceptedRanges().add(range);
-            } else if (dataType == DataType.STRING) {
-                final List<String> initValues = OCM.getOIFitsCollection().getDistinctValues(columnName);
-                if (initValues != null) {
-                    newGenericFilter.getAcceptedValues().addAll(initValues);
-                }
+            switch (dataType) {
+                case NUMERIC:
+                    final fr.jmmc.oitools.model.range.Range oitoolsRange
+                                                            = OCM.getOIFitsCollection().getColumnRange(columnName);
+                    final Range range = new Range();
+                    range.setMin(Double.isFinite(oitoolsRange.getMin()) ? oitoolsRange.getMin() : Double.NaN);
+                    range.setMax(Double.isFinite(oitoolsRange.getMax()) ? oitoolsRange.getMax() : Double.NaN);
+                    newGenericFilter.getAcceptedRanges().add(range);
+                    break;
+                case STRING:
+                    final List<String> initValues = OCM.getOIFitsCollection().getDistinctValues(columnName);
+                    if (initValues != null) {
+                        newGenericFilter.getAcceptedValues().addAll(initValues);
+                    }
+                    break;
+                default:
             }
-
             addGenericFilterEditor(newGenericFilter);
 
             revalidate();
-
             updateModel();
         }
     }
@@ -220,6 +215,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 GenericFilterEditor genericFilterEditorToDel = (GenericFilterEditor) panel.getComponent(0);
                 genericFilterEditorList.remove(genericFilterEditorToDel);
                 jPanelGenericFilters.remove(panel);
+
                 revalidate();
                 repaint();
                 updateModel();
