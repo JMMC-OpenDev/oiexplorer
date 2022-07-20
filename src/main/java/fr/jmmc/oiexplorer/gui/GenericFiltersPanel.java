@@ -47,15 +47,6 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     /** OIFitsCollectionManager singleton reference */
     private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
-    private static final List<String> SPECIAL_COLUMN_NAMES = Arrays.asList(new String[]{
-        Selector.FILTER_EFFWAVE,
-        Selector.FILTER_EFFBAND,
-        // uncomment once supported (String values)
-        // Selector.FILTER_NIGHT_ID,
-        Selector.FILTER_STAINDEX,
-        Selector.FILTER_STACONF
-    });
-
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final transient List<GenericFilterEditor> genericFilterEditorList;
 
@@ -124,10 +115,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                 }
 
                 // updating column choices from SelectorResult
-                for (String specialName : SPECIAL_COLUMN_NAMES) {
+                for (String specialName : Selector.SPECIAL_COLUMN_NAMES) {
                     columnChoices.add(specialName);
                 }
-                for (String columnName : getDistinctColumns1D(selectorResult)) {
+                for (String columnName : getDistinctNumericalColumnNames(selectorResult)) {
                     columnChoices.add(columnName);
                 }
                 if (jComboBoxColumnName.getSelectedIndex() == -1) {
@@ -293,11 +284,8 @@ public class GenericFiltersPanel extends javax.swing.JPanel
      * @param selectorResult Selector result from plot's subset definition
      * @return a Set of Strings with every distinct column names
      */
-    private static Set<String> getDistinctColumns1D(final SelectorResult selectorResult) {
-        final DataModel dataModel = (selectorResult == null) ? DataModel.getInstance() : selectorResult.getDataModel();
-        logger.debug("datamodel : {}", dataModel);
-
-        return dataModel.getNumericalColumnNames1D();
+    private static Set<String> getDistinctNumericalColumnNames(final SelectorResult selectorResult) {
+        return SelectorResult.getDataModel(selectorResult).getNumericalColumnNames();
     }
 
     /**
