@@ -127,7 +127,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
                 // CLI args
                 final String cliArgs
-                        = (selectorResult == null)
+                             = (selectorResult == null)
                                 ? ""
                                 : OIFitsProcessor.generateCLIargs(selectorResult.getSelector());
                 jTextAreaCLI.setText(cliArgs);
@@ -142,29 +142,27 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     /** Adds a GenericFilterEditor to the Panel, along with a delete button */
     private void addGenericFilterEditor(final GenericFilter genericFilter) {
         final JPanel panel = new JPanel(new GridBagLayout());
-        final GridBagConstraints layoutConsts = new GridBagConstraints();
+        final GridBagConstraints gridBagConstraints = new GridBagConstraints(); // gridBagConstraints
 
         final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
         newGenericFilterEditor.addChangeListener(this);
-
         newGenericFilterEditor.setGenericFilter(genericFilter);
-
         genericFilterEditorList.add(newGenericFilterEditor);
-        layoutConsts.gridx = 0;
-        layoutConsts.fill = GridBagConstraints.HORIZONTAL;
-        layoutConsts.weightx = 0.9;
-        panel.add(newGenericFilterEditor, layoutConsts);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.9;
+        panel.add(newGenericFilterEditor, gridBagConstraints);
 
         final JButton delButton = new JButton();
         delButton.setIcon(ResourceImage.LIST_DEL.icon());
         delButton.addActionListener(this);
-        delButton.setMargin(new Insets(1, 1, 2, 1));
-        layoutConsts.gridx = 1;
-        layoutConsts.fill = GridBagConstraints.NONE;
-        layoutConsts.weightx = 0;
-        layoutConsts.insets = new Insets(2, 2, 2, 2);
-        layoutConsts.anchor = GridBagConstraints.NORTH;
-        panel.add(delButton, layoutConsts);
+        delButton.setMargin(new Insets(0, 0, 0, 0));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.insets = new Insets(0, 4, 0, 4);
+        panel.add(delButton, gridBagConstraints);
 
         jPanelGenericFilters.add(panel, 0);
     }
@@ -311,7 +309,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         jPanelToolbar.setLayout(new java.awt.GridBagLayout());
 
         jButtonAddGenericFilter.setIcon(fr.jmmc.jmcs.gui.util.ResourceImage.LIST_ADD.icon());
-        jButtonAddGenericFilter.setMargin(new java.awt.Insets(1, 1, 1, 1));
+        jButtonAddGenericFilter.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jButtonAddGenericFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAddGenericFilterActionPerformed(evt);
@@ -351,11 +349,15 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints.weighty = 0.9;
         add(jScrollPaneFilters, gridBagConstraints);
 
+        jScrollPaneCLI.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         jTextAreaCLI.setEditable(false);
         jTextAreaCLI.setColumns(20);
-        jTextAreaCLI.setRows(1);
-        jTextAreaCLI.setText("CLI arguments equivalent to these generic filters");
-        jTextAreaCLI.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        jTextAreaCLI.setLineWrap(true);
+        jTextAreaCLI.setRows(4);
+        jTextAreaCLI.setTabSize(4);
+        jTextAreaCLI.setToolTipText("OITools CLI arguments equivalent to current filters");
+        jTextAreaCLI.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jScrollPaneCLI.setViewportView(jTextAreaCLI);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
