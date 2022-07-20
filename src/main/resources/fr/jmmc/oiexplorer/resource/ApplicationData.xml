@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 7"/>
-    <compilation date="08/07/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 8"/>
+    <compilation date="20/07/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,7 +169,19 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Fri, 08 Jul 2022 18:00:00 GMT</pubDate>
+            <pubDate>Wed, 20 Jul 2022 18:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 8">
+                <change type="FEATURE">Improved Filter panel to add / remove any filter (1D, 2D, String) supporting multiple ranges and value selection (STA_INDEX, STA_CONF)</change>
+                <change type="FEATURE">Improved Merger to log CLI inputs and args in HISTORY keywords of the FITS primary HDU</change>
+                <change type="FEATURE">Improved Merger to filter out the array values (2D numerical columns) using NaN</change>
+                <change type="FEATURE">Improved OITools in-memory filtering API to support String and array columns:
+                   String filters (STA_INDEX, STA_CONF);
+                   OI_DATA filters (2D) (VIS2DATA, VIS2ERR, NS_MODEL_VIS2DATA, NS_MODEL_VIS2ERR, EFF_WAVE, EFF_BAND, SPATIAL_FREQ,
+                    UCOORD_SPATIAL, VCOORD_SPATIAL, SNR_VIS2, SNR_MODEL_VIS2, RES_VIS2_MODEL, VISAMP, VISAMPERR, VISPHI, VISPHIERR,
+                    NS_MODEL_VISAMP, NS_MODEL_VISPHI, RVIS, RVISERR, IVIS, IVISERR, SNR_VISAMP, SNR_VISPHI, RES_VISAMP_MODEL, RES_VISPHI_MODEL,
+                    T3AMP, T3AMPERR, T3PHI, T3PHIERR, NS_MODEL_T3AMP, NS_MODEL_T3PHI, U1COORD_SPATIAL, V1COORD_SPATIAL, U2COORD_SPATIAL, V2COORD_SPATIAL,
+                    SNR_T3AMP, SNR_T3PHI, RES_T3AMP_MODEL, RES_T3PHI_MODEL, FLUXDATA, FLUXERR, SNR_FLUX)</change>
+            </prerelease>
             <prerelease version="0.3.0 beta 7">
                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/16">Improved Filter panel (bottom left corner) to add / remove any 1D filter and combine them: enjoy (;D) !</change>
                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/15">Improved OITools in-memory filtering API to support:
