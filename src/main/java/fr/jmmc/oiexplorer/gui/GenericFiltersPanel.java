@@ -33,6 +33,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fr.jmmc.jmcs.gui.util.ResourceImage;
 
 public class GenericFiltersPanel extends javax.swing.JPanel
         implements OIFitsCollectionManagerEventListener, ChangeListener, ActionListener {
@@ -163,8 +164,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         layoutConsts.weightx = 0.9;
         panel.add(newGenericFilterEditor, layoutConsts);
 
-        final JButton delButton = new JButton("-");
+        final JButton delButton = new JButton();
+        delButton.setIcon(ResourceImage.LIST_DEL.icon());
         delButton.addActionListener(this);
+        delButton.setMargin(new Insets(1, 1, 2, 1));
         layoutConsts.gridx = 1;
         layoutConsts.fill = GridBagConstraints.NONE;
         layoutConsts.weightx = 0;
@@ -319,7 +322,8 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
         jPanelToolbar.setLayout(new java.awt.GridBagLayout());
 
-        jButtonAddGenericFilter.setText("+");
+        jButtonAddGenericFilter.setIcon(fr.jmmc.jmcs.gui.util.ResourceImage.LIST_ADD.icon());
+        jButtonAddGenericFilter.setMargin(new java.awt.Insets(1, 1, 1, 1));
         jButtonAddGenericFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAddGenericFilterActionPerformed(evt);
