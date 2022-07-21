@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 8"/>
-    <compilation date="20/07/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 9"/>
+    <compilation date="21/07/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,7 +169,10 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Wed, 20 Jul 2022 18:00:00 GMT</pubDate>
+            <pubDate>Thu, 21 Jul 2022 15:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 9">
+                <change type="FEATURE">Improved Filter panel to avoid updating combo boxes (STA_INDEX, STA_CONF) too often</change>
+            </prerelease>
             <prerelease version="0.3.0 beta 8">
                 <change type="FEATURE">Improved Filter panel to add / remove any filter (1D, 2D, String) supporting multiple ranges and value selection (STA_INDEX, STA_CONF)</change>
                 <change type="FEATURE">Improved Merger to log CLI inputs and args in HISTORY keywords of the FITS primary HDU</change>
