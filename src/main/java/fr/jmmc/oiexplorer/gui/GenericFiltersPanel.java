@@ -15,7 +15,6 @@ import fr.jmmc.oiexplorer.core.model.oi.Identifiable;
 import fr.jmmc.oiexplorer.core.model.oi.SubsetDefinition;
 import fr.jmmc.oiexplorer.core.model.plot.Range;
 import fr.jmmc.oitools.OIFitsProcessor;
-import fr.jmmc.oitools.model.DataModel;
 import fr.jmmc.oitools.processing.Selector;
 import fr.jmmc.oitools.processing.SelectorResult;
 import java.awt.GridBagConstraints;
@@ -23,7 +22,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -72,14 +70,15 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         OCM.unbind(this);
     }
 
-    /** Updates OIExplorer Model from the GUI values. Here it updates the generic filters. Called when there is a change
-     * on GenericFilterEditors. */
+    /** 
+     * Updates SubsetDefinition from the GUI values to update the generic filters. 
+     * Called when there is a change on GenericFilterEditors. */
     private void updateModel() {
-        logger.debug("updates Model");
+        logger.debug("updateModel");
 
-        final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
+        final SubsetDefinition subsetCopy = OCM.getCurrentSubsetDefinition();
 
-        final List<GenericFilter> filters = subsetDefinitionCopy.getGenericFilters();
+        final List<GenericFilter> filters = subsetCopy.getGenericFilters();
         filters.clear();
 
         // take every genericFilter value from the genericFilterEditors and put it in a SubsetDefinition copy
@@ -87,31 +86,34 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             final GenericFilter genericFilterCopy = Identifiable.clone(genericFilterEditor.getGenericFilter());
             filters.add(genericFilterCopy);
         }
-        OCM.updateSubsetDefinition(null, subsetDefinitionCopy);
+        OCM.updateSubsetDefinition(this, subsetCopy);
     }
 
-    /** Updates GenericFilterEditors from the OIExplorer Model values. Called when a SUBSET_CHANGED event is received */
-    private void updateGUI() {
-        logger.debug("updates GUI");
+    /** 
+     * Update GenericFilterEditors from the OIExplorer Model values. 
+     * Called when a SUBSET_CHANGED event is received
+     * @param isEventFromThisSource true if the event comes from this panel instance
+     * @param subsetDefinition event's instance
+     */
+    private void updateGUI(final boolean isEventFromThisSource, final SubsetDefinition subsetDefinition) {
+        logger.debug("updateGUI");
+
+        final SelectorResult selectorResult = subsetDefinition.getSelectorResult();
 
         try {
             updatingGUI = true;
 
-            // we clear and re-create GenericFilterEditors
-            jPanelGenericFilters.removeAll();
-            genericFilterEditorList.forEach(GenericFilterEditor::dispose);
-            genericFilterEditorList.clear();
+            if (!isEventFromThisSource) {
+                // we clear and re-create GenericFilterEditors
+                jPanelGenericFilters.removeAll();
+                genericFilterEditorList.forEach(GenericFilterEditor::dispose);
+                genericFilterEditorList.clear();
 
-            // we clear and recreate column name choices
-            columnChoices.clear();
+                // we clear and recreate column name choices
+                columnChoices.clear();
 
-            final SubsetDefinition subsetDefinitionCopy = OCM.getCurrentSubsetDefinition();
-
-            if (subsetDefinitionCopy != null) {
-                final SelectorResult selectorResult = subsetDefinitionCopy.getSelectorResult();
-
-                for (GenericFilter genericFilter : subsetDefinitionCopy.getGenericFilters()) {
-                    addGenericFilterEditor(genericFilter);
+                for (GenericFilter genericFilter : subsetDefinition.getGenericFilters()) {
+                    addGenericFilterEditor(Identifiable.clone(genericFilter));
                 }
 
                 // updating column choices from SelectorResult
@@ -125,15 +127,14 @@ public class GenericFiltersPanel extends javax.swing.JPanel
                     jComboBoxColumnName.setSelectedIndex(0);
                 }
 
-                // CLI args
-                final String cliArgs
-                             = (selectorResult == null)
-                                ? ""
-                                : OIFitsProcessor.generateCLIargs(selectorResult.getSelector());
-                jTextAreaCLI.setText(cliArgs);
+                revalidate();
             }
 
-            revalidate();
+            // Always update CLI args:
+            final String cliArgs = (selectorResult != null)
+                    ? OIFitsProcessor.generateCLIargs(selectorResult.getSelector()) : "(no matching data)";
+            jTextAreaCLI.setText(cliArgs);
+
         } finally {
             updatingGUI = false;
         }
@@ -269,7 +270,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
         switch (event.getType()) {
             case SUBSET_CHANGED:
-                updateGUI();
+                updateGUI(event.getSources().contains(this), event.getSubsetDefinition());
                 break;
             default:
         }
