@@ -32,6 +32,9 @@ import javax.swing.event.ChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import fr.jmmc.jmcs.gui.util.ResourceImage;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.gui.util.SwingUtils.ComponentSizeVariant;
+import javax.swing.SwingUtilities;
 
 public class GenericFiltersPanel extends javax.swing.JPanel
         implements OIFitsCollectionManagerEventListener, ChangeListener, ActionListener {
@@ -46,7 +49,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
-    private final transient List<GenericFilterEditor> genericFilterEditorList;
+    private final transient List<GenericFilterEditor> genericFilterEditorList = new ArrayList<>(1);
 
     /** Store all column choices available */
     private final transient List<String> columnChoices = new LinkedList<String>();
@@ -56,11 +59,22 @@ public class GenericFiltersPanel extends javax.swing.JPanel
 
     /** Creates new form GenericFiltersPanel */
     public GenericFiltersPanel() {
-        logger.debug("creates GenericFiltersPanel");
         initComponents();
-        genericFilterEditorList = new ArrayList<>(1);
+        postInit();
+    }
+
+    /**
+     * This method is useful to set the models and specific features of initialized swing components :
+     */
+    private void postInit() {
         jComboBoxColumnName.setModel(new GenericListModel<String>(columnChoices, true));
         OCM.getSubsetDefinitionChangedEventNotifier().register(this);
+
+        // use small variant:
+        SwingUtils.adjustSize(this.jButtonAddGenericFilter, ComponentSizeVariant.small);
+
+        // update button UI:
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     /** Removes listeners references */
@@ -159,6 +173,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         delButton.setIcon(ResourceImage.LIST_DEL.icon());
         delButton.addActionListener(this);
         delButton.setMargin(new Insets(0, 0, 0, 0));
+        
+        // use small variant:
+        SwingUtils.adjustSize(delButton, ComponentSizeVariant.small);
+        
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0;
@@ -166,6 +184,8 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         panel.add(delButton, gridBagConstraints);
 
         jPanelGenericFilters.add(panel, 0);
+        // update button UI:
+        SwingUtilities.updateComponentTreeUI(jPanelGenericFilters);
     }
 
     /** Handler for the Add button, adds a new generic filter editor */

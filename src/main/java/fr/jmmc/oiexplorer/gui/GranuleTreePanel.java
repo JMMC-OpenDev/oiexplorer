@@ -5,6 +5,8 @@ package fr.jmmc.oiexplorer.gui;
 
 import fr.jmmc.jmal.ALX;
 import fr.jmmc.jmcs.gui.component.GenericJTree;
+import fr.jmmc.jmcs.gui.util.SwingUtils;
+import fr.jmmc.jmcs.gui.util.SwingUtils.ComponentSizeVariant;
 import fr.jmmc.jmcs.util.ObjectUtils;
 import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.oitools.model.InstrumentModeManager;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -99,6 +102,11 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
+        // use small variant:
+        SwingUtils.adjustSize(this.jToggleButtonExpandTree, ComponentSizeVariant.small);
+        SwingUtils.adjustSize(this.jToggleButtonCollapseTree, ComponentSizeVariant.small);
+        // update button UI:
+        SwingUtilities.updateComponentTreeUI(this);
 
         // dataTree contains Target / InstrumentMode / NightId or OITable objects:
         dataTree = new GenericJTree<Object>(null) {
