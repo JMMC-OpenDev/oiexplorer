@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.3.0 beta 10"/>
-    <compilation date="26/08/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.3.0 beta 11"/>
+    <compilation date="30/08/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -169,7 +169,10 @@
 
     <releasenotes>
         <release version="0.3.0">
-            <pubDate>Fri, 26 Aug 2022 15:00:00 GMT</pubDate>
+            <pubDate>Tue, 30 Aug 2022 16:00:00 GMT</pubDate>
+            <prerelease version="0.3.0 beta 11">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1209">Improved OIFits validator report to use compact mode in order to avoid excessive memory usage</change>
+            </prerelease>
             <prerelease version="0.3.0 beta 10">
                 <change type="FEATURE">Improved the plot chart panel to handle fixed ranges on axes in logarithmic scale</change>
                 <change type="BUGFIX">Fixed range editor to be disabled (not 'Fixed') to make zooming in / out work properly</change>
