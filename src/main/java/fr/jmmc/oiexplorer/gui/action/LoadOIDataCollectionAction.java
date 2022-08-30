@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.jaxb.XmlBindException;
+import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
@@ -111,7 +112,7 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
 
         Exception e = null;
         try {
-            final OIFitsChecker checker = new OIFitsChecker();
+            final OIFitsChecker checker = OIFitsChecker.newInstance();
 
             ocm.loadOIFitsCollection(file, checker,
                     new LoadOIFitsListener() {
@@ -127,13 +128,8 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                 public void done(final boolean cancelled) {
                     StatusBar.removeCustomPanel(progressPanel);
 
-                    // log validation messages anyway:
-                    final String checkReport = checker.getCheckReport();
-                    logger.info("validation results:\n{}", checkReport);
-
-                    // TODO: use a preference to show or hide the validation report:
-                    if (false && !cancelled) {
-                        MessagePane.showMessage(checkReport);
+                    if (!cancelled) {
+                        OIFitsCheckerPanel.displayReport(checker);
                     }
 
                     // Fire the Ready event to any listener:

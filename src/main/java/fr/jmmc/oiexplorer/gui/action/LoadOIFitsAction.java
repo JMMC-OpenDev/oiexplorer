@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oitools.model.OIFitsChecker;
@@ -82,7 +83,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
 
             StatusBar.addCustomPanel(progressPanel);
 
-            final OIFitsChecker checker = new OIFitsChecker();
+            final OIFitsChecker checker = OIFitsChecker.newInstance();
 
             OIFitsCollectionManager.getInstance().loadOIFitsFiles(files, checker,
                     new LoadOIFitsListener() {
@@ -98,12 +99,8 @@ public final class LoadOIFitsAction extends RegisteredAction {
                 public void done(final boolean cancelled) {
                     StatusBar.removeCustomPanel(progressPanel);
 
-                    // display validation messages anyway:
-                    final String checkReport = checker.getCheckReport();
-                    logger.info("validation results:\n{}", checkReport);
-
                     if (!cancelled) {
-                        MessagePane.showMessage(checkReport);
+                        OIFitsCheckerPanel.displayReport(checker);
                     }
                 }
             });

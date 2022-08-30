@@ -24,6 +24,7 @@ import fr.jmmc.jmcs.util.StringUtils;
 import fr.jmmc.jmcs.util.concurrent.ParallelJobExecutor;
 import fr.jmmc.oiexplorer.core.export.DocumentOptions;
 import fr.jmmc.oiexplorer.core.export.ImageOptions;
+import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
 import fr.jmmc.oiexplorer.gui.MainPanel;
 import fr.jmmc.oiexplorer.gui.PreferencePanel;
@@ -366,8 +367,7 @@ public final class OIFitsExplorer extends App {
                         public void run() {
                             App.showFrameToFront();
 
-                            final OIFitsChecker checker = new OIFitsChecker();
-
+                            final OIFitsChecker checker = OIFitsChecker.newInstance();
                             try {
                                 final long startTime = System.nanoTime();
 
@@ -379,25 +379,21 @@ public final class OIFitsExplorer extends App {
                                 MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
                                 StatusBar.show(ioe.getMessage());
                             } finally {
-                                // display validation messages anyway:
-                                final String checkReport = checker.getCheckReport();
-                                logger.info("validation results:\n{}", checkReport);
-
-                                MessagePane.showMessage(checkReport);
+                                OIFitsCheckerPanel.displayReport(checker);
                             }
                         }
                     });
                 }
             }
         };
-        
+
         // Add handler to load one new oifits
         new SampMessageHandler(SampCapability.OIFITSEXPLORER_LOAD_COLLECTION) {
             @Override
             protected void processMessage(final String senderId, final Message message) throws SampException {
                 final String url = (String) message.getParam("url");
                 final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
-          
+
                 if (!StringUtils.isEmpty(url)) {
                     URI uri;
 
@@ -418,35 +414,34 @@ public final class OIFitsExplorer extends App {
                             try {
                                 oixpFile = new File(uri);
                             } catch (IllegalArgumentException iae) {
-                                logger.debug("Invalid URI: {}", url, iae);                                
+                                logger.debug("Invalid URI: {}", url, iae);
                                 throw new SampException("Invalid URI: " + url);
-                            }                            
+                            }
                         } else {
                             final File file = FileUtils.getTempFile("samp-collection-", ".oixp");
 
                             if (Http.download(uri, file, false)) {
                                 oixpFile = file;
-                            }else{
+                            } else {
                                 throw new SampException("Can not read the file : " + url);
                             }
-                        }                    
-                    
+                        }
+
                         // bring this application to front and load data
                         SwingUtils.invokeLaterEDT(new Runnable() {
                             @Override
                             public void run() {
                                 App.showFrameToFront();
                                 LoadOIDataCollectionAction.loadOIFitsCollectionFromFile(oixpFile, ocm, true);
-                           }
+                            }
                         });
-                            
-                    
+
                     } catch (IOException ioe) {
                         MessagePane.showErrorMessage("Can not read the collection file at :\n\n" + url);
-                        
+
                         throw new SampException("Can not read the file : " + url, ioe);
                     }
-                    
+
                 }
             }
         };
@@ -514,7 +509,7 @@ public final class OIFitsExplorer extends App {
     }
 
     private static boolean initializeExport(final String filePath, final MimeType mimeType,
-            final String mode, final String dims) throws IOException {
+                                            final String mode, final String dims) throws IOException {
 
         if (filePath != null) {
             final DocumentOptions options = DocumentOptions.createInstance(mimeType).setMode(mode);
