@@ -172,7 +172,6 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         final JButton delButton = new JButton();
         delButton.setIcon(ResourceImage.LIST_DEL.icon());
         delButton.addActionListener(this);
-        delButton.setMargin(new Insets(0, 0, 0, 0));
         
         // use small variant:
         SwingUtils.adjustSize(delButton, ComponentSizeVariant.small);
