@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import fr.jmmc.jmcs.gui.util.ResourceImage;
 import fr.jmmc.jmcs.gui.util.SwingUtils;
 import fr.jmmc.jmcs.gui.util.SwingUtils.ComponentSizeVariant;
+import fr.jmmc.oitools.processing.BaseSelectorResult;
 import javax.swing.SwingUtilities;
 
 public class GenericFiltersPanel extends javax.swing.JPanel
@@ -48,6 +49,10 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     /** OIFitsCollectionManager singleton reference */
     private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
 
+    private final static int IDX_DEL_BUTTON = 0;
+    private final static int IDX_FILTER_EDITOR = 1;
+
+    /* members */
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final transient List<GenericFilterEditor> genericFilterEditorList = new ArrayList<>(1);
 
@@ -159,36 +164,40 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         final JPanel panel = new JPanel(new GridBagLayout());
         final GridBagConstraints gridBagConstraints = new GridBagConstraints(); // gridBagConstraints
 
+        final JButton delButton = new JButton();
+        delButton.setIcon(ResourceImage.LIST_DEL.icon());
+        delButton.setToolTipText("Remove this filter");
+        delButton.addActionListener(this);
+
+        // use small variant:
+        SwingUtils.adjustSize(delButton, ComponentSizeVariant.small);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0;
+        gridBagConstraints.insets = new Insets(0, 2, 0, 4);
+        panel.add(delButton, gridBagConstraints, IDX_DEL_BUTTON);
+
         final GenericFilterEditor newGenericFilterEditor = new GenericFilterEditor();
         newGenericFilterEditor.addChangeListener(this);
         newGenericFilterEditor.setGenericFilter(genericFilter);
         genericFilterEditorList.add(newGenericFilterEditor);
 
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.9;
-        panel.add(newGenericFilterEditor, gridBagConstraints);
+        gridBagConstraints.insets = SwingUtils.NO_MARGIN;
 
-        final JButton delButton = new JButton();
-        delButton.setIcon(ResourceImage.LIST_DEL.icon());
-        delButton.addActionListener(this);
-        
-        // use small variant:
-        SwingUtils.adjustSize(delButton, ComponentSizeVariant.small);
-        
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0;
-        gridBagConstraints.insets = new Insets(0, 4, 0, 4);
-        panel.add(delButton, gridBagConstraints);
+        panel.add(newGenericFilterEditor, gridBagConstraints, IDX_FILTER_EDITOR);
 
         jPanelGenericFilters.add(panel, 0);
+
         // update button UI:
-        SwingUtilities.updateComponentTreeUI(jPanelGenericFilters);
+        SwingUtilities.updateComponentTreeUI(panel);
     }
 
     /** Handler for the Add button, adds a new generic filter editor */
-    private void handlerAddGenericFilter() {
+    private void handleAddGenericFilter() {
         if (!updatingGUI) {
             final GenericFilter newGenericFilter = new GenericFilter();
             newGenericFilter.setEnabled(true);
@@ -227,22 +236,18 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     }
 
     /** Handler for the Del button. removes the generic filter editor associated to the button */
-    private void handlerDelGenericFilter(final JButton delButton) {
+    private void handleDelGenericFilter(final JButton delButton) {
         if (!updatingGUI) {
-            try {
-                /* retrieve the panel containing the actioned button and the generic filter editor to delete */
-                delButton.removeActionListener(this);
-                JPanel panel = (JPanel) delButton.getParent();
-                GenericFilterEditor genericFilterEditorToDel = (GenericFilterEditor) panel.getComponent(0);
-                genericFilterEditorList.remove(genericFilterEditorToDel);
-                jPanelGenericFilters.remove(panel);
+            /* retrieve the panel containing the actioned button and the generic filter editor to delete */
+            delButton.removeActionListener(this);
+            final JPanel panel = (JPanel) delButton.getParent();
+            final GenericFilterEditor genericFilterEditorToDel = (GenericFilterEditor) panel.getComponent(IDX_FILTER_EDITOR);
+            genericFilterEditorList.remove(genericFilterEditorToDel);
+            jPanelGenericFilters.remove(panel);
 
-                revalidate();
-                repaint();
-                updateModel();
-            } catch (ClassCastException e) {
-                logger.error("Cannot find GenericFilterEditor panel to remove.");
-            }
+            revalidate();
+            repaint();
+            updateModel();
         }
     }
 
@@ -253,7 +258,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     @Override
     public void actionPerformed(java.awt.event.ActionEvent evt) {
         if (evt.getSource() instanceof JButton) {
-            handlerDelGenericFilter((JButton) evt.getSource());
+            handleDelGenericFilter((JButton) evt.getSource());
         }
     }
 
@@ -303,7 +308,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
      * @return a Set of Strings with every distinct column names
      */
     private static Set<String> getDistinctNumericalColumnNames(final SelectorResult selectorResult) {
-        return SelectorResult.getDataModel(selectorResult).getNumericalColumnNames();
+        return BaseSelectorResult.getDataModel(selectorResult).getNumericalColumnNames();
     }
 
     /**
@@ -323,12 +328,13 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         jScrollPaneCLI = new javax.swing.JScrollPane();
         jTextAreaCLI = new javax.swing.JTextArea();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Generic Filters"));
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Filters"));
         setLayout(new java.awt.GridBagLayout());
 
         jPanelToolbar.setLayout(new java.awt.GridBagLayout());
 
         jButtonAddGenericFilter.setIcon(fr.jmmc.jmcs.gui.util.ResourceImage.LIST_ADD.icon());
+        jButtonAddGenericFilter.setToolTipText("add a new filter for the given column");
         jButtonAddGenericFilter.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jButtonAddGenericFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -338,25 +344,27 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 4);
         jPanelToolbar.add(jButtonAddGenericFilter, gridBagConstraints);
 
         jComboBoxColumnName.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "COLUMN_NAME" }));
+        jComboBoxColumnName.setToolTipText("Select the column name and click on [+] to add a new filter");
         jComboBoxColumnName.setPrototypeDisplayValue("XXXX");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.8;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 2, 2);
         jPanelToolbar.add(jComboBoxColumnName, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.9;
         add(jPanelToolbar, gridBagConstraints);
+
+        jScrollPaneFilters.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jPanelGenericFilters.setLayout(new javax.swing.BoxLayout(jPanelGenericFilters, javax.swing.BoxLayout.Y_AXIS));
         jScrollPaneFilters.setViewportView(jPanelGenericFilters);
@@ -365,8 +373,8 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.9;
-        gridBagConstraints.weighty = 0.9;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.8;
         add(jScrollPaneFilters, gridBagConstraints);
 
         jScrollPaneCLI.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -384,13 +392,12 @@ public class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.9;
         gridBagConstraints.weighty = 0.1;
         add(jScrollPaneCLI, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddGenericFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddGenericFilterActionPerformed
-        handlerAddGenericFilter();
+        handleAddGenericFilter();
     }//GEN-LAST:event_jButtonAddGenericFilterActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
