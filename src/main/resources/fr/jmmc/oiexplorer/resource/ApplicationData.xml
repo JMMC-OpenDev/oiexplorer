@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.0"/>
-    <compilation date="09/09/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.1 beta 1"/>
+    <compilation date="27/09/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -168,6 +168,16 @@
     </menubar>
 
     <releasenotes>
+
+        <release version="0.5.1">
+            <pubDate>Tue, 27 Sep 2022 15:00:00 GMT</pubDate>
+            <prerelease version="0.5.1 beta 1">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/23">Improved filters to support exclusive filters (NOT)
+                    both in the GUI (X checkbox) and in the Command-Line Interface (using prefix not:)</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1222">Fixed STA_INDEX filter to handle properly 'equivalent' baselines or triplets</change>
+                <change type="FEATURE">Improved color mapping (baseline or triplet, station configuration) to be stable with or without filters and consistent accross plots</change>
+            </prerelease>
+        </release>
         <release version="0.5.0">
             <pubDate>Fri, 09 Sep 2022 15:00:00 GMT</pubDate>
             <prerelease version="0.5.0 beta 11">
