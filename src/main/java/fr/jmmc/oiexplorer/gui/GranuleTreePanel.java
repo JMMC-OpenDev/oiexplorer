@@ -79,7 +79,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     /** Creates new GranuleTreePanel */
     public GranuleTreePanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
-        ocm.bindCollectionChangedEvent(this);
+        ocm.bindCollectionChanged(this);
 
         initComponents();
         postInit();

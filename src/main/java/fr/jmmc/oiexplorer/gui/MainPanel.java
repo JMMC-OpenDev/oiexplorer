@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mella
  */
-public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener, DocumentExportable {
+public final class MainPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener, DocumentExportable {
 
     /**
      * default serial UID for Serializable interface
@@ -95,12 +95,12 @@ public class MainPanel extends javax.swing.JPanel implements OIFitsCollectionMan
      */
     public MainPanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
-        ocm.bindCollectionChangedEvent(this);
-        ocm.bindPlotListChangedEvent(this);
-        ocm.getActivePlotChangedEventNotifier().register(this);
+        ocm.bindCollectionChanged(this);
+        ocm.bindPlotListChanged(this);
+        ocm.bindActivePlotChanged(this);
 
         if (DEV_MODE) {
-            ocm.getPlotChangedEventNotifier().register(this);
+            ocm.bindPlotChanged(this);
         }
 
         // Build GUI

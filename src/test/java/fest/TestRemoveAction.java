@@ -19,7 +19,7 @@ public class TestRemoveAction extends OIExplorerFestBase {
                                 = "PRODUCT_Gamma2_Velorum_2.02-2.09micron_2007-03-31T01_39_00.5372.fits";
     private static final String GAM_VIC_FILENAME = "2008-Contest_Binary.fits";
 
-    private final OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
+    private final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
     /**
      * Adds one file, removes it, checks if eveything is clean.
@@ -35,11 +35,11 @@ public class TestRemoveAction extends OIExplorerFestBase {
 
         // saveScreenshot(window, "OIXP-addOneFile-remove.png");
         // assert that there is no files remaining in OIFitsCollection
-        Assert.assertEquals(0, OCM.getOIFitsCollection().getOIFitsFiles().size());
+        Assert.assertEquals(0, ocm.getOIFitsCollection().getOIFitsFiles().size());
         // assert that there is no files remaining in OIDataCollection
-        Assert.assertNull(OCM.getOIDataFile(GAMMA2_VELORUM_FILENAME));
+        Assert.assertNull(ocm.getOIDataFile(GAMMA2_VELORUM_FILENAME));
         // assert that the filter of SubsetDefinition has no target
-        Assert.assertNull(OCM.getCurrentSubsetDefinition().getFilter().getTargetUID());
+        Assert.assertNull(ocm.getCurrentSubsetDefinition().getFilter().getTargetUID());
     }
 
     /**
@@ -56,7 +56,7 @@ public class TestRemoveAction extends OIExplorerFestBase {
         addOIFitsFile(RESOURCE_TEST_FOLDER, GAM_VIC_FILENAME);
 
         // memorize sorted targets: GAM_VIC, GAMMA2_VELORUM
-        List<Target> targets = OCM.getOIFitsCollection().getTargetManager().getGlobals();
+        List<Target> targets = ocm.getOIFitsCollection().getTargetManager().getGlobals();
         // logger.info("targets: " + targets);
 
         remove(); // will remove the selected one: Gamma2_Velorum
@@ -64,13 +64,13 @@ public class TestRemoveAction extends OIExplorerFestBase {
         // saveScreenshot(window, "OIXP-addTwoFiles-remove.png");
         // logger.info("global targets:  " + OCM.getOIFitsCollection().getTargetManager().getGlobals());
         // assert that only one granule remains
-        Assert.assertEquals(1, OCM.getOIFitsCollection().getSortedGranules().size());
+        Assert.assertEquals(1, ocm.getOIFitsCollection().getSortedGranules().size());
 
         // assert that there is one target less (GAM_VIC, UNDEFINED)
-        Assert.assertEquals(targets.size() - 1, OCM.getOIFitsCollection().getTargetManager().getGlobals().size());
+        Assert.assertEquals(targets.size() - 1, ocm.getOIFitsCollection().getTargetManager().getGlobals().size());
 
         // assert that the remaining target is GAM_VIC
-        Assert.assertEquals(targets.get(0), OCM.getOIFitsCollection().getTargetManager().getGlobals().get(0));
+        Assert.assertEquals(targets.get(0), ocm.getOIFitsCollection().getTargetManager().getGlobals().get(0));
     }
 
 }

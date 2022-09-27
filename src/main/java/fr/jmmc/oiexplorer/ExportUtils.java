@@ -51,11 +51,10 @@ public final class ExportUtils {
 
         final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
-        final OIFitsCollectionManagerEventListener readyEventListener
-                                                   = new ExportWhenReadyListener(file, options);
+        final OIFitsCollectionManagerEventListener readyEventListener = new ExportWhenReadyListener(file, options);
 
         // Register READY event listener:
-        ocm.getReadyEventNotifier().register(readyEventListener);
+        ocm.bindReadyEvent(readyEventListener);
 
         // Keep code alive:
         aliveListeners.add(readyEventListener);
@@ -126,7 +125,7 @@ public final class ExportUtils {
                 for (String subsetId : ocm.getSubsetDefinitionIds()) {
                     final SubsetDefinition subsetDefinition = ocm.getSubsetDefinitionRef(subsetId);
                     if (subsetDefinition != null) {
-                        if (subsetDefinition.getSelectorResult()!= null) {
+                        if (subsetDefinition.getSelectorResult() != null) {
                             noData = false;
                         } else {
                             logger.warn("Subset[{}] has no data with filter {}", subsetId, subsetDefinition.getFilter());

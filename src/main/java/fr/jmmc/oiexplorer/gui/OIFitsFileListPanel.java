@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * and hightligh the files used by active plot.
  * @author mella
  */
-public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
+public final class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCollectionManagerEventListener {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -50,11 +50,12 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
     /** Creates new form OIFitsFileListPanel */
     public OIFitsFileListPanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
-        ocm.bindCollectionChangedEvent(this);
-        ocm.getPlotChangedEventNotifier().register(this);
-        // DOES not work : ocm.bindSubsetDefinitionListChangedEvent(this);
-        // TODO fix and replace PlotChangedEvent
-        ocm.getActivePlotChangedEventNotifier().register(this);
+        ocm.bindCollectionChanged(this);
+
+        // DOES not work : ocm.bindSubsetDefinitionListChanged(this);
+        // TODO fix and replace PlotChangedEvent:
+        ocm.bindPlotChanged(this);
+        ocm.bindActivePlotChanged(this);
 
         initComponents();
         postInit();
@@ -176,7 +177,7 @@ public class OIFitsFileListPanel extends javax.swing.JPanel implements OIFitsCol
 
         final SubsetDefinition subset = getSubsetDefinitionRef();
         // ignore for non valid oifitsSubset associated
-        if (subset == null || subset.getSelectorResult()== null) {
+        if (subset == null || subset.getSelectorResult() == null) {
             return;
         }
 

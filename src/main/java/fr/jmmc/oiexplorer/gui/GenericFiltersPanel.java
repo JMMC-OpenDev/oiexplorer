@@ -37,7 +37,7 @@ import fr.jmmc.jmcs.gui.util.SwingUtils.ComponentSizeVariant;
 import fr.jmmc.oitools.processing.BaseSelectorResult;
 import javax.swing.SwingUtilities;
 
-public class GenericFiltersPanel extends javax.swing.JPanel
+public final class GenericFiltersPanel extends javax.swing.JPanel
         implements OIFitsCollectionManagerEventListener, ChangeListener, ActionListener {
 
     /** default serial UID for Serializable interface */
@@ -47,7 +47,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private static final Logger logger = LoggerFactory.getLogger(GenericFiltersPanel.class);
 
     /** OIFitsCollectionManager singleton reference */
-    private final static OIFitsCollectionManager OCM = OIFitsCollectionManager.getInstance();
+    private final static OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
     private final static int IDX_DEL_BUTTON = 0;
     private final static int IDX_FILTER_EDITOR = 1;
@@ -72,8 +72,9 @@ public class GenericFiltersPanel extends javax.swing.JPanel
      * This method is useful to set the models and specific features of initialized swing components :
      */
     private void postInit() {
+        ocm.bindSubsetDefinitionChanged(this);
+
         jComboBoxColumnName.setModel(new GenericListModel<String>(columnChoices, true));
-        OCM.getSubsetDefinitionChangedEventNotifier().register(this);
 
         // use small variant:
         SwingUtils.adjustSize(this.jButtonAddGenericFilter, ComponentSizeVariant.small);
@@ -86,7 +87,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     @Override
     public void dispose() {
         genericFilterEditorList.forEach(GenericFilterEditor::dispose);
-        OCM.unbind(this);
+        ocm.unbind(this);
     }
 
     /** 
@@ -95,7 +96,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
     private void updateModel() {
         logger.debug("updateModel");
 
-        final SubsetDefinition subsetCopy = OCM.getCurrentSubsetDefinition();
+        final SubsetDefinition subsetCopy = ocm.getCurrentSubsetDefinition();
 
         final List<GenericFilter> filters = subsetCopy.getGenericFilters();
         filters.clear();
@@ -105,7 +106,7 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             final GenericFilter genericFilterCopy = Identifiable.clone(genericFilterEditor.getGenericFilter());
             filters.add(genericFilterCopy);
         }
-        OCM.updateSubsetDefinition(this, subsetCopy);
+        ocm.updateSubsetDefinition(this, subsetCopy);
     }
 
     /** 
@@ -214,14 +215,14 @@ public class GenericFiltersPanel extends javax.swing.JPanel
             switch (dataType) {
                 case NUMERIC:
                     final fr.jmmc.oitools.model.range.Range oitoolsRange
-                                                            = OCM.getOIFitsCollection().getColumnRange(columnName);
+                                                            = ocm.getOIFitsCollection().getColumnRange(columnName);
                     final Range range = new Range();
                     range.setMin(Double.isFinite(oitoolsRange.getMin()) ? oitoolsRange.getMin() : Double.NaN);
                     range.setMax(Double.isFinite(oitoolsRange.getMax()) ? oitoolsRange.getMax() : Double.NaN);
                     newGenericFilter.getAcceptedRanges().add(range);
                     break;
                 case STRING:
-                    final List<String> initValues = OCM.getOIFitsCollection().getDistinctValues(columnName);
+                    final List<String> initValues = ocm.getOIFitsCollection().getDistinctValues(columnName);
                     if (initValues != null) {
                         newGenericFilter.getAcceptedValues().addAll(initValues);
                     }

@@ -97,9 +97,8 @@ public final class ExportOIFitsAction extends RegisteredAction {
      * @return default name [Aspro2_<TARGET>_<INSTRUMENT>_<CONFIGURATION>_<DATE>]
      */
     public static String getDefaultFileName(final OIFitsFile oiFitsFile, final boolean addExtension) {
-        
-        // TODO: merge with PlotChartPanel.getDefaultFileName() and Aspro2 ExportOIFitsAction ...
 
+        // TODO: merge with PlotChartPanel.getDefaultFileName() and Aspro2 ExportOIFitsAction ...
         final StringBuilder sb = new StringBuilder(128).append("OiXP_");
 
         final String altName = StringUtils.replaceNonAlphaNumericCharsByUnderscore(oiFitsFile.getOiTarget().getTarget()[0]);

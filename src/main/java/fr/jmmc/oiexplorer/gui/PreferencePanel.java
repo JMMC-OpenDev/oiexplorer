@@ -133,7 +133,6 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         add(jScrollPane);
     }// </editor-fold>//GEN-END:initComponents
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private fr.jmmc.oiexplorer.core.gui.ChartPreferencesView chartPreferencesView;
     private javax.swing.JFormattedTextField jFieldTargetSep;

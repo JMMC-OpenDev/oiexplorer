@@ -77,8 +77,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     /** Creates new form DataTreePanel */
     public DataTreePanel() {
         // always bind at the beginning of the constructor (to maintain correct ordering):
-        ocm.bindCollectionChangedEvent(this);
-        ocm.getActivePlotChangedEventNotifier().register(this);
+        ocm.bindCollectionChanged(this);
+        ocm.bindActivePlotChanged(this);
 
         initComponents();
         postInit();
