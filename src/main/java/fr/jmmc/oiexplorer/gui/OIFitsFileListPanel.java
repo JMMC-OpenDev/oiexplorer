@@ -21,7 +21,6 @@ import fr.jmmc.oitools.model.OIFitsCollection;
 import fr.jmmc.oitools.model.OIFitsFile;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -134,10 +133,8 @@ public final class OIFitsFileListPanel extends javax.swing.JPanel implements OIF
             final MainPanel mainPanel = OIFitsExplorer.getInstance().getMainPanel();
 
             if (!mainPanel.hasView(oiFitsFileName)) {
-                final WeakReference<OIFitsFile> oiFitsFileRef = new WeakReference<OIFitsFile>(oiFitsFile);
-
                 final OIFitsTableBrowser fb = new OIFitsTableBrowser();
-                fb.setOiFitsFileRef(oiFitsFileRef);
+                fb.setOiFitsFile(oiFitsFile);
 
                 mainPanel.addView(fb, oiFitsFileName);
             }

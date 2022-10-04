@@ -744,15 +744,15 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         jTabbedPaneBrowser = new javax.swing.JTabbedPane();
         granuleTreePanel = new fr.jmmc.oiexplorer.gui.GranuleTreePanel();
         oifitsFileListPanel = new fr.jmmc.oiexplorer.gui.OIFitsFileListPanel();
-        jSplitPane1 = new javax.swing.JSplitPane();
+        dataSplitPaneFilters = new javax.swing.JSplitPane();
         dataTreePanel = new fr.jmmc.oiexplorer.gui.DataTreePanel();
-        genericFiltersPanel1 = new fr.jmmc.oiexplorer.gui.GenericFiltersPanel();
+        genericFiltersPanel = new fr.jmmc.oiexplorer.gui.GenericFiltersPanel();
         tabbedPaneTop = createTabbedPane();
 
         setLayout(new java.awt.GridBagLayout());
 
         dataSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        dataSplitPane.setResizeWeight(0.3);
+        dataSplitPane.setResizeWeight(0.2);
         dataSplitPane.setMinimumSize(new java.awt.Dimension(150, 58));
 
         dataSplitTopPanel.setLayout(new java.awt.GridBagLayout());
@@ -776,12 +776,12 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
 
-        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPane1.setResizeWeight(0.66);
-        jSplitPane1.setTopComponent(dataTreePanel);
-        jSplitPane1.setBottomComponent(genericFiltersPanel1);
+        dataSplitPaneFilters.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        dataSplitPaneFilters.setResizeWeight(0.5);
+        dataSplitPaneFilters.setTopComponent(dataTreePanel);
+        dataSplitPaneFilters.setBottomComponent(genericFiltersPanel);
 
-        dataSplitPane.setRightComponent(jSplitPane1);
+        dataSplitPane.setRightComponent(dataSplitPaneFilters);
 
         mainSplitPane.setLeftComponent(dataSplitPane);
         mainSplitPane.setRightComponent(tabbedPaneTop);
@@ -796,11 +796,11 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSplitPane dataSplitPane;
+    private javax.swing.JSplitPane dataSplitPaneFilters;
     private javax.swing.JPanel dataSplitTopPanel;
     private fr.jmmc.oiexplorer.gui.DataTreePanel dataTreePanel;
-    private fr.jmmc.oiexplorer.gui.GenericFiltersPanel genericFiltersPanel1;
+    private fr.jmmc.oiexplorer.gui.GenericFiltersPanel genericFiltersPanel;
     private fr.jmmc.oiexplorer.gui.GranuleTreePanel granuleTreePanel;
-    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPaneBrowser;
     private javax.swing.JSplitPane mainSplitPane;
     private fr.jmmc.oiexplorer.gui.OIFitsFileListPanel oifitsFileListPanel;

@@ -682,7 +682,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
                 sb.append("<br><b>Parallax</b> (mas): ").append(target.getParallax() * ALX.DEG_IN_MILLI_ARCSEC)
                         .append(" [").append(target.getParaErr() * ALX.DEG_IN_MILLI_ARCSEC).append(']');
             }
-            if (target.getSpecTyp() != null && !target.getSpecTyp().isEmpty()) {
+            if ((target.getSpecTyp() != null) && !target.getSpecTyp().isEmpty()) {
                 sb.append("<br><b>Spectral types</b>: ").append(target.getSpecTyp());
             }
         } else if (value instanceof InstrumentMode) {

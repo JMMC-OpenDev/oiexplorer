@@ -287,9 +287,8 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     private void updateSubsetFilterFromTreeSelection(final TreePath[] selection) {
 
         Target target = null;
-        InstrumentMode insMode = null;
-        boolean allInstruments = false;
-        final List<OITable> listOITable = new ArrayList<>();
+        List<InstrumentMode> insModes = null;
+        List<OITable> listOITable = null;
 
         // go through all selected paths. two examples of typical paths : [root,target], [root,target,insMode,table]
         for (TreePath selectedPath : selection) {
@@ -300,7 +299,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                 if (node.equals(dataTree.getRootNode())) {
                     continue; // ignore root node, process to the next node (a target)
                 }
-
                 final Object userObject = ((DefaultMutableTreeNode) node).getUserObject(); // associated user object
 
                 if (userObject instanceof Target) {
@@ -311,26 +309,24 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         break; // a target is already registered, and the two targets are different: skip this path !!
                     }
                 } else if (userObject instanceof InstrumentMode) {
-                    if (!allInstruments) { // if not all instruments are already enabled
-                        final InstrumentMode thisInsMode = (InstrumentMode) userObject;
-                        if (insMode == null) {
-                            insMode = thisInsMode; // first instrument encountered: register it
-                        } else if (insMode != thisInsMode) {
-                            insMode = null; // an instrument is already registered, and the two are different:
-                            allInstruments = true; // set to null to enable all instruments
-                        }
+                    if (insModes == null) {
+                        insModes = new ArrayList<>();
                     }
+                    insModes.add((InstrumentMode) userObject);
                 } else if (userObject instanceof OITable) {
                     // if we reach this table node, it means we already passed through its
                     // parent insMode and its grandparent target
-                    listOITable.add((OITable) userObject); // add the table to the list
+                    if (listOITable == null) {
+                        listOITable = new ArrayList<>();
+                    }
+                    listOITable.add((OITable) userObject);
                 } else {
                     logger.error("Encountered unsupported node in the selected path : {}", userObject);
                 }
             }
         }
 
-        processSelection(target, insMode, listOITable);
+        processSelection(target, insModes, listOITable);
 
         if (logger.isDebugEnabled()) {
             logger.debug("new subsetFilter: {}", getSubsetDefinitionRef().getFilter().toShortString());
@@ -352,29 +348,38 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         if (filter.getTargetUID() == null) {
             // if target null, select first target as a default
-            DefaultMutableTreeNode firstTargetNode = (DefaultMutableTreeNode) dataTree.getRootNode().getFirstChild();
+            final DefaultMutableTreeNode firstTargetNode = (DefaultMutableTreeNode) dataTree.getRootNode().getFirstChild();
             selection.add(new TreePath(firstTargetNode.getPath()));
         } else {
             final Target target = oiFitsCollection.getTargetManager().getGlobalByUID(filter.getTargetUID());
             final DefaultMutableTreeNode targetTreeNode = dataTree.findTreeNode(target);
 
             if (targetTreeNode != null) {
-                DefaultMutableTreeNode insModeTreeNode = null;
-                List<DefaultMutableTreeNode> listTableTreeNode = null;
+                List<DefaultMutableTreeNode> insModeTreeNodes = null;
 
-                if (filter.getInsModeUID() != null) {
-                    final InstrumentMode insMode = oiFitsCollection.getInstrumentModeManager().getGlobalByUID(filter.getInsModeUID());
-                    insModeTreeNode = GenericJTree.findTreeNode(targetTreeNode, insMode);
+                if (filter.getInsModeUIDs() != null) {
+                    final List<InstrumentMode> insModes = oiFitsCollection.getInstrumentModeManager().getGlobalsByUID(filter.getInsModeUIDs());
+                    if (insModes != null) {
+                        for (InstrumentMode insMode : insModes) {
+                            final DefaultMutableTreeNode insModeTreeNode = GenericJTree.findTreeNode(targetTreeNode, insMode);
+                            if (insModeTreeNode != null) {
+                                if (insModeTreeNodes == null) {
+                                    insModeTreeNodes = new ArrayList<>();
+                                }
+                                insModeTreeNodes.add(insModeTreeNode);
+                            }
+                        }
+                    }
                 }
+                List<DefaultMutableTreeNode> tableTreeNodes = null;
 
                 if (!filter.getTables().isEmpty()) {
-
                     // for every instrument
                     for (int i = 0, sizeI = targetTreeNode.getChildCount(); i < sizeI; i++) {
                         DefaultMutableTreeNode insNode = (DefaultMutableTreeNode) targetTreeNode.getChildAt(i);
 
                         // skip instrument if it is not the one specified (null means all instruments)
-                        if (insModeTreeNode != null && !insModeTreeNode.equals(insNode)) {
+                        if ((insModeTreeNodes != null) && !insModeTreeNodes.contains(insNode)) {
                             continue;
                         }
 
@@ -385,15 +390,15 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                             final Integer extNb = tableUID.getExtNb();
 
                             for (int j = 0, sizeJ = insNode.getChildCount(); j < sizeJ; j++) {
-                                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) insNode.getChildAt(j);
-                                final OITable oiTable = (OITable) node.getUserObject();
+                                final DefaultMutableTreeNode tableNode = (DefaultMutableTreeNode) insNode.getChildAt(j);
+                                final OITable oiTable = (OITable) tableNode.getUserObject();
 
                                 if (filePath.equals(oiTable.getOIFitsFile().getAbsoluteFilePath())) {
-                                    if (extNb != null && extNb.intValue() == oiTable.getExtNb()) {
-                                        if (listTableTreeNode == null) {
-                                            listTableTreeNode = new ArrayList<>();
+                                    if ((extNb != null) && extNb.intValue() == oiTable.getExtNb()) {
+                                        if (tableTreeNodes == null) {
+                                            tableTreeNodes = new ArrayList<>();
                                         }
-                                        listTableTreeNode.add(node);
+                                        tableTreeNodes.add(tableNode);
                                         break;
                                     }
                                 }
@@ -401,19 +406,20 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                         }
                     }
                 }
-
-                if (listTableTreeNode != null) {
-                    for (DefaultMutableTreeNode node : listTableTreeNode) {
+                // update selected paths:
+                if (tableTreeNodes != null) {
+                    for (DefaultMutableTreeNode node : tableTreeNodes) {
                         selection.add(new TreePath(node.getPath()));
                     }
-                } else if (insModeTreeNode != null) {
-                    selection.add(new TreePath(insModeTreeNode.getPath()));
+                } else if (insModeTreeNodes != null) {
+                    for (DefaultMutableTreeNode node : insModeTreeNodes) {
+                        selection.add(new TreePath(node.getPath()));
+                    }
                 } else {
                     selection.add(new TreePath(targetTreeNode.getPath()));
                 }
             }
         }
-
         final TreePath[] arraySelection = selection.toArray(new TreePath[0]);
 
         if (logger.isDebugEnabled()) {
@@ -425,11 +431,11 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
     /**
      * Update the SubsetDefinition depending on the data tree selection
      * @param target selected target UID
-     * @param insMode selected InstrumentMode UID
-     * @param listOITable selected tables
+     * @param insModes selected InstrumentMode UIDs
+     * @param oiTables selected tables
      */
-    private void processSelection(final Target target, final InstrumentMode insMode, final List<OITable> listOITable) {
-        logger.debug("processSelection: {}", target, insMode, listOITable);
+    private void processSelection(final Target target, final List<InstrumentMode> insModes, final List<OITable> oiTables) {
+        logger.debug("processSelection: {}", target, insModes, oiTables);
 
         // update subset definition (copy):
         final SubsetDefinition subsetCopy = getSubsetDefinition();
@@ -437,12 +443,19 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
             final SubsetFilter filter = subsetCopy.getFilter();
 
             filter.setTargetUID(target == null ? null : target.getTarget());
-            filter.setInsModeUID(insMode == null ? null : insMode.getInsName());
+
+            final List<String> insModeUIDs = filter.getInsModeUIDs();
+            insModeUIDs.clear();
+            if (insModes != null) {
+                for (InstrumentMode insMode : insModes) {
+                    insModeUIDs.add(insMode.getInsName());
+                }
+            }
 
             final List<TableUID> tables = filter.getTables();
             tables.clear();
-            if (listOITable != null) {
-                for (OITable oiTable : listOITable) {
+            if (oiTables != null) {
+                for (OITable oiTable : oiTables) {
                     final OIDataFile dataFile = ocm.getOIDataFile(oiTable.getOIFitsFile());
                     if (dataFile != null) {
                         tables.add(new TableUID(dataFile, oiTable.getExtName(), oiTable.getExtNb()));
@@ -514,7 +527,6 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
 
         jScrollPane = new javax.swing.JScrollPane();
         genericTreePanel = new javax.swing.JPanel();
-        jPanelGenericFilters = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -528,18 +540,10 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(jScrollPane, gridBagConstraints);
-
-        jPanelGenericFilters.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        add(jPanelGenericFilters, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel genericTreePanel;
-    private javax.swing.JPanel jPanelGenericFilters;
     private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
 
@@ -716,7 +720,7 @@ public final class DataTreePanel extends javax.swing.JPanel implements TreeSelec
                     sb.append("<br><b>Parallax</b> (mas): ").append(target.getParallax() * ALX.DEG_IN_MILLI_ARCSEC)
                             .append(" [").append(target.getParaErr() * ALX.DEG_IN_MILLI_ARCSEC).append(']');
                 }
-                if (target.getSpecTyp() != null && !target.getSpecTyp().isEmpty()) {
+                if ((target.getSpecTyp() != null) && !target.getSpecTyp().isEmpty()) {
                     sb.append("<br><b>Spectral types</b>: ").append(target.getSpecTyp());
                 }
             } else if (value instanceof InstrumentMode) {
