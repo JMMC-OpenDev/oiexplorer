@@ -78,6 +78,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
 
         // use small variant:
         SwingUtils.adjustSize(this.jButtonAddGenericFilter, ComponentSizeVariant.small);
+        SwingUtils.adjustSize(this.jToggleButtonShow, ComponentSizeVariant.small);
 
         // update button UI:
         SwingUtilities.updateComponentTreeUI(this);
@@ -97,6 +98,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
         logger.debug("updateModel");
 
         final SubsetDefinition subsetCopy = ocm.getCurrentSubsetDefinition();
+        subsetCopy.setShow(Boolean.valueOf(this.jToggleButtonShow.isSelected()));
 
         final List<GenericFilter> filters = subsetCopy.getGenericFilters();
         filters.clear();
@@ -124,6 +126,9 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
             updatingGUI = true;
 
             if (!isEventFromThisSource) {
+                jToggleButtonShow.setSelected(!subsetDefinition.isHideFilteredData());
+                updateToggleButtonShowLabel();
+
                 // we clear and re-create GenericFilterEditors
                 jPanelGenericFilters.removeAll();
                 genericFilterEditorList.forEach(GenericFilterEditor::dispose);
@@ -324,6 +329,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
         jPanelToolbar = new javax.swing.JPanel();
         jButtonAddGenericFilter = new javax.swing.JButton();
         jComboBoxColumnName = new javax.swing.JComboBox<>();
+        jToggleButtonShow = new javax.swing.JToggleButton();
         jScrollPaneFilters = new javax.swing.JScrollPane();
         jPanelGenericFilters = new javax.swing.JPanel();
         jScrollPaneCLI = new javax.swing.JScrollPane();
@@ -354,10 +360,24 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.8;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 2, 2);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 1, 2);
         jPanelToolbar.add(jComboBoxColumnName, gridBagConstraints);
+
+        jToggleButtonShow.setText("Show");
+        jToggleButtonShow.setToolTipText("Show or Hide filtered data");
+        jToggleButtonShow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonShowActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 1, 1);
+        jPanelToolbar.add(jToggleButtonShow, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -401,6 +421,15 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
         handleAddGenericFilter();
     }//GEN-LAST:event_jButtonAddGenericFilterActionPerformed
 
+    private void jToggleButtonShowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonShowActionPerformed
+        updateToggleButtonShowLabel();
+        updateModel();
+    }//GEN-LAST:event_jToggleButtonShowActionPerformed
+
+    private void updateToggleButtonShowLabel() {
+        this.jToggleButtonShow.setText(this.jToggleButtonShow.isSelected() ? "Hide" : "Show");
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAddGenericFilter;
     private javax.swing.JComboBox<String> jComboBoxColumnName;
@@ -409,6 +438,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
     private javax.swing.JScrollPane jScrollPaneCLI;
     private javax.swing.JScrollPane jScrollPaneFilters;
     private javax.swing.JTextArea jTextAreaCLI;
+    private javax.swing.JToggleButton jToggleButtonShow;
     // End of variables declaration//GEN-END:variables
 
 }
