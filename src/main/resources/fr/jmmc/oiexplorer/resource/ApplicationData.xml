@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.1 beta 1"/>
-    <compilation date="27/09/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.1 beta 2"/>
+    <compilation date="04/10/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -170,12 +170,18 @@
     <releasenotes>
 
         <release version="0.5.1">
-            <pubDate>Tue, 27 Sep 2022 15:00:00 GMT</pubDate>
+            <pubDate>Tue, 04 Oct 2022 12:00:00 GMT</pubDate>
+            <prerelease version="0.5.1 beta 2">
+                <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/23">Added a new toggle button 'Show/Hide'
+                    on the filter panel to either display filtered data in light gray (below valid data) or hide filtered data</change>
+                <change type="FEATURE">Added multiple selection on instrument modes (GUI) and also on target and night criteria in the OITools Command-Line Interface</change>
+                <change type="FEATURE">Added computed columns STA_INDEX_NAME and STA_CONF_NAME in data tables (oitools) displayed in the FITS table browser</change>
+            </prerelease>
             <prerelease version="0.5.1 beta 1">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/23">Improved filters to support exclusive filters (NOT)
                     both in the GUI (X checkbox) and in the Command-Line Interface (using prefix not:)</change>
-                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1222">Fixed STA_INDEX filter to handle properly 'equivalent' baselines or triplets</change>
                 <change type="FEATURE">Improved color mapping (baseline or triplet, station configuration) to be stable with or without filters and consistent accross plots</change>
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1222">Fixed STA_INDEX filter to handle properly 'equivalent' baselines or triplets</change>
             </prerelease>
         </release>
         <release version="0.5.0">
