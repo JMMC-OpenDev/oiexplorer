@@ -109,7 +109,7 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jLabelTargetSep.setToolTipText("Targets within this separation radius are considered the same object");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 6);
         jPanelPrefs.add(jLabelTargetSep, gridBagConstraints);
@@ -120,8 +120,9 @@ public final class PreferencePanel extends javax.swing.JPanel implements Observe
         jFieldTargetSep.setName("jFieldMinElev"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 2, 2);
         jPanelPrefs.add(jFieldTargetSep, gridBagConstraints);
 
