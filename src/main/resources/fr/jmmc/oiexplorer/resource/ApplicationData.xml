@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.1 beta 2"/>
-    <compilation date="04/10/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.1 beta 3"/>
+    <compilation date="10/10/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -59,7 +59,17 @@
 
         <!-- 1. Science / VO libraries (always on top for better visibility) -->
 
-        <!-- OifitsExplorer dependencies -->
+        <!-- OIFitsExplorer dependencies -->
+
+        <package name="ColorCET - Perceptually Uniform Colour Maps"
+                 description="Peter Kovesi. Good Colour Maps: How to Design Them. arXiv:1509.03700 [cs.GR] 2015 (https://arxiv.org/abs/1509.03700)"
+                 link="https://colorcet.com/index.html"
+                 license="Creative Commons BY License (https://creativecommons.org/licenses/by/4.0/legalcode)" />
+
+        <package name="SCM 7 - Scientific colour maps 7.0.1"
+                 description="Crameri, Fabio. (2021). Scientific colour maps (7.0.1). Zenodo. https://doi.org/10.5281/zenodo.5501399"
+                 link="https://www.fabiocrameri.ch/colourmaps/"
+                 license="MIT License (https://opensource.org/licenses/MITCopyright)" />
 
         <!-- OITools dependencies -->
 
@@ -103,7 +113,7 @@
 
         <!-- 2. Swing -->
 
-        <!-- OifitsExplorer dependencies -->
+        <!-- OIFitsExplorer dependencies -->
 
         <package name="JFreeChart"
                  description="JFreeChart is a free 100% Java chart library that makes it easy for developers to display professional quality charts in their applications"
@@ -170,7 +180,12 @@
     <releasenotes>
 
         <release version="0.5.1">
-            <pubDate>Tue, 04 Oct 2022 12:00:00 GMT</pubDate>
+            <pubDate>Mon, 10 Oct 2022 12:00:00 GMT</pubDate>
+            <prerelease version="0.5.1 beta 3">
+                <change type="FEATURE">Added ColorCET - Perceptually Uniform Colour Maps.
+                    Changed 'Earth' and 'Rainbow' color ramps to use respectivelly 'batlowW' (scm7) and 'CET-R2' (colorCET) color maps</change>
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/29">Fixed event processing (active plot changed, viewport changed, ready)</change>
+            </prerelease>
             <prerelease version="0.5.1 beta 2">
                 <change type="FEATURE" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/23">Added a new toggle button 'Show/Hide'
                     on the filter panel to either display filtered data in light gray (below valid data) or hide filtered data</change>
@@ -396,7 +411,7 @@
         </release>
     </releasenotes>
 
-    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{OifitsExplorer}
+    <acknowledgment><![CDATA[This research has made use of the Jean-Marie Mariotti Center \texttt{OIFitsExplorer}
 service \footnote{Available at http://www.jmmc.fr/oifitsExplorer}.]]>
     </acknowledgment>
 
