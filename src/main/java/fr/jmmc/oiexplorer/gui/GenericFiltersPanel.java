@@ -22,7 +22,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JButton;
@@ -56,8 +55,8 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
     /** List of GenericFilterEditor for each GenericFilter in the current SubsetDefinition */
     private final transient List<GenericFilterEditor> genericFilterEditorList = new ArrayList<>(1);
 
-    /** Store all column choices available */
-    private final transient List<String> columnChoices = new LinkedList<String>();
+    /** List of available filter column names */
+    private final transient GenericListModel<String> nameComboBoxModel;
 
     /** when true, disables handler of Changes set on GenericFilterEditors. Used in updateGUI(). */
     private boolean updatingGUI = false;
@@ -65,6 +64,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
     /** Creates new form GenericFiltersPanel */
     public GenericFiltersPanel() {
         initComponents();
+        this.nameComboBoxModel = new GenericListModel<String>(new ArrayList<String>(25), true);
         postInit();
     }
 
@@ -74,7 +74,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
     private void postInit() {
         ocm.bindSubsetDefinitionChanged(this);
 
-        jComboBoxColumnName.setModel(new GenericListModel<String>(columnChoices, true));
+        jComboBoxColumnName.setModel(nameComboBoxModel);
 
         // use small variant:
         SwingUtils.adjustSize(this.jButtonAddGenericFilter, ComponentSizeVariant.small);
@@ -129,27 +129,24 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
                 jToggleButtonShow.setSelected(!subsetDefinition.isHideFilteredData());
                 updateToggleButtonShowLabel();
 
-                // we clear and re-create GenericFilterEditors
+                // clear and recreate column name choices:
+                nameComboBoxModel.clear();
+                nameComboBoxModel.addAll(Selector.SPECIAL_COLUMN_NAMES);
+
+                // update column choices from SelectorResult:
+                nameComboBoxModel.addAll(getDistinctNumericalColumnNames(selectorResult));
+
+                if (jComboBoxColumnName.getSelectedIndex() == -1) {
+                    jComboBoxColumnName.setSelectedIndex(0);
+                }
+
+                // clear and re-create GenericFilterEditors:
                 jPanelGenericFilters.removeAll();
                 genericFilterEditorList.forEach(GenericFilterEditor::dispose);
                 genericFilterEditorList.clear();
 
-                // we clear and recreate column name choices
-                columnChoices.clear();
-
                 for (GenericFilter genericFilter : subsetDefinition.getGenericFilters()) {
                     addGenericFilterEditor(Identifiable.clone(genericFilter));
-                }
-
-                // updating column choices from SelectorResult
-                for (String specialName : Selector.SPECIAL_COLUMN_NAMES) {
-                    columnChoices.add(specialName);
-                }
-                for (String columnName : getDistinctNumericalColumnNames(selectorResult)) {
-                    columnChoices.add(columnName);
-                }
-                if (jComboBoxColumnName.getSelectedIndex() == -1) {
-                    jComboBoxColumnName.setSelectedIndex(0);
                 }
 
                 revalidate();
