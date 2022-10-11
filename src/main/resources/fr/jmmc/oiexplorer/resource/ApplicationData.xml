@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.1 beta 3"/>
-    <compilation date="10/10/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.1"/>
+    <compilation date="11/10/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -180,7 +180,7 @@
     <releasenotes>
 
         <release version="0.5.1">
-            <pubDate>Mon, 10 Oct 2022 12:00:00 GMT</pubDate>
+            <pubDate>Mon, 11 Oct 2022 22:00:00 GMT</pubDate>
             <prerelease version="0.5.1 beta 3">
                 <change type="FEATURE">Added ColorCET - Perceptually Uniform Colour Maps.
                     Changed 'Earth' and 'Rainbow' color ramps to use respectivelly 'batlowW' (scm7) and 'CET-R2' (colorCET) color maps</change>
