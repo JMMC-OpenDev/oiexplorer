@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * Remove Action. See the list of available actions as String constants. For now, there is only one to remove from
  * collection all OIFitsFiles that are concerned by the current SubsetDefinition.
  */
-public class RemoveAction extends RegisteredAction {
+public class RemoveOIFitsAction extends RegisteredAction {
 
     /** default serial UID for Serializable interface */
     private static final long serialVersionUID = 1;
@@ -22,7 +22,7 @@ public class RemoveAction extends RegisteredAction {
     /**
      * Class name. This name is used to register to the ActionRegistrar
      */
-    public final static String className = RemoveAction.class.getName();
+    public final static String className = RemoveOIFitsAction.class.getName();
 
     /**
      * Class logger
@@ -32,7 +32,7 @@ public class RemoveAction extends RegisteredAction {
     /** Action name. This name is used to register to the ActionRegistrar */
     public final static String actionName = "remove";
 
-    public RemoveAction() {
+    public RemoveOIFitsAction() {
         super(className, actionName);
     }
 

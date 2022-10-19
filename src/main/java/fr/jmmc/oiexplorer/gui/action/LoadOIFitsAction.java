@@ -11,6 +11,7 @@ import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.data.MimeType;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.Preferences;
 import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -100,7 +101,7 @@ public final class LoadOIFitsAction extends RegisteredAction {
                     StatusBar.removeCustomPanel(progressPanel);
 
                     if (!cancelled) {
-                        OIFitsCheckerPanel.displayReport(checker);
+                        OIFitsCheckerPanel.displayReport(checker, Preferences.getInstance());
                     }
                 }
             });

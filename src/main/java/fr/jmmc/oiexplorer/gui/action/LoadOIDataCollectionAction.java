@@ -11,6 +11,8 @@ import fr.jmmc.jmcs.gui.component.FileChooser;
 import fr.jmmc.jmcs.gui.component.MessagePane;
 import fr.jmmc.jmcs.gui.component.StatusBar;
 import fr.jmmc.jmcs.util.jaxb.XmlBindException;
+import fr.jmmc.oiexplorer.OIFitsExplorer;
+import fr.jmmc.oiexplorer.Preferences;
 import fr.jmmc.oiexplorer.core.gui.OIFitsCheckerPanel;
 import fr.jmmc.oiexplorer.core.model.LoadOIFitsListener;
 import fr.jmmc.oiexplorer.core.model.OIFitsCollectionManager;
@@ -56,6 +58,10 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
     @Override
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
+        
+        if (!OIFitsExplorer.getInstance().checkAndConfirmSaveChanges("loading an OIFits Collection")) {
+            return;
+        }
 
         final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
@@ -87,7 +93,7 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                 defaultFileName = null;
             }
 
-            file = FileChooser.showOpenFileChooser("Load an OIFits Explorer Collection", null, mimeType, defaultFileName);
+            file = FileChooser.showOpenFileChooser("Load an OIFits Collection", null, mimeType, defaultFileName);
         }
 
         // If a file was defined (No cancel in the dialog)
@@ -99,9 +105,9 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
     public static void loadOIFitsCollectionFromFile(File file, final OIFitsCollectionManager ocm, final boolean appendOIFitsFilesOnly) throws XmlBindException {
         final String fileLocation = file.getAbsolutePath();
         if (appendOIFitsFilesOnly) {
-            StatusBar.show("loading OIFits from OIFits Explorer Collection: " + fileLocation);
+            StatusBar.show("loading OIFits files from OIFits Collection: " + fileLocation);
         } else {
-            StatusBar.show("loading OIFits Explorer Collection: " + fileLocation);
+            StatusBar.show("loading OIFits Collection: " + fileLocation);
         }
 
         // Create progress panel:
@@ -129,7 +135,7 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
                     StatusBar.removeCustomPanel(progressPanel);
 
                     if (!cancelled) {
-                        OIFitsCheckerPanel.displayReport(checker);
+                        OIFitsCheckerPanel.displayReport(checker, Preferences.getInstance());
                     }
 
                     // Fire the Ready event to any listener:
@@ -145,8 +151,8 @@ public final class LoadOIDataCollectionAction extends RegisteredAction {
             if (e != null) {
                 StatusBar.removeCustomPanel(progressPanel);
 
-                StatusBar.show("Could not load OIFits Explorer Collection: " + fileLocation);
-                MessagePane.showErrorMessage("Could not load OIFits Explorer Collection: " + fileLocation, e);
+                StatusBar.show("Could not load OIFits Collection: " + fileLocation);
+                MessagePane.showErrorMessage("Could not load OIFits Collection: " + fileLocation, e);
             }
         }
     }

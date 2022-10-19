@@ -46,7 +46,7 @@ public final class LoadOIFitsFromCollectionAction extends RegisteredAction {
 
         final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
 
-        final File file = FileChooser.showOpenFileChooser("Select OIFits Explorer Collection", null, mimeType, null);
+        final File file = FileChooser.showOpenFileChooser("Select an OIFits Collection", null, mimeType, null);
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {

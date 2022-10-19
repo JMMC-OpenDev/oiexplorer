@@ -47,8 +47,15 @@ public final class SaveOIDataCollectionAction extends RegisteredAction {
     public void actionPerformed(final ActionEvent evt) {
         logger.debug("actionPerformed");
 
-        final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
+        save();
+    }
 
+    /**
+     * Save the current observation
+     * @return true if successful
+     */
+    public boolean save() {
+        final OIFitsCollectionManager ocm = OIFitsCollectionManager.getInstance();
         final File oiFitsCollectionFile = ocm.getOiFitsCollectionFile();
 
         final String defaultFileName;
@@ -61,7 +68,9 @@ public final class SaveOIDataCollectionAction extends RegisteredAction {
 
         File file;
 
-        file = FileChooser.showSaveFileChooser("Save the current OIFits Explorer Collection", null, mimeType, defaultFileName);
+        file = FileChooser.showSaveFileChooser("Save the current OIFits Collection", null, mimeType, defaultFileName);
+
+        boolean result = true;
 
         // If a file was defined (No cancel in the dialog)
         if (file != null) {
@@ -71,16 +80,20 @@ public final class SaveOIDataCollectionAction extends RegisteredAction {
             try {
                 ocm.saveOIFitsCollection(file);
 
+                StatusBar.show("file saved : " + file.getName());
+
             } catch (IOException ex) {
                 e = ex;
             } catch (IllegalStateException ex) {
                 e = ex;
             } finally {
                 if (e != null) {
+                    result = false;
                     MessagePane.showErrorMessage("Could not save the file: " + fileLocation, e);
                     StatusBar.show("Could not save the file: " + fileLocation);
                 }
             }
         }
+        return result;
     }
 }
