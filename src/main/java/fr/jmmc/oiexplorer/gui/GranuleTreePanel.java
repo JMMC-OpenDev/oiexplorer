@@ -379,6 +379,13 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         // fire node structure changed :
         dataTree.fireNodeChanged(rootNode);
 
+        expandOrCollapseTree();
+    }
+
+    private void expandOrCollapseTree() {
+        logger.debug("expandOrCollapseTree: expandAll={} collapseAll={}",
+                jToggleButtonExpandTree.isSelected(), jToggleButtonCollapseTree.isSelected());
+
         if (jToggleButtonExpandTree.isSelected()) {
             dataTree.expandAll(true);
         } else if (jToggleButtonCollapseTree.isSelected()) {
@@ -498,6 +505,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
 
         jToggleButtonExpandTree.setSelected(true);
         jToggleButtonExpandTree.setText("Expand");
+        jToggleButtonExpandTree.setToolTipText("Expand all tree nodes");
         jToggleButtonExpandTree.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jToggleButtonExpandTreeActionPerformed(evt);
@@ -506,6 +514,7 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
         jPanelButtons.add(jToggleButtonExpandTree);
 
         jToggleButtonCollapseTree.setText("Collapse");
+        jToggleButtonCollapseTree.setToolTipText("Collapse all tree nodes");
         jToggleButtonCollapseTree.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jToggleButtonCollapseTreeActionPerformed(evt);
@@ -532,17 +541,13 @@ public final class GranuleTreePanel extends javax.swing.JPanel implements OIFits
     }//GEN-LAST:event_jRadioButtonOITableActionPerformed
 
     private void jToggleButtonExpandTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonExpandTreeActionPerformed
-        if (jToggleButtonExpandTree.isSelected()) {
-            dataTree.expandAll(true);
-            jToggleButtonCollapseTree.setSelected(false);
-        }
+        jToggleButtonCollapseTree.setSelected(!jToggleButtonExpandTree.isSelected());
+        expandOrCollapseTree();
     }//GEN-LAST:event_jToggleButtonExpandTreeActionPerformed
 
     private void jToggleButtonCollapseTreeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonCollapseTreeActionPerformed
-        if (jToggleButtonCollapseTree.isSelected()) {
-            dataTree.expandAll(false);
-            jToggleButtonExpandTree.setSelected(false);
-        }
+        jToggleButtonExpandTree.setSelected(!jToggleButtonCollapseTree.isSelected());
+        expandOrCollapseTree();
     }//GEN-LAST:event_jToggleButtonCollapseTreeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

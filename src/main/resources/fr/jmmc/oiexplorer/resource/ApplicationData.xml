@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.1"/>
-    <compilation date="11/10/2022" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.2 beta 1"/>
+    <compilation date="20/10/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -38,21 +38,21 @@
         <!-- Java Mariotti OIfitsExplorer-core -->
         <package name="OIFits Explorer core"
                  description="OIFits Explorer core is the JMMC library dedicated to share OIFits GUI components (plots)"
-                 link="http://www.jmmc.fr/dev/oiexplorer-core/"
+                 link="https://github.com/JMMC-OpenDev/oiexplorer-core/"
                  jars="oiexplorer-core.jar"
                  license="CECILL-B ???"/>
 
         <!-- Java Mariotti Astronomical library -->
         <package name="jMAL"
                  description="JMMC library to provide common astronomical computations (coordinate conversion, SIMBAD star resolver and analytical object models in interferometry)"
-                 link="http://www.jmmc.fr/dev/jmal/"
+                 link="https://github.com/JMMC-OpenDev/jmal/"
                  jars="jmal.jar"
                  license="CECILL-B ???"/>
 
         <!-- Java Mariotti OITools -->
         <package name="OITools"
                  description="OITools is the JMMC library dedicated to OIFits manipulation (load, save and validation)"
-                 link="http://www.jmmc.fr/dev/oitools/"
+                 link="https://github.com/JMMC-OpenDev/oitools/"
                  jars="oitools.jar"
                  license="CECILL-B ???"/>
 
@@ -131,7 +131,7 @@
 
     <menubar>
         <menu label="File">
-            <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewAction" action="newCollection" accelerator="N" />
+            <menu label="New OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.NewOIDataCollectionAction" action="newCollection" accelerator="N" />
             <menu/> <!-- menu separator -->
             <menu label="Add OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction" action="loadOIFits" accelerator="F"
                   icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add an OIFits file"/>
@@ -139,7 +139,7 @@
                   icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add OIFits files from OIFits Collection"/>
 
             <menu/> <!-- menu separator -->
-            <menu label="Remove OIFits files" classpath="fr.jmmc.oiexplorer.gui.action.RemoveAction"
+            <menu label="Remove OIFits files" classpath="fr.jmmc.oiexplorer.gui.action.RemoveOIFitsAction"
                   action="remove" icon="fr/jmmc/jmcs/resource/image/x-mark.png"
                   accelerator="DELETE" description="Remove selected OIFits files" />
 
@@ -178,7 +178,14 @@
     </menubar>
 
     <releasenotes>
-
+        <release version="0.5.2">
+            <pubDate>Fri, 20 Oct 2022 12:00:00 GMT</pubDate>
+            <prerelease version="0.5.2 beta 1">
+                <change type="FEATURE">Small improvements to GUI (layout, style)</change>
+                <change type="FEATURE">Added MyCarta - Perceptually Uniform Colour Maps.</change>
+                <change type="BUGFIX" url="">Improved GUI scaling (about panel, icon images)</change>
+            </prerelease>
+        </release>
         <release version="0.5.1">
             <pubDate>Mon, 11 Oct 2022 22:00:00 GMT</pubDate>
             <prerelease version="0.5.1 beta 3">

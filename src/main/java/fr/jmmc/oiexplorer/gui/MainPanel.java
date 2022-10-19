@@ -35,7 +35,7 @@ import fr.jmmc.oiexplorer.core.model.plot.PlotDefinition;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
-import fr.jmmc.oiexplorer.gui.action.RemoveAction;
+import fr.jmmc.oiexplorer.gui.action.RemoveOIFitsAction;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -363,7 +363,7 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
 
         // Build toolbar
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIFitsAction.className, LoadOIFitsAction.actionName)).setHideActionText(true);
-        toolBar.add(ActionRegistrar.getInstance().get(RemoveAction.className, RemoveAction.actionName)).setHideActionText(true);
+        toolBar.add(ActionRegistrar.getInstance().get(RemoveOIFitsAction.className, RemoveOIFitsAction.actionName)).setHideActionText(true);
         toolBar.add(ActionRegistrar.getInstance().get(LoadOIDataCollectionAction.className, LoadOIDataCollectionAction.actionName)).setHideActionText(true);
         toolBar.add(OIFitsExplorerExportAction.getInstance(MimeType.PDF)).setHideActionText(true);
     }
@@ -755,24 +755,15 @@ public final class MainPanel extends javax.swing.JPanel implements OIFitsCollect
         dataSplitPane.setResizeWeight(0.2);
         dataSplitPane.setMinimumSize(new java.awt.Dimension(150, 58));
 
-        dataSplitTopPanel.setLayout(new java.awt.GridBagLayout());
+        dataSplitTopPanel.setLayout(new java.awt.BorderLayout());
 
         toolBar.setRollover(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        dataSplitTopPanel.add(toolBar, gridBagConstraints);
+        dataSplitTopPanel.add(toolBar, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPaneBrowser.setTabPlacement(javax.swing.JTabbedPane.BOTTOM);
         jTabbedPaneBrowser.addTab("Granules", granuleTreePanel);
         jTabbedPaneBrowser.addTab("Files", oifitsFileListPanel);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        dataSplitTopPanel.add(jTabbedPaneBrowser, gridBagConstraints);
+        dataSplitTopPanel.add(jTabbedPaneBrowser, java.awt.BorderLayout.CENTER);
 
         dataSplitPane.setLeftComponent(dataSplitTopPanel);
 

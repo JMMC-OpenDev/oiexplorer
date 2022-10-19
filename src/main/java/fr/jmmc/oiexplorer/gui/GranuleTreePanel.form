@@ -169,6 +169,7 @@
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Expand"/>
+            <Property name="toolTipText" type="java.lang.String" value="Expand all tree nodes"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jToggleButtonExpandTreeActionPerformed"/>
@@ -177,6 +178,7 @@
         <Component class="javax.swing.JToggleButton" name="jToggleButtonCollapseTree">
           <Properties>
             <Property name="text" type="java.lang.String" value="Collapse"/>
+            <Property name="toolTipText" type="java.lang.String" value="Collapse all tree nodes"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jToggleButtonCollapseTreeActionPerformed"/>

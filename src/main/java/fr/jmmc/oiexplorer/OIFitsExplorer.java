@@ -32,10 +32,10 @@ import fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction;
-import fr.jmmc.oiexplorer.gui.action.NewAction;
+import fr.jmmc.oiexplorer.gui.action.NewOIDataCollectionAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAction;
 import fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction;
-import fr.jmmc.oiexplorer.gui.action.RemoveAction;
+import fr.jmmc.oiexplorer.gui.action.RemoveOIFitsAction;
 import fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction;
 import fr.jmmc.oiexplorer.interop.SendOIFitsAction;
 import fr.jmmc.oitools.model.DataModel;
@@ -88,6 +88,8 @@ public final class OIFitsExplorer extends App {
     /* members */
     /** main Panel */
     private MainPanel mainPanel;
+    /** Save action */
+    private SaveOIDataCollectionAction saveAction;
 
     /**
      * Main entry point : use swing setup and then launch the application
@@ -152,18 +154,18 @@ public final class OIFitsExplorer extends App {
     /**
      * Initialize application objects
      *
-     * @throws RuntimeException if the OifitsExplorerGui initialization failed
+     * @throws RuntimeException if the OIFitsExplorer initialization failed
      */
     @Override
     protected void setupGui() throws RuntimeException {
-        logger.debug("OifitsExplorerGui.setupGui() handler : enter");
+        logger.debug("OIFitsExplorer.setupGui() handler : enter");
         prepareFrame();
 
         if (!Bootstrapper.isHeadless()) {
             createPreferencesView();
         }
 
-        logger.debug("OifitsExplorerGui.setupGui() handler : exit");
+        logger.debug("OIFitsExplorer.setupGui() handler : exit");
     }
 
     /**
@@ -187,14 +189,13 @@ public final class OIFitsExplorer extends App {
      */
     @Override
     protected void execute() {
-
         SwingUtils.invokeLaterEDT(new Runnable() {
             /**
              * Show the application frame using EDT
              */
             @Override
             public void run() {
-                logger.debug("OifitsExplorerGui.execute() handler called.");
+                logger.debug("OIFitsExplorer.execute() handler called.");
 
                 // reset OIFitsManager to fire an OIFits collection changed event to all registered listeners:
                 OIFitsCollectionManager.getInstance().start();
@@ -215,29 +216,40 @@ public final class OIFitsExplorer extends App {
      */
     @Override
     public boolean canBeTerminatedNow() {
-        logger.debug("OifitsExplorerGui.finish() handler called.");
+        logger.debug("OIFitsExplorer.canBeTerminatedNow() handler called.");
+
+        return checkAndConfirmSaveChanges("closing");        
+    }
+
+    /**
+     * Check if the current observation was changed; if true, the user is asked to save changes
+     *
+     * @param beforeMessage part of the message inserted after 'before ' ?
+     * @return should return true if the application can continue, false otherwise to cancel any operation.
+     */
+    public boolean checkAndConfirmSaveChanges(final String beforeMessage) {
+        final boolean changed = OIFitsCollectionManager.getInstance().isUserCollectionChanged();
+        if (logger.isDebugEnabled()) {
+            logger.debug("changed: {}", changed);
+        }
 
         // Ask the user if he wants to save modifications
-        //@TODO replace by code when save will be available.
-        MessagePane.ConfirmSaveChanges result = MessagePane.ConfirmSaveChanges.Ignore;
-        //MessagePane.ConfirmSaveChanges result = MessagePane.showConfirmSaveChangesBeforeClosing();
+        final MessagePane.ConfirmSaveChanges result = (changed) ? MessagePane.showConfirmSaveChanges(beforeMessage) : MessagePane.ConfirmSaveChanges.Ignore;
 
         // Handle user choice
         switch (result) {
-            // If the user clicked the "Save" button, save and exit
+            // If the user clicked the "Save" button, save and continue
             case Save:
-                /*
-                 if (this.saveAction != null) {
-                 return this.saveAction.save();
-                 }
-                 */
+                if (this.saveAction != null) {
+                    return this.saveAction.save();
+                }
                 break;
 
-            // If the user clicked the "Don't Save" button, exit
+            // If the user clicked the "Don't Save" button, continue
             case Ignore:
                 break;
 
-            // If the user clicked the "Cancel" button or pressed 'esc' key, don't exit
+            // If the user clicked the "Cancel" button or pressed 'esc' key, don't continue
             case Cancel:
             default: // Any other case
                 return false;
@@ -322,12 +334,12 @@ public final class OIFitsExplorer extends App {
      */
     private void registerActions() {
         // File menu :
-        new NewAction();
+        new NewOIDataCollectionAction();
         new LoadOIFitsAction();
         new LoadOIFitsFromCollectionAction();
 
         new LoadOIDataCollectionAction();
-        new SaveOIDataCollectionAction();
+        this.saveAction = new SaveOIDataCollectionAction();
 
         new ExportOIFitsAction();
 
@@ -340,7 +352,7 @@ public final class OIFitsExplorer extends App {
         new OIFitsExplorerExportAllAction(MimeType.PNG);
         new OIFitsExplorerExportAllAction(MimeType.JPG);
 
-        new RemoveAction();
+        new RemoveOIFitsAction();
 
         // Edit menu :
         // Interop menu :
@@ -379,7 +391,7 @@ public final class OIFitsExplorer extends App {
                                 MessagePane.showErrorMessage(ioe.getMessage(), ioe.getCause());
                                 StatusBar.show(ioe.getMessage());
                             } finally {
-                                OIFitsCheckerPanel.displayReport(checker);
+                                OIFitsCheckerPanel.displayReport(checker, Preferences.getInstance());
                             }
                         }
                     });

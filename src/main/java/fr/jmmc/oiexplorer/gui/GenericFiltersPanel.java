@@ -98,7 +98,7 @@ public final class GenericFiltersPanel extends javax.swing.JPanel
         logger.debug("updateModel");
 
         final SubsetDefinition subsetCopy = ocm.getCurrentSubsetDefinition();
-        subsetCopy.setShow(Boolean.valueOf(this.jToggleButtonShow.isSelected()));
+        subsetCopy.setHideFilteredData(!this.jToggleButtonShow.isSelected());
 
         final List<GenericFilter> filters = subsetCopy.getGenericFilters();
         filters.clear();
