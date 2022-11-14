@@ -15,7 +15,7 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.2 beta 1"/>
+    <program name="OIFitsExplorer" version="0.5.2 beta 2"/>
     <compilation date="20/10/2022" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
@@ -179,6 +179,10 @@
 
     <releasenotes>
         <release version="0.5.2">
+            <pubDate>Mon, 14 Nov 2022 12:00:00 GMT</pubDate>
+            <prerelease version="0.5.2 beta 2">
+                <change type="BUGFIX" url="https://github.com/JMMC-OpenDev/oiexplorer/issues/30">Plot dataset coming from individual monochromatic OIFits with colors.</change>
+            </prerelease>
             <pubDate>Fri, 20 Oct 2022 12:00:00 GMT</pubDate>
             <prerelease version="0.5.2 beta 1">
                 <change type="FEATURE">Small improvements to GUI (layout, style)</change>
