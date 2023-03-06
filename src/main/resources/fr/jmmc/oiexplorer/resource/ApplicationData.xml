@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.3 beta 1"/>
-    <compilation date="03/03/2023" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.3"/>
+    <compilation date="06/03/2023" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -179,7 +179,7 @@
 
     <releasenotes>
         <release version="0.5.3">
-            <pubDate>Fri, 03 Mar 2023 16:00:00 GMT</pubDate>
+            <pubDate>Mon, 06 Mar 2023 15:00:00 GMT</pubDate>
             <prerelease version="0.5.3 beta 1">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1288">Improved OIFits loading to fix invalid TargetId values
                     (1 instead of 0) if only 1 target and fix other integer or string references if only one accepted value.</change>
