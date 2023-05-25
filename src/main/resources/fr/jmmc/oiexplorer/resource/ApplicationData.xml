@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.4 beta 1"/>
-    <compilation date="04/05/2023" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.4 beta 2"/>
+    <compilation date="25/05/2023" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -179,10 +179,16 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Thu, 04 May 2023 16:00:00 GMT</pubDate>
+            <pubDate>Thu, 25 May 2023 16:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 2">
+                <change type="FEATURE">Improved scaling of exported plots as image/pdf with hi-dpi settings</change>
+                <change type="FEATURE">Updated U-V coverage plot presets</change>
+                <change type="FEATURE">Added support for axis inverted flag in the axis editor</change>
+                <change type="FEATURE">Added label to the legend axis</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 1">
                 <change type="FEATURE">Improved 'UV coverage' plot to be displayed as a squared plot</change>
-                <change type="BUGFIX">Enhanced plot settings for high-dpi screens</change>
+                <change type="BUGFIX">Improved plot rendering on high-dpi screens</change>
             </prerelease>
         </release>
         <release version="0.5.3">
