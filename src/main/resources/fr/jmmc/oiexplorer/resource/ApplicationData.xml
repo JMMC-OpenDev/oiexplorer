@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.4 beta 2"/>
-    <compilation date="25/05/2023" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.4 beta 3"/>
+    <compilation date="31/05/2023" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -179,7 +179,10 @@
 
     <releasenotes>
         <release version="0.5.4">
-            <pubDate>Thu, 25 May 2023 16:00:00 GMT</pubDate>
+            <pubDate>Wed, 31 May 2023 12:00:00 GMT</pubDate>
+            <prerelease version="0.5.4 beta 3">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1313">Fixed OIFits table browser when OIData table arrays have wrong dimensions (&lt; 1)</change>
+            </prerelease>
             <prerelease version="0.5.4 beta 2">
                 <change type="FEATURE">Improved scaling of exported plots as image/pdf with hi-dpi settings</change>
                 <change type="FEATURE">Updated U-V coverage plot presets</change>
