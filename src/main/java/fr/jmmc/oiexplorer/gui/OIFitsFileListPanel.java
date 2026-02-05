@@ -383,11 +383,14 @@ public final class OIFitsFileListPanel extends javax.swing.JPanel implements OIF
             sb.append("Do you confirm to remove the following OIFits file(s):\n");
             for (OIFitsFile file : filesToRemove) {
                 sb.append("\n").append(file.getFileName()).append("\n");
-                sb.append(file.getOiTarget().getTarget().length).append(" target(s):");
-                for (String targetName : file.getOiTarget().getTarget()) {
-                    sb.append(" ").append(targetName);
+                
+                if (file.hasOiTarget()) {
+                    sb.append(file.getOiTarget().getTarget().length).append(" target(s):");
+                    for (String targetName : file.getOiTarget().getTarget()) {
+                        sb.append(" ").append(targetName);
+                    }
+                    sb.append(".\n");
                 }
-                sb.append(".\n");
                 sb.append(file.getNbOiVis()).append(" OI_VIS, ");
                 sb.append(file.getNbOiVis2()).append(" OI_VIS2, ");
                 sb.append(file.getNbOiT3()).append(" OI_T3.\n");

@@ -101,7 +101,7 @@ public final class ExportOIFitsAction extends RegisteredAction {
         // TODO: merge with PlotChartPanel.getDefaultFileName() and Aspro2 ExportOIFitsAction ...
         final StringBuilder sb = new StringBuilder(128).append("OiXP_");
 
-        final String altName = StringUtils.replaceNonAlphaNumericCharsByUnderscore(oiFitsFile.getOiTarget().getTarget()[0]);
+        final String altName = (oiFitsFile.hasOiTarget()) ? StringUtils.replaceNonAlphaNumericCharsByUnderscore(oiFitsFile.getOiTarget().getTarget()[0]) : "";
 
         sb.append(altName).append('_');
 
