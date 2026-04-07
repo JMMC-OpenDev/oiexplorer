@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.8 beta 1"/>
-    <compilation date="17/02/2026" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.8 beta 2"/>
+    <compilation date="07/04/2026" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -179,7 +179,10 @@
 
     <releasenotes>
         <release version="0.5.8">
-            <pubDate>Tue, 17 Feb 2026 14:00:00 GMT</pubDate>
+            <pubDate>Tue, 07 Apr 2026 16:00:00 GMT</pubDate>
+            <prerelease version="0.5.8 beta 2">
+                <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1516">Fixed plotting discarded data ('Show' filtered mode) from tables having multiple targets (TargetID)</change>
+            </prerelease>
             <prerelease version="0.5.8 beta 1">
                 <change type="BUGFIX" url="http://trac.jmmc.fr/jmmc-sw/ticket/1498">Fixed orientation handling (T3PHI vs PA)</change>
             </prerelease>
