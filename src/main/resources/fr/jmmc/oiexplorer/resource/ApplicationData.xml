@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.8 beta 2"/>
-    <compilation date="07/04/2026" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.9 beta 1"/>
+    <compilation date="02/07/2026" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -178,6 +178,14 @@
     </menubar>
 
     <releasenotes>
+        <release version="0.5.9">
+            <pubDate>Thu, 02 Jul 2026 16:00:00 GMT</pubDate>
+            <prerelease version="0.5.9 beta 1">
+                <change type="FEATURE">Improved selection / cross hairs to use sibling data (same target, instrument mode, MJD +/- 30s, (sorted) baseline) to show related data among data tables (VIS2, VIS, T3)</change>
+                <change type="FEATURE">Improved the selection tooltip to be selectable (copy/paste) and show information about the selection, followed by sibling data with (VIS2, VIS, T3) main values</change>
+                <change type="FEATURE">Fixed 'Hide' button on plot panels to reset selection and hide selection tooltips on all panels</change>
+            </prerelease>
+        </release>
         <release version="0.5.8">
             <pubDate>Tue, 07 Apr 2026 16:00:00 GMT</pubDate>
             <prerelease version="0.5.8 beta 2">
