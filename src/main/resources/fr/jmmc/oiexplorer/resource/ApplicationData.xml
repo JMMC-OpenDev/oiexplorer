@@ -15,8 +15,8 @@
         <feedback_form_url>http://jmmc.fr/feedback/feedback.php</feedback_form_url>
     </company>
 
-    <program name="OIFitsExplorer" version="0.5.9 beta 1"/>
-    <compilation date="02/07/2026" compiler="JDK 1.8.0"/>
+    <program name="OIFitsExplorer" version="0.5.9"/>
+    <compilation date="10/09/2026" compiler="JDK 1.8.0"/>
 
     <text>OIFitsExplorer is the JMMC tool to explore your interferometric observation reduced data as OIFits files.</text>
 
@@ -137,18 +137,15 @@
                   icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add an OIFits file"/>
             <menu label="Add OIFits files from collection" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIFitsFromCollectionAction" action="loadOIFitsFromCollection"
                   icon="fr/jmmc/jmcs/resource/image/file_add.png" description="Add OIFits files from OIFits Collection"/>
-
             <menu/> <!-- menu separator -->
             <menu label="Remove OIFits files" classpath="fr.jmmc.oiexplorer.gui.action.RemoveOIFitsAction"
                   action="remove" icon="fr/jmmc/jmcs/resource/image/x-mark.png"
                   accelerator="DELETE" description="Remove selected OIFits files" />
-
             <menu/> <!-- menu separator -->
             <menu label="Open OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.LoadOIDataCollectionAction" action="loadOIDataCollection"
                   accelerator="O" icon="fr/jmmc/jmcs/resource/image/folder.png" description="load an OIFits Collection settings"/>
             <menu label="Save OIFits Collection" classpath="fr.jmmc.oiexplorer.gui.action.SaveOIDataCollectionAction" action="saveOIDataCollection"
                   accelerator="S" description="save the current OIFits Collection settings"/>
-
             <menu/> <!-- menu separator -->
             <menu label="Export to OIFits file" classpath="fr.jmmc.oiexplorer.gui.action.ExportOIFitsAction" action="exportOIFits"
                   description="Export your current selection to an OIFits file"/>
@@ -167,10 +164,8 @@
             <menu label="Export all plots to JPG" classpath="fr.jmmc.oiexplorer.gui.action.OIFitsExplorerExportAllAction" action="exportJPG"
                   description="Export all plots to JPG images"/>
         </menu>
-
         <menu label="Edit">
         </menu>
-
         <menu label="Interop">
             <menu label="Send OIFits data" classpath="fr.jmmc.oiexplorer.interop.SendOIFitsAction" action="sendOIFitsAction"
                   description="send selected OIFits data to OImaging or other VO Tools (SAMP)"/>
@@ -179,7 +174,7 @@
 
     <releasenotes>
         <release version="0.5.9">
-            <pubDate>Thu, 02 Jul 2026 16:00:00 GMT</pubDate>
+            <pubDate>Tue, 10 Sep 2026 08:00:00 GMT</pubDate>
             <prerelease version="0.5.9 beta 1">
                 <change type="FEATURE">Improved selection / cross hairs to use sibling data (same target, instrument mode, MJD +/- 30s, (sorted) baseline) to show related data among data tables (VIS2, VIS, T3)</change>
                 <change type="FEATURE">Improved the selection tooltip to be selectable (copy/paste) and show information about the selection, followed by sibling data with (VIS2, VIS, T3) main values</change>
